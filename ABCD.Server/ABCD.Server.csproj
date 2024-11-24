@@ -8,6 +8,7 @@
     <SpaRoot>..\abcd.client</SpaRoot>
     <SpaProxyLaunchCommand>npm start</SpaProxyLaunchCommand>
     <SpaProxyServerUrl>https://localhost:4200</SpaProxyServerUrl>
+    <UserSecretsId>04a48c14-f500-45ca-9749-ab38d6417e20</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

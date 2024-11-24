@@ -22,4 +22,12 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Crypto\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ABCD.Services\ABCD.Services.csproj" />
+  </ItemGroup>
+
 </Project>
