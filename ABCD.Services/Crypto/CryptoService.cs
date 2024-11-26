@@ -6,7 +6,7 @@ namespace ABCD.Services.Crypto {
 
         private const int KeySizeBits = 256; // Key size in bits
         private const int KeySizeBytes = KeySizeBits / 8; // Key size in bytes
-        private const int IvSizeBytes = 16; // IV size in bytes (128 bits)
+        private const int IVSizeBytes = 16; // IV size in bytes (128 bits)
 
         private readonly byte[] key;
 
@@ -54,10 +54,10 @@ namespace ABCD.Services.Crypto {
             var buffer = Convert.FromBase64String(encrypted);
 
             using (var aes = Aes.Create()) {
-                var iv = ExtractIv(buffer);
+                var iv = ExtractIV(buffer);
                 var decryptor = aes.CreateDecryptor(key, iv);
 
-                using (var ms = new MemoryStream(buffer, IvSizeBytes, buffer.Length - IvSizeBytes)) {
+                using (var ms = new MemoryStream(buffer, IVSizeBytes, buffer.Length - IVSizeBytes)) {
                     using (var cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Read)) {
                         using (var sr = new StreamReader(cs)) {
                             return sr.ReadToEnd();
@@ -67,9 +67,9 @@ namespace ABCD.Services.Crypto {
             }
         }
 
-        private byte[] ExtractIv(byte[] buffer) {
-            var iv = new byte[IvSizeBytes];
-            Array.Copy(buffer, 0, iv, 0, IvSizeBytes);
+        private byte[] ExtractIV(byte[] buffer) {
+            var iv = new byte[IVSizeBytes];
+            Array.Copy(buffer, 0, iv, 0, IVSizeBytes);
             return iv;
         }
     }
