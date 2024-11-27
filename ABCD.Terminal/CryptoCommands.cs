@@ -13,9 +13,9 @@ namespace ABCD.Terminal {
         public CryptoCommands(ICryptoService cryptoService) {
             this.cryptoService = cryptoService;
         }
-                
-        [Command("key", Description = "dotnet run -- key --length 64")]
-        public void GenerateKey(int length) {
+
+        [Command("key", Description = "dotnet run -- key --l 64")]
+        public void GenerateKey([Option("l", Description = "length of key string to be generated")] int length) {
             if (length <= 0) {
                 throw new ArgumentException("Length must be a positive integer.", nameof(length));
             }
@@ -32,6 +32,25 @@ namespace ABCD.Terminal {
             }
             Console.WriteLine($"Generated Key: {key}");
         }
+
+        [Command("encrypt", Description = "dotnet run -- encrypt --i \"Hello World\"")]
+        public void Encrypt([Option("i", Description = "input string to be encrypted")] string input) {
+            if (string.IsNullOrEmpty(input)) {
+                throw new ArgumentException("Input cannot be null or empty.", nameof(input));
+            }
+
+            string encrypted = cryptoService.Encrypt(input);
+            Console.WriteLine($"Encrypted String: {encrypted}");
+        }
+
+        [Command("decrypt", Description = "dotnet run -- decrypt --i \"9LpRPlXIDTGOjUyl07WgqZPcu62EGuQSQSvM+CzlEt0=\"")]
+        public void Decrypt([Option("i", Description = "input string to be decrypted")] string input) {
+            if (string.IsNullOrEmpty(input)) {
+                throw new ArgumentException("Input cannot be null or empty.", nameof(input));
+            }
+
+            string decrypted = cryptoService.Decrypt(input);
+            Console.WriteLine($"Decrypted String: {decrypted}");
+        }
     }
 }
-
