@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ABCD.Terminal": {
+      "commandName": "Project",
+      "commandLineArgs": "key --length 96"
+    }
+  }
+}
