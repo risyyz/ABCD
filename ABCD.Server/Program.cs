@@ -1,42 +1,61 @@
-namespace ABCD.Server {
-    public class Program {
-        public static void Main(string[] args) {
-            var builder = WebApplication.CreateBuilder(args);
+using ABCD.Data;
+using ABCD.Lib;
+using ABCD.Server;
 
-            // Add services to the container.
-            builder.Services.AddAuthorization();
+using Microsoft.Extensions.Options;
 
+var builder = WebApplication.CreateBuilder(args);
 
-            var app = builder.Build();
+// Add configuration sources
+builder.Configuration
+    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
+    .AddEnvironmentVariables();
 
-            app.UseDefaultFiles();
-            app.UseStaticFiles();
+if (builder.Environment.IsDevelopment())
+    builder.Configuration.AddUserSecrets<Program>();
 
-            // Configure the HTTP request pipeline.
+// Bind Settings class to configuration
+var configuration = builder.Configuration;
+builder.Services.Configure<Settings>(options => {
+    options.ConnectionString = configuration.GetConnectionString("DefaultConnection");
+    options.CryptoPassPhrase = configuration["Crypto:PassPhrase"];
+});
 
-            app.UseHttpsRedirection();
+// Add services to the container.
+builder.Services.AddAuthorization();
+builder.Services.Configure<WeatherForecastOptions>(builder.Configuration.GetSection("WeatherForecast"));
+builder.Services.AddDbContext<DataContext>();
 
-            app.UseAuthorization();
+var app = builder.Build();
 
-            var summaries = new[]
-            {
-                "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-            };
+app.UseDefaultFiles();
+app.UseStaticFiles();
 
-            app.MapGet("/weatherforecast", (HttpContext httpContext) => {
-                var forecast = Enumerable.Range(1, 5).Select(index =>
-                    new WeatherForecast {
-                        Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                        TemperatureC = Random.Shared.Next(-20, 55),
-                        Summary = summaries[Random.Shared.Next(summaries.Length)]
-                    })
-                    .ToArray();
-                return forecast;
-            });
+// Configure the HTTP request pipeline.
+app.UseHttpsRedirection();
 
-            app.MapFallbackToFile("/index.html");
+app.UseAuthorization();
 
-            app.Run();
-        }
-    }
-}
+var summaries = new[]
+{
+    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
+};
+
+app.MapGet("/weatherforecast", (HttpContext httpContext, IOptions<WeatherForecastOptions> options, IOptions<Settings> settings, DataContext dbContext) => {
+    var summaries = options.Value.Summaries;
+    var forecast = Enumerable.Range(1, 5).Select(index =>
+        new WeatherForecast {
+            Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
+            TemperatureC = Random.Shared.Next(-20, 55)
+        })
+        .ToArray();
+    return forecast;
+});
+
+app.MapFallbackToFile("/index.html");
+
+// Apply migrations
+MigrationHelper.ApplyMigrations(app.Services);
+
+app.Run();

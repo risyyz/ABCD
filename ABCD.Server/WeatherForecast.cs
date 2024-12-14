@@ -8,4 +8,8 @@ namespace ABCD.Server {
 
         public string? Summary { get; set; }
     }
+
+    public class WeatherForecastOptions {
+        public string[] Summaries { get; set; } = Array.Empty<string>();
+    }
 }
