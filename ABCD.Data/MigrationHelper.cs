@@ -9,8 +9,10 @@ namespace ABCD.Data
         public static void ApplyMigrations(IServiceProvider serviceProvider)
         {
             using var scope = serviceProvider.CreateScope();
-            var dbContext = scope.ServiceProvider.GetRequiredService<DataContext>();
-            dbContext.Database.Migrate();
+            var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
+            dataContext.Database.Migrate();
+            var authContext = scope.ServiceProvider.GetRequiredService<AuthContext>();
+            authContext.Database.Migrate();
         }
     }
 }
