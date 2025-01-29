@@ -7,7 +7,11 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 
-namespace ABCD.Services.Security {
+namespace ABCD.Services {
+    public interface ITokenService {
+        Task<string> GenerateToken();
+    }
+
     public class TokenService : ITokenService {
 
         private readonly JwtSettings jwtSettings;

@@ -1,5 +1,3 @@
-using ABCD.Services.Crypto;
-
 namespace ABCD.Services.Tests.Crypto {
     public class CryptoServiceTests {
         private readonly string passphrase = "3q2+7w==...";

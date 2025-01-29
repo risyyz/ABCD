@@ -1,12 +1,12 @@
-using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 
 using ABCD.Data;
 using ABCD.Lib;
 using ABCD.Server;
-using ABCD.Services.Security;
+using ABCD.Services;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
@@ -50,8 +50,12 @@ builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection(JwtSett
 var connectionString = configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(connectionString));
 builder.Services.AddDbContext<AuthContext>(options => options.UseSqlServer(connectionString));
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+     .AddEntityFrameworkStores<AuthContext>()
+     .AddDefaultTokenProviders();
+
 builder.Services.AddSingleton<JsonWebTokenHandler>();
-builder.Services.AddSingleton<ITokenService, TokenService>();
+builder.Services.AddSingleton<TokenService, TokenService>();
 
 var jwtSettings = builder.Configuration.GetSection(JwtSettings.SectionName).Get<JwtSettings>();
 builder.Services.AddAuthentication(options => {
@@ -78,6 +82,12 @@ builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 
 builder.Services.Configure<WeatherForecastOptions>(builder.Configuration.GetSection("WeatherForecast"));
+builder.Services.AddScoped<ICryptoService>(provider => {
+    var configuration = provider.GetRequiredService<IConfiguration>();
+    return new CryptoService(configuration["Crypto:PassPhrase"]);
+});
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 var app = builder.Build();
 

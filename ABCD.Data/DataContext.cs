@@ -6,17 +6,8 @@ using Microsoft.Extensions.Options;
 
 namespace ABCD.Data {
     public class DataContext : DbContext {
-        private readonly IOptions<Settings> _settings;
 
-        public DataContext(DbContextOptions<DataContext> options, IOptions<Settings> settings) : base(options) {
-            _settings = settings;
-        }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
-            if (!optionsBuilder.IsConfigured) {
-                optionsBuilder.UseSqlServer(_settings.Value.ConnectionString);
-            }
-        }
+        public DataContext(DbContextOptions<DataContext> options, IOptions<Settings> settings) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) {
             base.OnModelCreating(modelBuilder);
