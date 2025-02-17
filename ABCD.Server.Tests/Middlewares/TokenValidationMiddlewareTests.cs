@@ -7,7 +7,7 @@ using Microsoft.Extensions.Caching.Memory;
 
 using Moq;
 
-namespace ABCD.Server.Tests {
+namespace ABCD.Server.Tests.Middlewares {
     public class TokenValidationMiddlewareTests {
         private readonly DefaultHttpContext _context;
         private readonly Mock<IMemoryCache> _cacheMock;
