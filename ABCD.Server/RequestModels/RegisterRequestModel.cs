@@ -1,7 +1,7 @@
 ﻿namespace ABCD.Server.RequestModels {
-    public class RegisterRequestModel {
-        public string Email { get; set; }
-        public string Password { get; set; }
-        public string ConfirmPassword { get; set; }
+    public record RegisterRequestModel {
+        public required string Email { get; init; }
+        public required string Password { get; init; }
+        public required string PasswordConfirmation { get; init; }
     }
 }

@@ -7,6 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\ABCD.Core\ABCD.Core.csproj" />
     <ProjectReference Include="..\ABCD.Data\ABCD.Data.csproj" />
   </ItemGroup>

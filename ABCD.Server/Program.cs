@@ -2,8 +2,12 @@ using System.Text;
 
 using ABCD.Data;
 using ABCD.Lib;
+using ABCD.Lib.Auth;
 using ABCD.Server;
+using ABCD.Server.Middlewares;
 using ABCD.Services;
+
+using FluentValidation;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -54,8 +58,8 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
      .AddEntityFrameworkStores<AuthContext>()
      .AddDefaultTokenProviders();
 
+builder.Services.AddMemoryCache();
 builder.Services.AddSingleton<JsonWebTokenHandler>();
-builder.Services.AddSingleton<TokenService, TokenService>();
 
 var jwtSettings = builder.Configuration.GetSection(JwtSettings.SectionName).Get<JwtSettings>();
 builder.Services.AddAuthentication(options => {
@@ -75,19 +79,26 @@ builder.Services.AddAuthentication(options => {
     };
 });
 
+
 builder.Services.AddAuthorization();
 //builder.Services.AddIdentityApiEndpoints<ApplicationUser>()
 //    .AddEntityFrameworkStores<AuthContext>();
 
 builder.Services.AddControllers();
+builder.Services.AddValidatorsFromAssemblyContaining<UserRegistrationValidator>();
 
 builder.Services.Configure<WeatherForecastOptions>(builder.Configuration.GetSection("WeatherForecast"));
 builder.Services.AddScoped<ICryptoService>(provider => {
     var configuration = provider.GetRequiredService<IConfiguration>();
     return new CryptoService(configuration["Crypto:PassPhrase"]);
 });
-builder.Services.AddScoped<ITokenService, TokenService>();
-builder.Services.AddScoped<IUserService, UserService>();
+
+builder.Services.AddScoped<IValidator<UserRegistration>, UserRegistrationValidator>();
+builder.Services.AddScoped<IValidator<UserLogin>, UserLoginValidator>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+
+var mapper = AutoMapperConfig.Initialize();
+builder.Services.AddSingleton(mapper);
 
 var app = builder.Build();
 
@@ -101,6 +112,7 @@ if (app.Environment.IsDevelopment()) {
 // Configure the HTTP request pipeline.
 app.UseHttpsRedirection();
 app.UseAuthentication();
+app.UseMiddleware<TokenValidationMiddleware>();
 app.UseAuthorization();
 var summaries = new[]
 {

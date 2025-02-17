@@ -1,5 +1,11 @@
-﻿using ABCD.Server.RequestModels;
+﻿using ABCD.Lib.Auth;
+using ABCD.Lib.Exceptions;
+using ABCD.Server.RequestModels;
 using ABCD.Services;
+
+using AutoMapper;
+
+using FluentValidation;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -8,34 +14,46 @@ namespace ABCD.Server.Controllers {
     [Route("api/[controller]")]
     [ApiController]
     public class AuthController : ControllerBase {
-        private readonly ITokenService tokenService;
-        private readonly IUserService userService;
+        private readonly IAuthService _userService;
+        private readonly IMapper _mapper;
 
-        public AuthController(ITokenService tokenService, IUserService userService) {
-            this.tokenService = tokenService;
-            this.userService = userService;
+        public AuthController( IAuthService userService, IMapper mapper) {
+            _userService = userService;
+            _mapper = mapper;
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginRequestModel loginRequest) {
-            var token = await tokenService.GenerateToken();
-            return Ok(token);
+            try {
+                var userLogin = _mapper.Map<UserLogin>(loginRequest);
+                var result = await _userService.LoginUser(userLogin);
+                return Ok(result);
+            } catch (ValidationException ex) {
+                return BadRequest(string.Join(" ", ex.Errors.Select(e => e.ErrorMessage)));            
+            } catch (LoginFailedException ex) {
+                return Unauthorized("Invalid login attempt.");
+            }            
+        }
+
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout() {
+            var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            await _userService.InvalidateToken(token);
+            return Ok();
         }
 
         [Authorize]
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterRequestModel registerRequest) {
-            if (registerRequest.Password != registerRequest.ConfirmPassword) {
-                return BadRequest("Passwords do not match.");
+            try { 
+                var userRegistration = _mapper.Map<UserRegistration>(registerRequest);
+                await _userService.RegisterUser(userRegistration);
             }
-
-            var result = await userService.RegisterUser(registerRequest.Email, registerRequest.Password);
-            if (!result.Succeeded) {
-                return BadRequest(result.Errors);
+            catch(ValidationException ex) {
+                return BadRequest(string.Join(" ", ex.Errors.Select(e => e.ErrorMessage)));
             }
 
             return Ok("User registered successfully.");
         }
     }
 }
-
