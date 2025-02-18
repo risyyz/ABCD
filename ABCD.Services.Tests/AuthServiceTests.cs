@@ -41,7 +41,7 @@ namespace ABCD.Services.Tests {
                 Issuer = "test-issuer",
                 Audience = "test-audience",
                 SecretKey = "test-secret-key",
-                ExpiryInMinutes = 60
+                TokenExpiryInMinutes = 60
             };
             _jwtSettingsMock.Setup(s => s.Value).Returns(jwtSettings);
 
@@ -84,7 +84,8 @@ namespace ABCD.Services.Tests {
             var result = await _authService.LoginUser(userLogin);
 
             // Assert
-            result.Should().Be(token);
+            result.Token.Should().Be(token);
+            result.RefreshToken.Should().NotBeNullOrEmpty();
         }
 
         [Fact]

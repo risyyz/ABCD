@@ -34,9 +34,10 @@ namespace ABCD.Server.Tests.Controllers {
             var loginRequest = new LoginRequestModel { Email = "test@example.com", Password = "password" };
             var userLogin = new UserLogin { Email = "test@example.com", Password = "password" };
             var token = "test-token";
+            var refreshToken = "test-refresh-token";
 
             _mapperMock.Setup(m => m.Map<UserLogin>(loginRequest)).Returns(userLogin);
-            _authServiceMock.Setup(s => s.LoginUser(userLogin)).ReturnsAsync(token);
+            _authServiceMock.Setup(s => s.LoginUser(userLogin)).ReturnsAsync((token, refreshToken));
 
             // Act
             var result = await _controller.Login(loginRequest);

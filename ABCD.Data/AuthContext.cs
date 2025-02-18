@@ -20,4 +20,7 @@ public class AuthContext : IdentityDbContext<ApplicationUser> {
     }
 }
 
-public class ApplicationUser : IdentityUser { }
+public class ApplicationUser : IdentityUser {
+    public string RefreshToken { get; set; }
+    public DateTimeOffset RefreshTokenExpiryTime { get; set; }
+}

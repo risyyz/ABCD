@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace ABCD.Server.Middlewares {
 
@@ -8,6 +9,7 @@ namespace ABCD.Server.Middlewares {
     public class TokenValidationMiddleware {
         private readonly RequestDelegate _next;
         private readonly IMemoryCache _cache;
+        private const string AUTH_HEADER = "Authorization";
 
         public TokenValidationMiddleware(RequestDelegate next, IMemoryCache cache) {
             _next = next;
@@ -15,8 +17,9 @@ namespace ABCD.Server.Middlewares {
         }
 
         public async Task InvokeAsync(HttpContext context) {
-            if (context.Request.Headers.ContainsKey("Authorization")) {
-                var token = context.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            var authorizeAttribute = context.GetEndpoint()?.Metadata.GetMetadata<AuthorizeAttribute>();
+            if (authorizeAttribute != null && context.Request.Headers.ContainsKey(AUTH_HEADER)) {
+                var token = context.Request.Headers[AUTH_HEADER].ToString().Replace("Bearer ", "");
 
                 if (_cache.TryGetValue(token, out _)) {
                     context.Response.StatusCode = StatusCodes.Status401Unauthorized;
@@ -24,7 +27,6 @@ namespace ABCD.Server.Middlewares {
                     return;
                 }
             }
-
             await _next(context);
         }
     }

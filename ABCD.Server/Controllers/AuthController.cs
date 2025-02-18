@@ -27,7 +27,7 @@ namespace ABCD.Server.Controllers {
             try {
                 var userLogin = _mapper.Map<UserLogin>(loginRequest);
                 var result = await _userService.LoginUser(userLogin);
-                return Ok(result);
+                return Ok(new { result.Token, result.RefreshToken });
             } catch (ValidationException ex) {
                 return BadRequest(string.Join(" ", ex.Errors.Select(e => e.ErrorMessage)));            
             } catch (LoginFailedException ex) {
@@ -35,6 +35,7 @@ namespace ABCD.Server.Controllers {
             }            
         }
 
+        [Authorize]
         [HttpPost("logout")]
         public async Task<IActionResult> Logout() {
             var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
