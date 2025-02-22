@@ -45,7 +45,7 @@ namespace ABCD.Server.Tests.Controllers {
             // Assert
             var okResult = result as OkObjectResult;
             okResult.Should().NotBeNull();
-            okResult.Value.Should().Be(token);
+            okResult.Value.Should().BeEquivalentTo(new { Token = token, RefreshToken = refreshToken });
         }
 
         [Fact]

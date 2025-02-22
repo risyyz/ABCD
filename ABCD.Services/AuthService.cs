@@ -30,17 +30,19 @@ namespace ABCD.Services {
         private readonly JsonWebTokenHandler _tokenHandler;
         private readonly IValidator<UserRegistration> _userRegistrationValidator;
         private readonly IValidator<UserLogin> _userLoginValidator;
+        private readonly ISecurityTokenValidator _tokenValidator;
         private readonly IMemoryCache _invalidatedTokenCache;
 
         public AuthService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, 
             IOptions<JwtSettings> jwtSettings, JsonWebTokenHandler tokenHandler, IValidator<UserRegistration> userRegistrationValidator,
-            IValidator<UserLogin> userLoginValidator, IMemoryCache cache) {
+            IValidator<UserLogin> userLoginValidator, ISecurityTokenValidator tokenValidator, IMemoryCache cache) {
             _userManager = userManager;
             _signInManager = signInManager;
             _jwtSettings = jwtSettings.Value;
             _tokenHandler = tokenHandler;
             _userRegistrationValidator = userRegistrationValidator;
             _userLoginValidator = userLoginValidator;
+            _tokenValidator = tokenValidator;
             _invalidatedTokenCache = cache;
         }
 
@@ -87,8 +89,7 @@ namespace ABCD.Services {
         }
 
         private ClaimsPrincipal GetPrincipalFromExpiredToken(string token) {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var principal = tokenHandler.ValidateToken(token, _jwtSettings.GetTokenValidationParameters(), out SecurityToken securityToken);
+            var principal = _tokenValidator.ValidateToken(token, _jwtSettings.GetTokenValidationParameters(), out SecurityToken securityToken);
             var jwtSecurityToken = securityToken as JwtSecurityToken;
 
             if (jwtSecurityToken == null || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase)) {

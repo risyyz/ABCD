@@ -1,3 +1,4 @@
+using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 
 using ABCD.Data;
@@ -86,6 +87,7 @@ builder.Services.AddScoped<ICryptoService>(provider => {
 
 builder.Services.AddScoped<IValidator<UserRegistration>, UserRegistrationValidator>();
 builder.Services.AddScoped<IValidator<UserLogin>, UserLoginValidator>();
+builder.Services.AddScoped<ISecurityTokenValidator, JwtSecurityTokenHandler>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
 var mapper = AutoMapperConfig.Initialize();
