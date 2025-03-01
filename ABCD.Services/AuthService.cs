@@ -42,7 +42,7 @@ namespace ABCD.Services {
                 await _userManager.UpdateAsync(user);
                 return token;
             }
-            throw new LoginFailedException("Invalid login attempt");
+            throw new SignInFailedException("Invalid login attempt");
         }
 
         public async Task SignOut(string jwt) {

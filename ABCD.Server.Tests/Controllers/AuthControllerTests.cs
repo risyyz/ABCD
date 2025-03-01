@@ -1,3 +1,4 @@
+using ABCD.Lib;
 using ABCD.Lib.Auth;
 using ABCD.Lib.Exceptions;
 using ABCD.Server.Controllers;
@@ -29,45 +30,67 @@ namespace ABCD.Server.Tests.Controllers {
         }
 
         [Fact]
-        public async Task Login_ValidCredentials_ReturnsOk() {
+        public async Task SignIn_MissingRequiredParameters_ReturnsBadRequest() {
             // Arrange
-            var loginRequest = new LoginRequestModel { Email = "test@example.com", Password = "password" };
-            var userLogin = new UserLogin { Email = "test@example.com", Password = "password" };
-            var token = "test-token";
-            var refreshToken = "test-refresh-token";
-
-            _mapperMock.Setup(m => m.Map<UserLogin>(loginRequest)).Returns(userLogin);
-            _authServiceMock.Setup(s => s.LoginUser(userLogin)).ReturnsAsync((token, refreshToken));
+            var request = new SignInRequestModel { Email = null, Password = null };
+            var credentials = new SignInCredentials { Email = null, Password = null };
+            string message = "Missing parameters";
+            _mapperMock.Setup(m => m.Map<SignInCredentials>(request)).Returns(credentials);
+            _authServiceMock.Setup(s => s.SignIn(credentials)).ThrowsAsync(
+                new ValidationException(new List<ValidationFailure> { new ValidationFailure { ErrorMessage = message } }));
 
             // Act
-            var result = await _controller.Login(loginRequest);
+            var result = await _controller.SignIn(request);
 
             // Assert
-            var okResult = result as OkObjectResult;
-            okResult.Should().NotBeNull();
-            okResult.Value.Should().BeEquivalentTo(new { Token = token, RefreshToken = refreshToken });
+            result.Should().BeOfType<BadRequestObjectResult>();
+            var badRequestResult = result as BadRequestObjectResult;
+            badRequestResult.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
+            badRequestResult.Value.Should().Be(message);
         }
 
         [Fact]
-        public async Task Login_InvalidCredentials_ReturnsUnauthorized() {
+        public async Task SignIn_InvalidCredentials_ReturnsUnauthorized() {
             // Arrange
-            var loginRequest = new LoginRequestModel { Email = "test@example.com", Password = "password" };
-            var userLogin = new UserLogin { Email = "test@example.com", Password = "password" };
+            var request = new SignInRequestModel { Email = "test@example.com", Password = "password" };
+            var credentials = new SignInCredentials { Email = "test@example.com", Password = "password" };
             string message = "Invalid login attempt.";
-            _mapperMock.Setup(m => m.Map<UserLogin>(loginRequest)).Returns(userLogin);
-            _authServiceMock.Setup(s => s.LoginUser(userLogin)).ThrowsAsync(new LoginFailedException(message));
+            _mapperMock.Setup(m => m.Map<SignInCredentials>(request)).Returns(credentials);
+            _authServiceMock.Setup(s => s.SignIn(credentials)).ThrowsAsync(new SignInFailedException(message));
 
             // Act
-            var result = await _controller.Login(loginRequest);
+            var result = await _controller.SignIn(request);
 
             // Assert
+            result.Should().BeOfType<UnauthorizedObjectResult>();
             var unauthorizedResult = result as UnauthorizedObjectResult;
             unauthorizedResult.Should().NotBeNull();
             unauthorizedResult.Value.Should().Be(message);
         }
 
         [Fact]
-        public async Task Logout_ValidToken_ReturnsOk() {
+        public async Task SignIn_ValidCredentials_ReturnsOk() {
+            // Arrange
+            var signInRequest = new SignInRequestModel { Email = "test@example.com", Password = "password" };
+            var credentials = new SignInCredentials { Email = "test@example.com", Password = "password" };
+            var jwt = "test-token";
+            var refreshToken = "test-refresh-token";
+            var token = new Token { JWT = jwt, RefreshToken = refreshToken };
+
+            _mapperMock.Setup(m => m.Map<SignInCredentials>(signInRequest)).Returns(credentials);
+            _authServiceMock.Setup(s => s.SignIn(credentials)).ReturnsAsync(token);
+
+            // Act
+            var result = await _controller.SignIn(signInRequest);
+
+            // Assert
+            var okResult = result as OkObjectResult;
+            okResult.Should().NotBeNull();
+            okResult.Value.Should().BeEquivalentTo(new { token = jwt, refreshToken = refreshToken });
+        }
+
+        [Fact]
+        public async Task SignOut_ValidToken_ReturnsOk() {
             // Arrange
             var token = "test-token";
             var context = new DefaultHttpContext();
@@ -77,48 +100,12 @@ namespace ABCD.Server.Tests.Controllers {
             };
 
             // Act
-            var result = await _controller.Logout();
+            var result = await _controller.SignOut();
 
             // Assert
             var okResult = result as OkResult;
             okResult.Should().NotBeNull();
-            _authServiceMock.Verify(s => s.InvalidateToken(token), Times.Once);
-        }
-
-        [Fact]
-        public async Task Register_ValidRequest_ReturnsOk() {
-            // Arrange
-            var registerRequest = new RegisterRequestModel { Email = "test@example.com", Password = "password", PasswordConfirmation = "password" };
-            var userRegistration = new UserRegistration { Email = "test@example.com", Password = "password", PasswordConfirmation = "password" };
-
-            _mapperMock.Setup(m => m.Map<UserRegistration>(registerRequest)).Returns(userRegistration);
-
-            // Act
-            var result = await _controller.Register(registerRequest);
-
-            // Assert
-            var okResult = result as OkObjectResult;
-            okResult.Should().NotBeNull();
-            okResult.Value.Should().Be("User registered successfully.");
-            _authServiceMock.Verify(s => s.RegisterUser(userRegistration), Times.Once);
-        }
-
-        [Fact]
-        public async Task Register_InvalidRequest_ReturnsBadRequest() {
-            // Arrange
-            var registerRequest = new RegisterRequestModel { Email = "test@example.com", Password = "password", PasswordConfirmation = "password" };
-            var userRegistration = new UserRegistration { Email = "test@example.com", Password = "password", PasswordConfirmation = "password" };
-            var message = "Invalid data";
-            _mapperMock.Setup(m => m.Map<UserRegistration>(registerRequest)).Returns(userRegistration);
-            _authServiceMock.Setup(s => s.RegisterUser(userRegistration)).ThrowsAsync(new ValidationException(message, new List<ValidationFailure> { new ValidationFailure { ErrorMessage = message } }));
-
-            // Act
-            var result = await _controller.Register(registerRequest);
-
-            // Assert
-            var badRequestResult = result as BadRequestObjectResult;
-            badRequestResult.Should().NotBeNull();
-            badRequestResult.Value.Should().Be(message);
-        }
+            _authServiceMock.Verify(s => s.SignOut(token), Times.Once);
+        }        
     }
 }

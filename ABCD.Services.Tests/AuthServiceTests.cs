@@ -86,7 +86,7 @@ namespace ABCD.Services.Tests {
             Func<Task> act = async () => await _authService.SignIn(credentials);
 
             // Assert
-            await act.Should().ThrowAsync<LoginFailedException>().WithMessage("*Invalid login attempt*");
+            await act.Should().ThrowAsync<SignInFailedException>().WithMessage("*Invalid login attempt*");
             _userManagerMock.Verify(m => m.FindByEmailAsync(credentials.Email), Times.Never);
             _userManagerMock.Verify(m => m.UpdateAsync(It.IsAny<ApplicationUser>()), Times.Never);
             _tokenServiceMock.Verify(m => m.GenerateToken(It.IsAny<ApplicationUser>()), Times.Never);

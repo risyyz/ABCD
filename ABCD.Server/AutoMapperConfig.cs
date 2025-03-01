@@ -16,6 +16,6 @@ public static class AutoMapperConfig {
 public class MappingProfile : Profile {
     public MappingProfile() {
         CreateMap<RegisterRequestModel, UserRegistration>();
-        CreateMap<LoginRequestModel, UserLogin>();
+        CreateMap<SignInRequestModel, SignInCredentials>();
     }
 }

@@ -14,47 +14,35 @@ namespace ABCD.Server.Controllers {
     [Route("api/[controller]")]
     [ApiController]
     public class AuthController : ControllerBase {
-        private readonly IAuthService _userService;
+        private readonly IAuthService _authService;
         private readonly IMapper _mapper;
 
-        public AuthController( IAuthService userService, IMapper mapper) {
-            _userService = userService;
+        public AuthController( IAuthService authService, IMapper mapper) {
+            _authService = authService;
             _mapper = mapper;
         }
 
-        [HttpPost("login")]
-        public async Task<IActionResult> Login(LoginRequestModel loginRequest) {
+        [HttpPost("signin")]
+        public async Task<IActionResult> SignIn(SignInRequestModel signInRequest) {
             try {
-                var userLogin = _mapper.Map<UserLogin>(loginRequest);
-                var result = await _userService.LoginUser(userLogin);
-                return Ok(new { result.Token, result.RefreshToken });
+                var credentials = _mapper.Map<SignInCredentials>(signInRequest);
+                var result = await _authService.SignIn(credentials);
+                return Ok(new { token = result.JWT, refreshToken = result.RefreshToken });
             } catch (ValidationException ex) {
                 return BadRequest(string.Join(" ", ex.Errors.Select(e => e.ErrorMessage)));            
-            } catch (LoginFailedException ex) {
+            } catch (SignInFailedException ex) {
                 return Unauthorized("Invalid login attempt.");
             }            
         }
 
         [Authorize]
-        [HttpPost("logout")]
-        public async Task<IActionResult> Logout() {
+        [HttpPost("signout")]
+        public async Task<IActionResult> SignOut() {
             var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-            await _userService.InvalidateToken(token);
+            await _authService.SignOut(token);
             return Ok();
         }
 
-        [Authorize]
-        [HttpPost("register")]
-        public async Task<IActionResult> Register(RegisterRequestModel registerRequest) {
-            try { 
-                var userRegistration = _mapper.Map<UserRegistration>(registerRequest);
-                await _userService.RegisterUser(userRegistration);
-            }
-            catch(ValidationException ex) {
-                return BadRequest(string.Join(" ", ex.Errors.Select(e => e.ErrorMessage)));
-            }
-
-            return Ok("User registered successfully.");
-        }
+        
     }
 }
