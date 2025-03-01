@@ -46,17 +46,23 @@ namespace ABCD.Services {
         }
 
         public async Task SignOut(string jwt) {
-            //if (!string.IsNullOrWhiteSpace(token)) {
-            //    var user = await GetUserFromToken(token);
-            //    if (!string.IsNullOrWhiteSpace(user?.RefreshToken)) {
-            //        user.RefreshToken = string.Empty;
-            //        user.RefreshTokenExpiryTime = DateTimeOffset.MinValue;
-            //        await _userManager.UpdateAsync(user);
-            //    }
-                
-            //    var expiration = TimeSpan.FromMinutes(_jwtSettings.TokenExpiryInMinutes);
-            //    _invalidatedTokenCache.Set(token, true, expiration);
-            //}
+            if(string.IsNullOrWhiteSpace(jwt))
+                return;
+
+            var claims = _tokenService.GetPrincipalFromToken(jwt);
+            if (claims == null)
+                return;
+            
+            var user = await _userManager.FindByEmailAsync(claims.Identity.Name);
+            if(user == null)
+                return;
+
+            user.RefreshToken = string.Empty;
+            user.RefreshTokenExpiryTime = DateTimeOffset.MinValue;
+            await _userManager.UpdateAsync(user);
+
+            var expiration = TimeSpan.FromMinutes(_jwtSettings.TokenExpiryInMinutes);
+            _invalidatedTokenCache.Set(jwt, true, expiration);
         }
     }
 }

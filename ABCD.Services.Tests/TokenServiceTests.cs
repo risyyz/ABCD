@@ -73,25 +73,13 @@ namespace ABCD.Services.Tests {
             _tokenHandlerMock.Verify(x => x.CreateToken(It.IsAny<SecurityTokenDescriptor>()), Times.Once);
         }
 
-        [Fact]
-        public void GetPrincipalFromToken_NullToken_ThrowsSecurityTokenException() {
-            // Arrange
-            Token token = null;
-
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData("  ")]
+        public void GetPrincipalFromToken_NullEmptyWhiteSpaceToken_ThrowsSecurityTokenException(string jwt) {
             // Act
-            Action act = () => _tokenService.GetPrincipalFromToken(token);
-
-            // Assert
-            act.Should().Throw<SecurityTokenException>().WithMessage("Invalid token");
-        }
-
-        [Fact]
-        public void GetPrincipalFromToken_EmptyToken_ThrowsSecurityTokenException() {
-            // Arrange
-            var token = new Token { JWT = string.Empty, RefreshToken = string.Empty };
-
-            // Act
-            Action act = () => _tokenService.GetPrincipalFromToken(token);
+            Action act = () => _tokenService.GetPrincipalFromToken(jwt);
 
             // Assert
             act.Should().Throw<SecurityTokenException>().WithMessage("Invalid token");
@@ -100,13 +88,13 @@ namespace ABCD.Services.Tests {
         [Fact]
         public void GetPrincipalFromToken_NullSecurityToken_ThrowsSecurityTokenException() {
             // Arrange
-            var token = new Token { JWT = "invalid_jwt_token", RefreshToken = "invalid_refresh_token" };
+            var jwt = "invalid_jwt_token";
 
             SecurityToken securityToken;
-            _tokenValidatorMock.Setup(x => x.ValidateToken(token.JWT, It.IsAny<TokenValidationParameters>(), out securityToken));
+            _tokenValidatorMock.Setup(x => x.ValidateToken(jwt, It.IsAny<TokenValidationParameters>(), out securityToken));
 
             // Act
-            Action act = () => _tokenService.GetPrincipalFromToken(token);
+            Action act = () => _tokenService.GetPrincipalFromToken(jwt);
 
             // Assert
             act.Should().Throw<SecurityTokenException>().WithMessage("Invalid token");
@@ -115,13 +103,13 @@ namespace ABCD.Services.Tests {
         [Fact]
         public void GetPrincipalFromToken_IncorrectSecurityAlgorithm_ThrowsSecurityTokenException() {
             // Arrange
-            var token = new Token { JWT = "invalid_jwt_token", RefreshToken = "invalid_refresh_token" };
+            var jwt = "valid_jwt_token";
 
             SecurityToken securityToken = new JwtSecurityToken(signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes("test-key")), "invalid-algorithm"));
-            _tokenValidatorMock.Setup(x => x.ValidateToken(token.JWT, It.IsAny<TokenValidationParameters>(), out securityToken));
+            _tokenValidatorMock.Setup(x => x.ValidateToken(jwt, It.IsAny<TokenValidationParameters>(), out securityToken));
 
             // Act
-            Action act = () => _tokenService.GetPrincipalFromToken(token);
+            Action act = () => _tokenService.GetPrincipalFromToken(jwt);
 
             // Assert
             act.Should().Throw<SecurityTokenException>().WithMessage("Invalid token");
@@ -130,10 +118,10 @@ namespace ABCD.Services.Tests {
         [Fact]
         public void GetPrincipalFromToken_HmacSha256SecurityAlgorithm_ReturnsValidPrincipal() {
             // Arrange
-            var token = new Token { JWT = "invalid_jwt_token", RefreshToken = "invalid_refresh_token" };
+            var jwt = "valid_jwt_token";
 
             SecurityToken securityToken = new JwtSecurityToken(signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes("test-key")), SecurityAlgorithms.HmacSha256));
-            _tokenValidatorMock.Setup(x => x.ValidateToken(token.JWT, It.IsAny<TokenValidationParameters>(), out securityToken)).Returns(
+            _tokenValidatorMock.Setup(x => x.ValidateToken(jwt, It.IsAny<TokenValidationParameters>(), out securityToken)).Returns(
                 new ClaimsPrincipal (
                     new ClaimsIdentity(new[] {
                         new Claim(ClaimTypes.Name, "username"),
@@ -142,7 +130,7 @@ namespace ABCD.Services.Tests {
             ));
 
             // Act
-            var principal = _tokenService.GetPrincipalFromToken(token);
+            var principal = _tokenService.GetPrincipalFromToken(jwt);
 
             // Assert
             principal.Should().NotBeNull();

@@ -26,7 +26,6 @@ namespace ABCD.Services.Tests {
         private readonly Mock<SignInManager<ApplicationUser>> _signInManagerMock;
         private readonly Mock<ITokenService> _tokenServiceMock;
         private readonly Mock<IOptions<JwtSettings>> _jwtSettingsMock;
-        private readonly Mock<IValidator<UserRegistration>> _userRegistrationValidatorMock;
         private readonly Mock<IValidator<SignInCredentials>> _userLoginValidatorMock;
         private readonly Mock<IMemoryCache> _cacheMock;
         private readonly AuthService _authService;
@@ -118,6 +117,73 @@ namespace ABCD.Services.Tests {
             _userManagerMock.Verify(m => m.FindByEmailAsync(credentials.Email), Times.Once);
             _userManagerMock.Verify(m => m.UpdateAsync(It.IsAny<ApplicationUser>()), Times.Once);
             _tokenServiceMock.Verify(m => m.GenerateToken(It.IsAny<ApplicationUser>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task SignOut_NullClaimsPrincipal_DoesNotSetCache() {
+            // Arrange
+            var jwt = "valid_jwt_token";
+
+            _tokenServiceMock.Setup(t => t.GetPrincipalFromToken(jwt)).Returns((ClaimsPrincipal)null);
+
+            // Act
+            await _authService.SignOut(jwt);
+
+            // Assert
+            _userManagerMock.Verify(m => m.FindByEmailAsync(It.IsAny<string>()), Times.Never);
+            _userManagerMock.Verify(m => m.UpdateAsync(It.IsAny<ApplicationUser>()), Times.Never);
+            _cacheMock.Verify(m => m.CreateEntry(It.IsAny<string>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task SignOut_UserNotFound_DoesNotSetCache() {
+            // Arrange
+            var jwt = "valid_jwt_token";
+            var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+            {
+                new Claim(ClaimTypes.Name, "user@example.com")
+            }));
+
+            _tokenServiceMock.Setup(t => t.GetPrincipalFromToken(jwt)).Returns(claimsPrincipal);
+            _userManagerMock.Setup(m => m.FindByEmailAsync("user@example.com")).ReturnsAsync((ApplicationUser)null);
+
+            // Act
+            await _authService.SignOut(jwt);
+
+            // Assert
+            _userManagerMock.Verify(m => m.FindByEmailAsync(It.IsAny<string>()), Times.Once);
+            _userManagerMock.Verify(m => m.UpdateAsync(It.IsAny<ApplicationUser>()), Times.Never);
+            _cacheMock.Verify(m => m.CreateEntry(It.IsAny<string>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task SignOut_ValidToken_SetsCache() {
+            // Arrange
+            var jwt = "valid_jwt_token";
+            var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+            {
+                new Claim(ClaimTypes.Name, "user@example.com")
+            }));
+            var user = new ApplicationUser {
+                Email = "user@example.com",
+                RefreshToken = "refresh_token",
+                RefreshTokenExpiryTime = DateTimeOffset.UtcNow.AddMinutes(60)
+            };
+
+            _tokenServiceMock.Setup(t => t.GetPrincipalFromToken(jwt)).Returns(claimsPrincipal);
+            _userManagerMock.Setup(m => m.FindByEmailAsync("user@example.com")).ReturnsAsync(user);
+            _userManagerMock.Setup(m => m.UpdateAsync(It.IsAny<ApplicationUser>())).ReturnsAsync(IdentityResult.Success);
+
+            var cacheEntryMock = new Mock<ICacheEntry>();
+            _cacheMock.Setup(m => m.CreateEntry(It.IsAny<object>())).Returns(cacheEntryMock.Object);
+
+            // Act
+            await _authService.SignOut(jwt);
+
+            // Assert
+            _userManagerMock.Verify(m => m.FindByEmailAsync(It.IsAny<string>()), Times.Once);
+            _userManagerMock.Verify(m => m.UpdateAsync(It.IsAny<ApplicationUser>()), Times.Once);
+            _cacheMock.Verify(m => m.CreateEntry(jwt), Times.Once);
         }
     }
 }

@@ -14,7 +14,7 @@ namespace ABCD.Services {
 
     public interface ITokenService {
         Token GenerateToken(ApplicationUser user);
-        ClaimsPrincipal GetPrincipalFromToken(Token token);
+        ClaimsPrincipal GetPrincipalFromToken(string jwt);
     }
 
     public class TokenService : ITokenService {
@@ -49,11 +49,11 @@ namespace ABCD.Services {
             return new Token { JWT = _tokenHandler.CreateToken(tokenDescriptor), RefreshToken = GeneratRefreshToken() };
         }
 
-        public ClaimsPrincipal GetPrincipalFromToken(Token token) {
-            if(token?.IsEmpty ?? true)
+        public ClaimsPrincipal GetPrincipalFromToken(string jwt) {
+            if(string.IsNullOrWhiteSpace(jwt))
                 throw new SecurityTokenException("Invalid token");
 
-            var principal = _tokenValidator.ValidateToken(token.JWT, _jwtSettings.GetTokenValidationParameters(), out SecurityToken securityToken);
+            var principal = _tokenValidator.ValidateToken(jwt, _jwtSettings.GetTokenValidationParameters(), out SecurityToken securityToken);
             var jwtSecurityToken = securityToken as JwtSecurityToken;
 
             if (jwtSecurityToken == null || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase)) {
