@@ -73,9 +73,6 @@ builder.Services.AddAuthentication(options => {
 
 
 builder.Services.AddAuthorization();
-//builder.Services.AddIdentityApiEndpoints<ApplicationUser>()
-//    .AddEntityFrameworkStores<AuthContext>();
-
 builder.Services.AddControllers();
 builder.Services.AddValidatorsFromAssemblyContaining<UserRegistrationValidator>();
 
@@ -87,7 +84,10 @@ builder.Services.AddScoped<ICryptoService>(provider => {
 
 builder.Services.AddScoped<IValidator<UserRegistration>, UserRegistrationValidator>();
 builder.Services.AddScoped<IValidator<SignInCredentials>, SignInCredentialsValidator>();
-builder.Services.AddScoped<ISecurityTokenValidator, JwtSecurityTokenHandler>();
+builder.Services.AddScoped<SecurityTokenHandler, JwtSecurityTokenHandler>();
+
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
 var mapper = AutoMapperConfig.Initialize();
@@ -100,28 +100,26 @@ if (app.Environment.IsDevelopment()) {
     app.UseSwaggerUI();
 }
 
-//app.MapIdentityApi<ApplicationUser>();
-
 // Configure the HTTP request pipeline.
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseMiddleware<TokenValidationMiddleware>();
 app.UseAuthorization();
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+//var summaries = new[]
+//{
+//    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
+//};
 
-app.MapGet("/weatherforecast", (HttpContext httpContext, IOptions<WeatherForecastOptions> options) => {
-    var summaries = options.Value.Summaries;
-    var forecast = Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast {
-            Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            TemperatureC = Random.Shared.Next(-20, 55)
-        })
-        .ToArray();
-    return forecast;
-}).RequireAuthorization();
+//app.MapGet("/weatherforecast", (HttpContext httpContext, IOptions<WeatherForecastOptions> options) => {
+//    var summaries = options.Value.Summaries;
+//    var forecast = Enumerable.Range(1, 5).Select(index =>
+//        new WeatherForecast {
+//            Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
+//            TemperatureC = Random.Shared.Next(-20, 55)
+//        })
+//        .ToArray();
+//    return forecast;
+//}).RequireAuthorization();
 
 app.MapControllers();
 

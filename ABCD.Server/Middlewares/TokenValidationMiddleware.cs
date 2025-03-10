@@ -23,7 +23,7 @@ namespace ABCD.Server.Middlewares {
 
                 if (_cache.TryGetValue(token, out _)) {
                     context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                    await context.Response.WriteAsync("invalidated token");
+                    await context.Response.WriteAsync("invalid token");
                     return;
                 }
             }

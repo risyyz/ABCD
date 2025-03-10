@@ -39,7 +39,7 @@ namespace ABCD.Services.Tests {
             SecurityToken securityToken = new JwtSecurityToken(signingCredentials: credentials);
             _tokenValidatorMock.Setup(x => x.ValidateToken(It.IsAny<string>(), It.IsAny<TokenValidationParameters>(), out securityToken)).Returns(new ClaimsPrincipal());
 
-            _tokenService = new TokenService(_tokenHandlerMock.Object, _tokenValidatorMock.Object, _jwtSettingsMock.Object);
+            //_tokenService = new TokenService(_tokenHandlerMock.Object, _tokenValidatorMock.Object, _jwtSettingsMock.Object);
         }
 
         [Fact]

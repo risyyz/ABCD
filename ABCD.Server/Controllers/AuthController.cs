@@ -41,8 +41,6 @@ namespace ABCD.Server.Controllers {
             var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
             await _authService.SignOut(token);
             return Ok();
-        }
-
-        
+        }        
     }
 }

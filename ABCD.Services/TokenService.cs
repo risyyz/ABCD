@@ -7,7 +7,6 @@ using ABCD.Lib;
 
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
-
 using Microsoft.IdentityModel.Tokens;
 
 namespace ABCD.Services {
@@ -17,46 +16,48 @@ namespace ABCD.Services {
         ClaimsPrincipal GetPrincipalFromToken(string jwt);
     }
 
-    public class TokenService : ITokenService {
-        private readonly JsonWebTokenHandler _tokenHandler;
-        private readonly ISecurityTokenValidator _tokenValidator;
+    public class TokenService : ITokenService {        
+        private readonly SecurityTokenHandler _securityTokenHandler;
         private readonly JwtSettings _jwtSettings;
 
-        public TokenService(JsonWebTokenHandler tokenHandler, ISecurityTokenValidator tokenValidator, IOptions<JwtSettings> jwtSettings) {
-            Guard.ThrowIfNull(tokenHandler, tokenValidator, jwtSettings);
-            _tokenHandler = tokenHandler;
-            _tokenValidator = tokenValidator;
+        public TokenService(SecurityTokenHandler securityTokenHandler, IOptions<JwtSettings> jwtSettings) {
+            Guard.ThrowIfNull(securityTokenHandler, jwtSettings);
+            _securityTokenHandler = securityTokenHandler;
+            _securityTokenHandler = securityTokenHandler;
             _jwtSettings = jwtSettings.Value;
         }
 
         public Token GenerateToken(ApplicationUser user) {
             if(user == null)
-                return new Token { JWT = string.Empty, RefreshToken = string.Empty };  
+                return new Token { JWT = string.Empty, RefreshToken = string.Empty };
 
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey));
-            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-            var tokenDescriptor = new SecurityTokenDescriptor {
-                Issuer = _jwtSettings.Issuer,
-                Audience = _jwtSettings.Audience,
-                SigningCredentials = credentials,
-                Expires = DateTime.Now.AddMinutes(_jwtSettings.TokenExpiryInMinutes),
-                Subject = new ClaimsIdentity(new[] {
-                    new Claim(ClaimTypes.Name, user.UserName),
-                    new Claim(ClaimTypes.Email, user.Email),
-                    new Claim(ClaimTypes.Role, "Admin") })
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Role, "Admin")
             };
 
-            return new Token { JWT = _tokenHandler.CreateToken(tokenDescriptor), RefreshToken = GeneratRefreshToken() };
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey));
+            var credentials = new SigningCredentials(securityKey, _jwtSettings.SecurityAlgorithm);
+            var tokenDescriptor = new JwtSecurityToken(
+                issuer: _jwtSettings.Issuer,
+                audience: _jwtSettings.Audience,
+                signingCredentials: credentials,
+                expires: DateTime.UtcNow.AddDays(1),
+                claims:  claims
+            );
+            return new Token { JWT = _securityTokenHandler.WriteToken(tokenDescriptor), RefreshToken = GeneratRefreshToken() };
         }
 
         public ClaimsPrincipal GetPrincipalFromToken(string jwt) {
-            if(string.IsNullOrWhiteSpace(jwt))
+            if (string.IsNullOrWhiteSpace(jwt))
                 throw new SecurityTokenException("Invalid token");
 
-            var principal = _tokenValidator.ValidateToken(jwt, _jwtSettings.GetTokenValidationParameters(), out SecurityToken securityToken);
+            var principal = _securityTokenHandler.ValidateToken(jwt, _jwtSettings.GetTokenValidationParameters(), out SecurityToken securityToken);
             var jwtSecurityToken = securityToken as JwtSecurityToken;
 
-            if (jwtSecurityToken == null || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase)) {
+            if (jwtSecurityToken == null || !jwtSecurityToken.Header.Alg.Equals(_jwtSettings.SecurityAlgorithm, StringComparison.InvariantCultureIgnoreCase)) {
                 throw new SecurityTokenException("Invalid token");
             }
 
