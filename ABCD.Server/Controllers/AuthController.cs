@@ -41,6 +41,14 @@ namespace ABCD.Server.Controllers {
             var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
             await _authService.SignOut(token);
             return Ok();
-        }        
+        }
+
+        [Authorize]
+        [HttpPost("refresh-token")]
+        public async Task<IActionResult> RefreshToken() {
+            var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            await _authService.SignOut(token);
+            return Ok();
+        }
     }
 }

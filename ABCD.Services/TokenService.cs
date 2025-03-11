@@ -44,7 +44,7 @@ namespace ABCD.Services {
                 issuer: _jwtSettings.Issuer,
                 audience: _jwtSettings.Audience,
                 signingCredentials: credentials,
-                expires: DateTime.UtcNow.AddDays(1),
+                expires: DateTime.UtcNow.AddMinutes(_jwtSettings.TokenExpiryInMinutes),
                 claims:  claims
             );
             return new Token { JWT = _securityTokenHandler.WriteToken(tokenDescriptor), RefreshToken = GeneratRefreshToken() };
