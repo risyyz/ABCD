@@ -55,7 +55,7 @@ namespace ABCD.Server.Tests.Middlewares {
             _context.Response.Body.Seek(0, SeekOrigin.Begin);
             var reader = new StreamReader(_context.Response.Body);
             var responseText = await reader.ReadToEndAsync();
-            responseText.Should().Be("invalidated token");
+            responseText.Should().Be("invalid token");
             _nextMock.Verify(m => m(It.IsAny<HttpContext>()), Times.Never);
         }
 
