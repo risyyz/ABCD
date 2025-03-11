@@ -7,7 +7,6 @@ using ABCD.Lib;
 using FluentAssertions;
 
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 
 using Moq;
@@ -15,14 +14,13 @@ using Moq;
 namespace ABCD.Services.Tests {
     public class TokenServiceTests {
 
-        private readonly Mock<JsonWebTokenHandler> _tokenHandlerMock;
-        private readonly Mock<ISecurityTokenValidator> _tokenValidatorMock;
+        private readonly Mock<SecurityTokenHandler> _tokenHandlerMock;
         private readonly Mock<IOptions<JwtSettings>> _jwtSettingsMock;
         private readonly TokenService _tokenService;
+        private readonly string _validJwt = "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoicmlzaGkudGFwc2VlQGdtYWlsLmNvbSIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWVpZGVudGlmaWVyIjoiZTE2NjIzOTAtZjMyMi00ZTU2LTg4MDktZTgxYTdjZjhmYzg2IiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiQWRtaW4iLCJleHAiOjE3NDE2NjM2NzAsImlzcyI6Imh0dHBzOi8vbG9jYWxob3N0OjcwMDEiLCJhdWQiOiJodHRwczovL2xvY2FsaG9zdDo3MDAxIn0.OHqJ6XBZ4dyXQX7bQmfJkffARC5tjIBY9INoe-Cbawdz_9c7JvGk3aKQDPxWsCWB_1NAPf0KNuHYjl-vKNuKQA";
 
         public TokenServiceTests() {
-            _tokenHandlerMock = new Mock<JsonWebTokenHandler>();
-            _tokenValidatorMock = new Mock<ISecurityTokenValidator>();
+            _tokenHandlerMock = new Mock<SecurityTokenHandler>();
             _jwtSettingsMock = new Mock<IOptions<JwtSettings>>();
 
             var jwtSettings = new JwtSettings {
@@ -35,11 +33,9 @@ namespace ABCD.Services.Tests {
             _jwtSettingsMock.Setup(s => s.Value).Returns(jwtSettings);
 
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey));
-            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha512);
             SecurityToken securityToken = new JwtSecurityToken(signingCredentials: credentials);
-            _tokenValidatorMock.Setup(x => x.ValidateToken(It.IsAny<string>(), It.IsAny<TokenValidationParameters>(), out securityToken)).Returns(new ClaimsPrincipal());
-
-            //_tokenService = new TokenService(_tokenHandlerMock.Object, _tokenValidatorMock.Object, _jwtSettingsMock.Object);
+            _tokenService = new TokenService(_tokenHandlerMock.Object, _jwtSettingsMock.Object);
         }
 
         [Fact]
@@ -61,16 +57,16 @@ namespace ABCD.Services.Tests {
                 Email = "user@example.com"
             };
 
-            _tokenHandlerMock.Setup(x => x.CreateToken(It.IsAny<SecurityTokenDescriptor>())).Returns("test-token");
+            _tokenHandlerMock.Setup(x => x.WriteToken(It.IsAny<SecurityToken>())).Returns(_validJwt);
 
             // Act
             var token = _tokenService.GenerateToken(user);
 
             // Assert
-            token.JWT.Should().Be("test-token");
+            token.JWT.Should().Be(_validJwt);
             token.RefreshToken.Should().NotBeNullOrEmpty();
             token.IsEmpty.Should().BeFalse();
-            _tokenHandlerMock.Verify(x => x.CreateToken(It.IsAny<SecurityTokenDescriptor>()), Times.Once);
+            _tokenHandlerMock.Verify(x => x.WriteToken(It.IsAny<SecurityToken>()), Times.Once);
         }
 
         [Theory]
@@ -91,7 +87,7 @@ namespace ABCD.Services.Tests {
             var jwt = "invalid_jwt_token";
 
             SecurityToken securityToken;
-            _tokenValidatorMock.Setup(x => x.ValidateToken(jwt, It.IsAny<TokenValidationParameters>(), out securityToken));
+            _tokenHandlerMock.Setup(x => x.ValidateToken(jwt, It.IsAny<TokenValidationParameters>(), out securityToken));
 
             // Act
             Action act = () => _tokenService.GetPrincipalFromToken(jwt);
@@ -106,7 +102,7 @@ namespace ABCD.Services.Tests {
             var jwt = "valid_jwt_token";
 
             SecurityToken securityToken = new JwtSecurityToken(signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes("test-key")), "invalid-algorithm"));
-            _tokenValidatorMock.Setup(x => x.ValidateToken(jwt, It.IsAny<TokenValidationParameters>(), out securityToken));
+            _tokenHandlerMock.Setup(x => x.ValidateToken(jwt, It.IsAny<TokenValidationParameters>(), out securityToken));
 
             // Act
             Action act = () => _tokenService.GetPrincipalFromToken(jwt);
@@ -117,11 +113,9 @@ namespace ABCD.Services.Tests {
 
         [Fact]
         public void GetPrincipalFromToken_HmacSha256SecurityAlgorithm_ReturnsValidPrincipal() {
-            // Arrange
-            var jwt = "valid_jwt_token";
 
-            SecurityToken securityToken = new JwtSecurityToken(signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes("test-key")), SecurityAlgorithms.HmacSha256));
-            _tokenValidatorMock.Setup(x => x.ValidateToken(jwt, It.IsAny<TokenValidationParameters>(), out securityToken)).Returns(
+            SecurityToken securityToken = new JwtSecurityToken(signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes("test-key")), SecurityAlgorithms.HmacSha512));
+            _tokenHandlerMock.Setup(x => x.ValidateToken(_validJwt, It.IsAny<TokenValidationParameters>(), out securityToken)).Returns(
                 new ClaimsPrincipal (
                     new ClaimsIdentity(new[] {
                         new Claim(ClaimTypes.Name, "username"),
@@ -130,7 +124,7 @@ namespace ABCD.Services.Tests {
             ));
 
             // Act
-            var principal = _tokenService.GetPrincipalFromToken(jwt);
+            var principal = _tokenService.GetPrincipalFromToken(_validJwt);
 
             // Assert
             principal.Should().NotBeNull();
