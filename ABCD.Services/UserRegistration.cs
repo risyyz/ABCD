@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace ABCD.Lib.Auth {
+namespace ABCD.Services {
     public record UserRegistration {
         public required string Email { get; init; }
         public required string Password { get; init; }

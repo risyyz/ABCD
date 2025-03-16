@@ -1,9 +1,5 @@
 using FluentAssertions;
 
-using System;
-
-using Xunit;
-
 namespace ABCD.Services.Tests {
     public class CryptoServiceTests {
         private readonly string passphrase = "3q2+7w==...";

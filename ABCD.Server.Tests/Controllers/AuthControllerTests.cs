@@ -1,5 +1,4 @@
 using ABCD.Lib;
-using ABCD.Lib.Auth;
 using ABCD.Lib.Exceptions;
 using ABCD.Server.Controllers;
 using ABCD.Server.RequestModels;

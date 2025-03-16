@@ -1,9 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
-using System.Text;
 
 using ABCD.Data;
 using ABCD.Lib;
-using ABCD.Lib.Auth;
 using ABCD.Server;
 using ABCD.Server.Middlewares;
 using ABCD.Services;
@@ -13,7 +11,6 @@ using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;

@@ -1,5 +1,4 @@
-﻿using ABCD.Lib.Auth;
-using ABCD.Lib.Exceptions;
+﻿using ABCD.Lib.Exceptions;
 using ABCD.Server.RequestModels;
 using ABCD.Services;
 
@@ -47,7 +46,7 @@ namespace ABCD.Server.Controllers {
         [HttpPost("refresh-token")]
         public async Task<IActionResult> RefreshToken() {
             var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-            await _authService.SignOut(token);
+            //await _authService.
             return Ok();
         }
     }

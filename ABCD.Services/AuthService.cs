@@ -1,5 +1,4 @@
 ﻿using ABCD.Lib;
-using ABCD.Lib.Auth;
 using ABCD.Lib.Exceptions;
 
 using FluentValidation;
@@ -7,9 +6,11 @@ using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 
 namespace ABCD.Services {
     public interface IAuthService {
+        Task<Token> RefreshToken(TokenRefreshment tokenRefresh); 
         Task<Token> SignIn(SignInCredentials credentials);
         Task SignOut(string jwt);
     }
@@ -19,17 +20,38 @@ namespace ABCD.Services {
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ITokenService _tokenService;
         private readonly IValidator<SignInCredentials> _credentialsValidator;
+        private readonly IValidator<TokenRefreshment> _tokenRefreshValidator;
         private readonly IMemoryCache _invalidatedTokenCache;
         private readonly JwtSettings _jwtSettings;
 
         public AuthService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, ITokenService tokenService,
-             IValidator<SignInCredentials> credentialsValidator, IMemoryCache cache, IOptions<JwtSettings> jwtSettings) {
+             IValidator<SignInCredentials> credentialsValidator, IValidator<TokenRefreshment> tokenRefreshValidator, IMemoryCache cache, IOptions<JwtSettings> jwtSettings) {
             _userManager = userManager;
             _signInManager = signInManager;
             _tokenService = tokenService;
             _credentialsValidator = credentialsValidator;
+            _tokenRefreshValidator = tokenRefreshValidator;
             _invalidatedTokenCache = cache;
             _jwtSettings = jwtSettings.Value;
+        }
+
+        public async Task<Token> RefreshToken(TokenRefreshment tokenRefresh) {
+            _tokenRefreshValidator.ValidateAndThrow(tokenRefresh);
+
+            var principal = _tokenService.GetPrincipalFromToken(tokenRefresh.JWT);
+            if (principal == null || principal.Identity?.Name != tokenRefresh.Email)
+                throw new SecurityTokenException("Invalid token");
+
+            var user = await _userManager.FindByEmailAsync(tokenRefresh.Email);
+            if (user == null || user.RefreshToken != tokenRefresh.RefreshToken || user.RefreshTokenExpiryTime <= DateTimeOffset.UtcNow)
+                throw new SecurityTokenException("Invalid refresh token");
+
+            var newToken = _tokenService.GenerateToken(user);
+            user.RefreshToken = newToken.RefreshToken;
+            user.RefreshTokenExpiryTime = DateTimeOffset.UtcNow.AddMinutes(_jwtSettings.RefreshTokenExpiryInMinutes);
+            await _userManager.UpdateAsync(user);
+
+            return newToken;
         }
 
         public async Task<Token> SignIn(SignInCredentials credentials) {
@@ -38,6 +60,7 @@ namespace ABCD.Services {
             if (result.Succeeded) {
                 var user = await _userManager.FindByEmailAsync(credentials.Email);
                 var token = _tokenService.GenerateToken(user);
+                user.RefreshToken = token.RefreshToken;
                 user.RefreshTokenExpiryTime = DateTimeOffset.UtcNow.AddMinutes(_jwtSettings.RefreshTokenExpiryInMinutes);
                 await _userManager.UpdateAsync(user);
                 return token;

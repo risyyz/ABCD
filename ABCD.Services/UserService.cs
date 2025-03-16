@@ -1,13 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using ABCD.Lib.Auth;
-using Microsoft.AspNetCore.Identity;
-
-namespace ABCD.Services {
+﻿namespace ABCD.Services {
 
     public interface IUserService {
         Task<IEnumerable<ApplicationUser>> GetUsers();
