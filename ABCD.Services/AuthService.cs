@@ -51,6 +51,9 @@ namespace ABCD.Services {
             user.RefreshTokenExpiryTime = DateTimeOffset.UtcNow.AddMinutes(_jwtSettings.RefreshTokenExpiryInMinutes);
             await _userManager.UpdateAsync(user);
 
+            var expiration = TimeSpan.FromMinutes(_jwtSettings.TokenExpiryInMinutes);
+            _invalidatedTokenCache.Set(tokenRefresh.JWT, true, expiration);
+
             return newToken;
         }
 

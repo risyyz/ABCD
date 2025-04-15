@@ -8,6 +8,7 @@ using FluentValidation;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 
 namespace ABCD.Server.Controllers {
     [Route("api/[controller]")]
@@ -55,6 +56,8 @@ namespace ABCD.Server.Controllers {
                 return Ok(new { token = result.JWT, refreshToken = result.RefreshToken });
             } catch (ValidationException ex) {
                 return BadRequest(string.Join(" ", ex.Errors.Select(e => e.ErrorMessage)));            
+            } catch (SecurityTokenException ex) {
+                return BadRequest(ex.Message);
             }
         }
     }
