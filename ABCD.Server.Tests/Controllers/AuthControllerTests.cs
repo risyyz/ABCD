@@ -1,7 +1,7 @@
 using ABCD.Lib;
 using ABCD.Lib.Exceptions;
 using ABCD.Server.Controllers;
-using ABCD.Server.RequestModels;
+using ABCD.Server.Requests;
 using ABCD.Services;
 
 using AutoMapper;
@@ -31,7 +31,7 @@ namespace ABCD.Server.Tests.Controllers {
         [Fact]
         public async Task SignIn_MissingRequiredParameters_ReturnsBadRequest() {
             // Arrange
-            var request = new SignInRequestModel { Email = null, Password = null };
+            var request = new SignInRequest { Email = null, Password = null };
             var credentials = new SignInCredentials { Email = null, Password = null };
             string message = "Missing parameters";
             _mapperMock.Setup(m => m.Map<SignInCredentials>(request)).Returns(credentials);
@@ -51,7 +51,7 @@ namespace ABCD.Server.Tests.Controllers {
         [Fact]
         public async Task SignIn_InvalidCredentials_ReturnsUnauthorized() {
             // Arrange
-            var request = new SignInRequestModel { Email = "test@example.com", Password = "password" };
+            var request = new SignInRequest { Email = "test@example.com", Password = "password" };
             var credentials = new SignInCredentials { Email = "test@example.com", Password = "password" };
             string message = "Invalid login attempt.";
             _mapperMock.Setup(m => m.Map<SignInCredentials>(request)).Returns(credentials);
@@ -70,7 +70,7 @@ namespace ABCD.Server.Tests.Controllers {
         [Fact]
         public async Task SignIn_ValidCredentials_ReturnsOk() {
             // Arrange
-            var signInRequest = new SignInRequestModel { Email = "test@example.com", Password = "password" };
+            var signInRequest = new SignInRequest { Email = "test@example.com", Password = "password" };
             var credentials = new SignInCredentials { Email = "test@example.com", Password = "password" };
             var jwt = "test-token";
             var refreshToken = "test-refresh-token";

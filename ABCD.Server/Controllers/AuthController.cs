@@ -1,5 +1,5 @@
 ﻿using ABCD.Lib.Exceptions;
-using ABCD.Server.RequestModels;
+using ABCD.Server.Requests;
 using ABCD.Services;
 
 using AutoMapper;
@@ -22,7 +22,7 @@ namespace ABCD.Server.Controllers {
         }
 
         [HttpPost("signin")]
-        public async Task<IActionResult> SignIn(SignInRequestModel signInRequest) {
+        public async Task<IActionResult> SignIn(SignInRequest signInRequest) {
             try {
                 var credentials = _mapper.Map<SignInCredentials>(signInRequest);
                 var result = await _authService.SignIn(credentials);
@@ -44,10 +44,18 @@ namespace ABCD.Server.Controllers {
 
         [Authorize]
         [HttpPost("refresh-token")]
-        public async Task<IActionResult> RefreshToken() {
-            var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-            //await _authService.
-            return Ok();
+        public async Task<IActionResult> RefreshToken(RefreshTokenRequest refreshTokenRequest) {
+            try {
+                var refreshment = new TokenRefreshment {
+                    Email = refreshTokenRequest.Email,
+                    RefreshToken = refreshTokenRequest.RefreshToken,
+                    JWT = Request.Headers["Authorization"].ToString().Replace("Bearer ", "")
+                };
+                var result = await _authService.RefreshToken(refreshment);
+                return Ok(new { token = result.JWT, refreshToken = result.RefreshToken });
+            } catch (ValidationException ex) {
+                return BadRequest(string.Join(" ", ex.Errors.Select(e => e.ErrorMessage)));            
+            }
         }
     }
 }

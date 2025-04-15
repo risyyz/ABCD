@@ -1,4 +1,4 @@
-﻿using ABCD.Server.RequestModels;
+﻿using ABCD.Server.Requests;
 using ABCD.Services;
 
 using AutoMapper;
@@ -15,7 +15,7 @@ public static class AutoMapperConfig {
 
 public class MappingProfile : Profile {
     public MappingProfile() {
-        CreateMap<RegisterRequestModel, UserRegistration>();
-        CreateMap<SignInRequestModel, SignInCredentials>();
+        CreateMap<RegisterRequest, UserRegistration>();
+        CreateMap<SignInRequest, SignInCredentials>();
     }
 }
