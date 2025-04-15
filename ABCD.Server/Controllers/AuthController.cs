@@ -1,8 +1,7 @@
-﻿using ABCD.Lib.Exceptions;
+﻿using ABCD.Lib;
+using ABCD.Lib.Exceptions;
 using ABCD.Server.Requests;
 using ABCD.Services;
-
-using AutoMapper;
 
 using FluentValidation;
 
@@ -15,9 +14,9 @@ namespace ABCD.Server.Controllers {
     [ApiController]
     public class AuthController : ControllerBase {
         private readonly IAuthService _authService;
-        private readonly IMapper _mapper;
+        private readonly IClassMapper _mapper;
 
-        public AuthController( IAuthService authService, IMapper mapper) {
+        public AuthController( IAuthService authService, IClassMapper mapper) {
             _authService = authService;
             _mapper = mapper;
         }
@@ -25,7 +24,7 @@ namespace ABCD.Server.Controllers {
         [HttpPost("signin")]
         public async Task<IActionResult> SignIn(SignInRequest signInRequest) {
             try {
-                var credentials = _mapper.Map<SignInCredentials>(signInRequest);
+                var credentials = _mapper.Map<SignInRequest, SignInCredentials>(signInRequest);
                 var result = await _authService.SignIn(credentials);
                 return Ok(new { token = result.JWT, refreshToken = result.RefreshToken });
             } catch (ValidationException ex) {

@@ -327,12 +327,15 @@ namespace ABCD.Services.Tests {
             };
             _tokenServiceMock.Setup(x => x.GenerateToken(It.IsAny<ApplicationUser>())).Returns(newToken);
 
+            var cacheEntryMock = new Mock<ICacheEntry>();
+            _cacheMock.Setup(m => m.CreateEntry(It.IsAny<object>())).Returns(cacheEntryMock.Object);
             // Act
             var result = await _authService.RefreshToken(tokenRefresh);
 
             // Assert
             result.Should().BeEquivalentTo(newToken);
             _userManagerMock.Verify(x => x.UpdateAsync(It.IsAny<ApplicationUser>()), Times.Once);
+            _cacheMock.Verify(m => m.CreateEntry(tokenRefresh.JWT), Times.Once);
         }
     }
 }

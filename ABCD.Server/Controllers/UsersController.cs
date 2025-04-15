@@ -1,6 +1,5 @@
-﻿using ABCD.Services;
-
-using AutoMapper;
+﻿using ABCD.Lib;
+using ABCD.Services;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,8 +11,8 @@ namespace ABCD.Server.Controllers {
     [ApiController]
     public class UsersController : ControllerBase {
         private readonly IUserService _userService;
-        private readonly IMapper _mapper;
-        public UsersController(IUserService userService, IMapper mapper) {
+        private readonly IClassMapper _mapper;
+        public UsersController(IUserService userService, IClassMapper mapper) {
             _userService = userService;
             _mapper = mapper;
         }

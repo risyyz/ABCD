@@ -89,6 +89,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 
 var mapper = AutoMapperConfig.Initialize();
 builder.Services.AddSingleton(mapper);
+builder.Services.AddSingleton<IClassMapper, ClassMapper>();
 
 var app = builder.Build();
 
