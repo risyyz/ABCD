@@ -79,7 +79,9 @@ builder.Services.AddScoped<ICryptoService>(provider => {
     return new CryptoService(configuration["Crypto:PassPhrase"]);
 });
 
-builder.Services.AddScoped<IValidator<UserRegistration>, UserRegistrationValidator>();
+var minPasswordLength = builder.Configuration.GetSection("PasswordPolicy:MinPasswordLength").Get<int>();
+
+var passwordPolicy = builder.Configuration.GetSection("PasswordPolicy").Get<PasswordPolicy>();
 builder.Services.AddScoped<IValidator<SignInCredentials>, SignInCredentialsValidator>();
 builder.Services.AddScoped<SecurityTokenHandler, JwtSecurityTokenHandler>();
 
