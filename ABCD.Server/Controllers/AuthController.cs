@@ -16,7 +16,7 @@ namespace ABCD.Server.Controllers {
         private readonly IAuthService _authService;
         private readonly IClassMapper _mapper;
 
-        public AuthController( IAuthService authService, IClassMapper mapper) {
+        public AuthController(IAuthService authService, IClassMapper mapper) {
             _authService = authService;
             _mapper = mapper;
         }
@@ -28,33 +28,42 @@ namespace ABCD.Server.Controllers {
                 var result = await _authService.SignIn(credentials);
                 return Ok(new { token = result.JWT, refreshToken = result.RefreshToken });
             } catch (ValidationException ex) {
-                return BadRequest(string.Join(" ", ex.Errors.Select(e => e.ErrorMessage)));            
+                return BadRequest(string.Join(" ", ex.Errors.Select(e => e.ErrorMessage)));
             } catch (SignInFailedException ex) {
                 return Unauthorized("Invalid login attempt.");
-            }            
+            }
         }
 
         [Authorize]
         [HttpPost("sign-out")]
-        public async Task<IActionResult> SignOut() {
-            var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+        public async Task<IActionResult> SignOut([FromServices] BearerTokenReader tokenReader) {
+            var token = tokenReader.GetToken();
+            if (string.IsNullOrEmpty(token)) {
+                return Unauthorized("Authorization token is missing or invalid.");
+            }
+
             await _authService.SignOut(token);
             return Ok();
         }
 
         [Authorize]
         [HttpPost("refresh-token")]
-        public async Task<IActionResult> RefreshToken(RefreshTokenRequest refreshTokenRequest) {
+        public async Task<IActionResult> RefreshToken([FromServices] BearerTokenReader tokenReader, RefreshTokenRequest refreshTokenRequest) {
             try {
+                var token = tokenReader.GetToken();
+                if (string.IsNullOrEmpty(token)) {
+                    return Unauthorized("Authorization token is missing or invalid.");
+                }
+
                 var refreshment = new TokenRefreshment {
                     Email = refreshTokenRequest.Email,
                     RefreshToken = refreshTokenRequest.RefreshToken,
-                    JWT = Request.Headers["Authorization"].ToString().Replace("Bearer ", "")
+                    JWT = token
                 };
                 var result = await _authService.RefreshToken(refreshment);
                 return Ok(new { token = result.JWT, refreshToken = result.RefreshToken });
             } catch (ValidationException ex) {
-                return BadRequest(string.Join(" ", ex.Errors.Select(e => e.ErrorMessage)));            
+                return BadRequest(string.Join(" ", ex.Errors.Select(e => e.ErrorMessage)));
             } catch (SecurityTokenException ex) {
                 return BadRequest(ex.Message);
             }

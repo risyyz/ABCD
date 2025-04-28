@@ -68,7 +68,7 @@ builder.Services.AddAuthentication(options => {
     options.TokenValidationParameters = jwtSettings.GetTokenValidationParameters();
 });
 
-
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 builder.Services.AddValidatorsFromAssemblyContaining<UserRegistrationValidator>();
@@ -88,6 +88,7 @@ builder.Services.AddScoped<SecurityTokenHandler, JwtSecurityTokenHandler>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<BearerTokenReader>();
 
 var mapper = AutoMapperConfig.Initialize();
 builder.Services.AddSingleton(mapper);

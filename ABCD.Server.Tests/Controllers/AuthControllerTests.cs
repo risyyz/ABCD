@@ -18,11 +18,13 @@ namespace ABCD.Server.Tests.Controllers {
     public class AuthControllerTests {
         private readonly Mock<IAuthService> _authServiceMock;
         private readonly Mock<IClassMapper> _mapperMock;
+        private readonly Mock<BearerTokenReader> _tokenReaderMock;
         private readonly AuthController _controller;
 
         public AuthControllerTests() {
             _authServiceMock = new Mock<IAuthService>();
             _mapperMock = new Mock<IClassMapper>();
+            _tokenReaderMock = new Mock<BearerTokenReader>(Mock.Of<IHttpContextAccessor>());
             _controller = new AuthController(_authServiceMock.Object, _mapperMock.Object);
         }
 
@@ -90,19 +92,89 @@ namespace ABCD.Server.Tests.Controllers {
         public async Task SignOut_ValidToken_ReturnsOk() {
             // Arrange
             var token = "test-token";
-            var context = new DefaultHttpContext();
-            context.Request.Headers["Authorization"] = $"Bearer {token}";
-            _controller.ControllerContext = new ControllerContext {
-                HttpContext = context
-            };
+            _tokenReaderMock.Setup(tr => tr.GetToken()).Returns(token);
 
             // Act
-            var result = await _controller.SignOut();
+            var result = await _controller.SignOut(_tokenReaderMock.Object);
 
             // Assert
             var okResult = result as OkResult;
             okResult.Should().NotBeNull();
             _authServiceMock.Verify(s => s.SignOut(token), Times.Once);
-        }        
+        }
+
+        [Fact]
+        public async Task SignOut_MissingToken_ReturnsUnauthorized() {
+            // Arrange
+            _tokenReaderMock.Setup(tr => tr.GetToken()).Returns((string)null);
+
+            // Act
+            var result = await _controller.SignOut(_tokenReaderMock.Object);
+
+            // Assert
+            result.Should().BeOfType<UnauthorizedObjectResult>();
+            var unauthorizedResult = result as UnauthorizedObjectResult;
+            unauthorizedResult.Should().NotBeNull();
+            unauthorizedResult.Value.Should().Be("Authorization token is missing or invalid.");
+        }
+
+        [Fact]
+        public async Task RefreshToken_ValidRequest_ReturnsOk() {
+            // Arrange
+            var token = "test-token";
+            var refreshTokenRequest = new RefreshTokenRequest { Email = "test@example.com", RefreshToken = "refresh-token" };
+            var refreshment = new TokenRefreshment { Email = "test@example.com", JWT = token, RefreshToken = "refresh-token" };
+            var jwt = "new-jwt";
+            var newRefreshToken = "new-refresh-token";
+            var resultToken = new Token { JWT = jwt, RefreshToken = newRefreshToken };
+
+            _tokenReaderMock.Setup(tr => tr.GetToken()).Returns(token);
+            _authServiceMock.Setup(s => s.RefreshToken(refreshment)).ReturnsAsync(resultToken);
+
+            // Act
+            var result = await _controller.RefreshToken(_tokenReaderMock.Object, refreshTokenRequest);
+
+            // Assert
+            var okResult = result as OkObjectResult;
+            okResult.Should().NotBeNull();
+            okResult.Value.Should().BeEquivalentTo(new { token = jwt, refreshToken = newRefreshToken });
+        }
+
+        [Fact]
+        public async Task RefreshToken_MissingToken_ReturnsUnauthorized() {
+            // Arrange
+            var refreshTokenRequest = new RefreshTokenRequest { Email = "test@example.com", RefreshToken = "refresh-token" };
+            _tokenReaderMock.Setup(tr => tr.GetToken()).Returns((string)null);
+
+            // Act
+            var result = await _controller.RefreshToken(_tokenReaderMock.Object, refreshTokenRequest);
+
+            // Assert
+            result.Should().BeOfType<UnauthorizedObjectResult>();
+            var unauthorizedResult = result as UnauthorizedObjectResult;
+            unauthorizedResult.Should().NotBeNull();
+            unauthorizedResult.Value.Should().Be("Authorization token is missing or invalid.");
+        }
+
+        [Fact]
+        public async Task RefreshToken_InvalidRequest_ReturnsBadRequest() {
+            // Arrange
+            var token = "test-token";
+            var refreshTokenRequest = new RefreshTokenRequest { Email = "test@example.com", RefreshToken = "refresh-token" };
+            var refreshment = new TokenRefreshment { Email = "test@example.com", JWT = token, RefreshToken = "refresh-token" };
+            var validationFailures = new List<ValidationFailure> { new ValidationFailure("Email", "Invalid email format") };
+
+            _tokenReaderMock.Setup(tr => tr.GetToken()).Returns(token);
+            _authServiceMock.Setup(s => s.RefreshToken(refreshment)).ThrowsAsync(new ValidationException(validationFailures));
+
+            // Act
+            var result = await _controller.RefreshToken(_tokenReaderMock.Object, refreshTokenRequest);
+
+            // Assert
+            result.Should().BeOfType<BadRequestObjectResult>();
+            var badRequestResult = result as BadRequestObjectResult;
+            badRequestResult.Should().NotBeNull();
+            badRequestResult.Value.Should().Be("Invalid email format");
+        }
     }
 }
