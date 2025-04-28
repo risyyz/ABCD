@@ -21,7 +21,7 @@ namespace ABCD.Server.Controllers {
             _mapper = mapper;
         }
 
-        [HttpPost("signin")]
+        [HttpPost("sign-in")]
         public async Task<IActionResult> SignIn(SignInRequest signInRequest) {
             try {
                 var credentials = _mapper.Map<SignInRequest, SignInCredentials>(signInRequest);
@@ -35,7 +35,7 @@ namespace ABCD.Server.Controllers {
         }
 
         [Authorize]
-        [HttpPost("signout")]
+        [HttpPost("sign-out")]
         public async Task<IActionResult> SignOut() {
             var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
             await _authService.SignOut(token);
