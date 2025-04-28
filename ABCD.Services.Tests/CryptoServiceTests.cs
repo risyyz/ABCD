@@ -1,6 +1,6 @@
-using ABCD.Services.Crypto;
+using FluentAssertions;
 
-namespace ABCD.Services.Tests.Crypto {
+namespace ABCD.Services.Tests {
     public class CryptoServiceTests {
         private readonly string passphrase = "3q2+7w==...";
         private readonly ICryptoService cryptoService;
@@ -18,8 +18,8 @@ namespace ABCD.Services.Tests.Crypto {
             string encrypted = cryptoService.Encrypt(input);
 
             // Assert
-            Assert.False(string.IsNullOrEmpty(encrypted));
-            Assert.NotEqual(input, encrypted);
+            encrypted.Should().NotBeNullOrEmpty();
+            encrypted.Should().NotBe(input);
         }
 
         [Fact]
@@ -32,19 +32,25 @@ namespace ABCD.Services.Tests.Crypto {
             string decrypted = cryptoService.Decrypt(encrypted);
 
             // Assert
-            Assert.Equal(input, decrypted);
+            decrypted.Should().Be(input);
         }
 
         [Fact]
         public void Encrypt_ShouldThrowArgumentNullException_WhenInputIsNull() {
-            // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => cryptoService.Encrypt(null));
+            // Act
+            Action act = () => cryptoService.Encrypt(null);
+
+            // Assert
+            act.Should().Throw<ArgumentNullException>();
         }
 
         [Fact]
         public void Decrypt_ShouldThrowArgumentNullException_WhenInputIsNull() {
-            // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => cryptoService.Decrypt(null));
+            // Act
+            Action act = () => cryptoService.Decrypt(null);
+
+            // Assert
+            act.Should().Throw<ArgumentNullException>();
         }
 
         [Fact]
@@ -52,8 +58,11 @@ namespace ABCD.Services.Tests.Crypto {
             // Arrange
             string invalidBase64 = "InvalidBase64String";
 
-            // Act & Assert
-            Assert.Throws<FormatException>(() => cryptoService.Decrypt(invalidBase64));
+            // Act
+            Action act = () => cryptoService.Decrypt(invalidBase64);
+
+            // Assert
+            act.Should().Throw<FormatException>();
         }
     }
 }

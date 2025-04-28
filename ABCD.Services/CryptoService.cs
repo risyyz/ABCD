@@ -1,7 +1,12 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
 
-namespace ABCD.Services.Crypto {
+namespace ABCD.Services {
+    public interface ICryptoService {
+        string Encrypt(string plainText);
+        string Decrypt(string encrypted);
+    }
+
     public class CryptoService : ICryptoService {
 
         private const int KeySizeBits = 256; // Key size in bits

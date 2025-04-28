@@ -1,0 +1,6 @@
+#migrations
+dotnet ef migrations add 01 --context DataContext --project ./ABCD.Data/ABCD.Data.csproj --startup-project ./ABCD.Server/ABCD.Server.csproj --output-dir Migrations/Data
+dotnet ef migrations add 01 --context AuthContext --project ./ABCD.Data/ABCD.Data.csproj --startup-project ./ABCD.Server/ABCD.Server.csproj --output-dir Migrations/Auth
+
+dotnet ef database update --context AuthContext --project ./ABCD.Data/ABCD.Data.csproj --startup-project ./ABCD.Server/ABCD.Server.csproj
+dotnet ef database update --context DataContext --project ./ABCD.Data/ABCD.Data.csproj --startup-project ./ABCD.Server/ABCD.Server.csproj

@@ -2,10 +2,10 @@
 
 #nullable disable
 
-namespace ABCD.Data.Migrations
+namespace ABCD.Data.Migrations.Data
 {
     /// <inheritdoc />
-    public partial class _2024121400h26 : Migration
+    public partial class _01 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
