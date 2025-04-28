@@ -11,6 +11,7 @@ using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -79,9 +80,10 @@ builder.Services.AddScoped<ICryptoService>(provider => {
     return new CryptoService(configuration["Crypto:PassPhrase"]);
 });
 
-var minPasswordLength = builder.Configuration.GetSection("PasswordPolicy:MinPasswordLength").Get<int>();
 
 var passwordPolicy = builder.Configuration.GetSection("PasswordPolicy").Get<PasswordPolicy>();
+builder.Services.AddScoped<PasswordPolicy>(provider => passwordPolicy);
+builder.Services.AddScoped<IValidator<UserRegistration>, UserRegistrationValidator>();
 builder.Services.AddScoped<IValidator<SignInCredentials>, SignInCredentialsValidator>();
 builder.Services.AddScoped<SecurityTokenHandler, JwtSecurityTokenHandler>();
 
