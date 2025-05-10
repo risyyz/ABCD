@@ -1,16 +1,25 @@
 <div class="login-container">
   <div class="login-card">
     <h2 class="login-title">Sign in to continue</h2>
-    <form>
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
       <mat-form-field appearance="outline">
         <mat-label>Email</mat-label>
-        <input matInput type="email" placeholder="Enter your email" required>
+        <input matInput type="email" formControlName="email" placeholder="Enter your email" required>
+        <mat-error *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
+          Please enter a valid email.
+        </mat-error>
       </mat-form-field>
       <mat-form-field appearance="outline">
         <mat-label>Password</mat-label>
-        <input matInput type="password" placeholder="Enter your password" required>
+        <input matInput type="password" formControlName="password" placeholder="Enter your password" required>
+        <mat-error *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+          Password must be at least 6 characters long.
+        </mat-error>
       </mat-form-field>
-      <button mat-raised-button color="primary" class="login-button">Login</button>     
+      <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+      <div class="button-container">
+        <button mat-raised-button color="primary" class="login-button" type="submit">Login</button>
+      </div>
     </form>
   </div>
 </div>

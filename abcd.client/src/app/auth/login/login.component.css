@@ -1,3 +1,23 @@
+/* Error message styling */
+.error-message {
+  color: red;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+/* Button styling */
+.login-button {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  font-weight: 500;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
 /* Center the login container */
 .login-container {
   display: flex;
@@ -67,15 +87,3 @@ mat-form-field .mat-form-field-infix {
   padding: 8px; /* Add padding inside the input */
 }
 
-/* Button styling */
-.login-button {
-  width: 100%;
-  padding: 10px;
-  font-size: 16px;
-  font-weight: 500;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
