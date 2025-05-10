@@ -1,12 +1,16 @@
 <div class="login-container">
-  <h2>Login</h2>
-  <form>
-    <label for="email">Email:</label>
-    <input id="email" type="email" placeholder="Enter your email" required />
-
-    <label for="password">Password:</label>
-    <input id="password" type="password" placeholder="Enter your password" required />
-
-    <button type="submit">Login</button>
-  </form>
+  <div class="login-card">
+    <h2 class="login-title">Sign in to continue</h2>
+    <form>
+      <mat-form-field appearance="outline">
+        <mat-label>Email</mat-label>
+        <input matInput type="email" placeholder="Enter your email" required>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Password</mat-label>
+        <input matInput type="password" placeholder="Enter your password" required>
+      </mat-form-field>
+      <button mat-raised-button color="primary" class="login-button">Login</button>     
+    </form>
+  </div>
 </div>

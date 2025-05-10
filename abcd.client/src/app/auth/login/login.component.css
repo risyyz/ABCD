@@ -1,38 +1,81 @@
+/* Center the login container */
 .login-container {
-  max-width: 400px;
-  margin: 50px auto;
-  padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-form {
   display: flex;
-  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f5f5f5;
+  font-family: 'Roboto', sans-serif;
 }
 
-label {
-  margin-bottom: 8px;
-  font-weight: bold;
+/* Style the card */
+.login-card {
+  width: 360px;
+  padding: 24px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: center;
 }
 
-input {
+/* Logo styling */
+.login-logo {
   margin-bottom: 16px;
-  padding: 8px;
-  font-size: 16px;
 }
 
-button {
+/* Logo text styling */
+.logo-text {
+  font-size: 32px;
+  font-weight: bold;
+  color: #1a73e8; /* Use a color similar to Google's blue */
+  font-family: 'Roboto', sans-serif;
+}
+
+/* Title styling */
+.login-title {
+  font-size: 24px;
+  font-weight: 500;
+  margin-bottom: 16px;
+  color: #202124;
+  text-align: center;
+}
+
+.button-container {
+  display: flex;
+  justify-content: flex-end; /* Aligns the button to the right */
+  margin-top: 16px; /* Adds spacing above the button */
+}
+
+.login-button {
+  padding: 10px 24px; /* Optional: Adjust button padding */
+}
+
+/* Form field styling */
+mat-form-field {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+  /* Ensure the input field has a white background */
+mat-form-field .mat-form-field-flex {
+  background-color: white !important; /* Set the background color to white */
+  border-radius: 4px; /* Optional: Add rounded corners */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Optional: Add a subtle shadow */
+}
+
+mat-form-field .mat-form-field-infix {
+  padding: 8px; /* Add padding inside the input */
+}
+
+/* Button styling */
+.login-button {
+  width: 100%;
   padding: 10px;
   font-size: 16px;
-  background-color: #007bff;
+  font-weight: 500;
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  transition: background-color 0.3s ease;
 }
-
-  button:hover {
-    background-color: #0056b3;
-  }
