@@ -1,25 +1,53 @@
-<div class="login-container">
-  <div class="login-card">
-    <h2 class="login-title">Sign in to continue</h2>
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-      <mat-form-field appearance="outline">
-        <mat-label>Email</mat-label>
-        <input matInput type="email" formControlName="email" placeholder="Enter your email" required>
-        <mat-error *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
-          Please enter a valid email.
-        </mat-error>
-      </mat-form-field>
-      <mat-form-field appearance="outline">
-        <mat-label>Password</mat-label>
-        <input matInput type="password" formControlName="password" placeholder="Enter your password" required>
-        <mat-error *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
-          Password must be at least 6 characters long.
-        </mat-error>
-      </mat-form-field>
-      <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
-      <div class="button-container">
-        <button mat-raised-button color="primary" class="login-button" type="submit">Login</button>
+<div class="hero is-fullheight is-light">
+  <div class="hero-body">
+    <div class="container">
+      <div class="columns is-centered">
+        <div class="column is-5-tablet is-4-desktop is-3-widescreen">
+          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="box">
+            <div class="field">
+              <label class="label">Email</label>
+              <div class="control">
+                <input 
+                  class="input" 
+                  type="email" 
+                  formControlName="email" 
+                  placeholder="Enter your email"
+                  [class.is-danger]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
+              </div>
+              <p *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched" class="help is-danger">
+                Please enter a valid email.
+              </p>
+            </div>
+            
+            <div class="field">
+              <label class="label">Password</label>
+              <div class="control">
+                <input 
+                  class="input" 
+                  type="password" 
+                  formControlName="password" 
+                  placeholder="Enter your password"
+                  [class.is-danger]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+              </div>
+              <p *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched" class="help is-danger">
+                Password must be at least 6 characters long.
+              </p>
+            </div>
+
+            <div *ngIf="errorMessage" class="notification is-danger is-light">
+              {{ errorMessage }}
+            </div>
+
+            <div class="field">
+              <div class="control">
+                <button class="button is-primary is-fullwidth" type="submit" [disabled]="loginForm.invalid">
+                  Sign in
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
       </div>
-    </form>
+    </div>
   </div>
 </div>
