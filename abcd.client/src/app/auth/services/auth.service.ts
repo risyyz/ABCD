@@ -27,7 +27,26 @@ export class AuthService {
   }
 
   signIn(loginData: LoginRequest): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>('/api/auth/sign-in', loginData).pipe(
+    // Temporary mock for demo purposes - remove when backend is ready
+    if (loginData.email === 'demo@test.com' && loginData.password === 'demo123') {
+      const mockResponse: LoginResponse = {
+        success: true,
+        token: 'mock-jwt-token-12345'
+      };
+      if (mockResponse.token) {
+        localStorage.setItem('auth_token', mockResponse.token);
+        this.isAuthenticatedSubject.next(true);
+      }
+      return new Observable(observer => {
+        setTimeout(() => {
+          observer.next(mockResponse);
+          observer.complete();
+        }, 1000); // Simulate network delay
+      });
+    }
+
+    // Real API call for production use
+    return this.http.post<LoginResponse>('/auth/sign-in', loginData).pipe(
       tap(response => {
         if (response.success && response.token) {
           localStorage.setItem('auth_token', response.token);
