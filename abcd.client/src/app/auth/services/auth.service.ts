@@ -46,7 +46,7 @@ export class AuthService {
     }
 
     // Real API call for production use
-    return this.http.post<LoginResponse>('/auth/sign-in', loginData).pipe(
+    return this.http.post<LoginResponse>('/api/auth/sign-in', loginData).pipe(
       tap(response => {
         if (response.success && response.token) {
           localStorage.setItem('auth_token', response.token);
