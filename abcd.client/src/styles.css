@@ -1,15 +1,24 @@
 /* You can add global styles to this file, and also import other style files */
+@import 'bulma/css/bulma.css';
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
-
-/* Snackbar styles for login feedback */
-.error-snackbar {
-  background-color: #f44336 !important;
-  color: white !important;
+html, body { 
+  height: 100%; 
+  margin: 0; 
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-.success-snackbar {
-  background-color: #4caf50 !important;
-  color: white !important;
+/* Custom notification styles */
+.notification.is-danger {
+  background-color: #f14668;
+  color: white;
+}
+
+.notification.is-success {
+  background-color: #48c78e;
+  color: white;
+}
+
+/* Custom spacing and layout utilities */
+.full-height {
+  min-height: 100vh;
 }

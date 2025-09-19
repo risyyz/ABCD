@@ -1,21 +1,55 @@
 <div class="dashboard-container">
-  <header class="dashboard-header">
-    <h1>Welcome to Dashboard</h1>
-    <button mat-raised-button color="warn" (click)="logout()" class="logout-button">
-      Logout
-    </button>
-  </header>
+  <nav class="navbar is-primary" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+      <h1 class="navbar-item is-size-4 has-text-weight-bold">Welcome to Dashboard</h1>
+    </div>
+    
+    <div class="navbar-menu">
+      <div class="navbar-end">
+        <div class="navbar-item">
+          <button class="button is-light is-outlined" (click)="logout()">
+            <span class="icon">
+              <i class="fas fa-sign-out-alt"></i>
+            </span>
+            <span>Logout</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
 
-  <main class="dashboard-content">
-    <mat-card class="welcome-card">
-      <mat-card-header>
-        <mat-card-title>Dashboard</mat-card-title>
-        <mat-card-subtitle>You have successfully logged in!</mat-card-subtitle>
-      </mat-card-header>
-      <mat-card-content>
-        <p>This is your dashboard where you can manage your application.</p>
-        <p>You can add more features and components here as needed.</p>
-      </mat-card-content>
-    </mat-card>
+  <main class="section">
+    <div class="container">
+      <div class="columns is-centered">
+        <div class="column is-8">
+          <div class="box">
+            <div class="content has-text-centered">
+              <h2 class="title is-2">Dashboard</h2>
+              <p class="subtitle is-5">You have successfully logged in!</p>
+              
+              <div class="mt-5">
+                <p class="is-size-5">This is your dashboard where you can manage your application.</p>
+                <p class="is-size-5">You can add more features and components here as needed.</p>
+              </div>
+              
+              <div class="buttons is-centered mt-6">
+                <button class="button is-primary is-medium">
+                  <span class="icon">
+                    <i class="fas fa-plus"></i>
+                  </span>
+                  <span>Add New Item</span>
+                </button>
+                <button class="button is-info is-medium">
+                  <span class="icon">
+                    <i class="fas fa-cog"></i>
+                  </span>
+                  <span>Settings</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </main>
 </div>
