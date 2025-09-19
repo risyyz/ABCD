@@ -11,6 +11,7 @@ export interface LoginRequest {
 export interface LoginResponse {
   success: boolean;
   token?: string;
+  refreshToken?: string;
   message?: string;
 }
 
@@ -48,7 +49,7 @@ export class AuthService {
     // Real API call for production use
     return this.http.post<LoginResponse>('/api/auth/sign-in', loginData).pipe(
       tap(response => {
-        if (response.success && response.token) {
+        if (response.success && response.token && response.refreshToken) {
           localStorage.setItem('auth_token', response.token);
           this.isAuthenticatedSubject.next(true);
         }
