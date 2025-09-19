@@ -35,9 +35,9 @@ export class AuthService {
   private refreshTokenExpirationTime: Date | null = null;
   private refreshTimer: any = null;
 
-  // Configuration - should match backend RefreshTokenExpiryInMinutes setting
-  private readonly REFRESH_TOKEN_EXPIRY_MINUTES = 60; // Default, should be configurable
-  private readonly TOKEN_EXPIRY_MINUTES = 15; // Default JWT expiry, should be configurable
+  // Configuration - should match backend JWT settings in appsettings.json
+  private readonly REFRESH_TOKEN_EXPIRY_MINUTES = 60; // RefreshTokenExpiryInMinutes from backend
+  private readonly TOKEN_EXPIRY_MINUTES = 30; // TokenExpiryInMinutes from backend
   private readonly REFRESH_BUFFER_MINUTES = 2; // Refresh token 2 minutes before expiry
 
   constructor(private http: HttpClient) {
