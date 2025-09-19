@@ -35,7 +35,7 @@
 /* Form inputs */
 .input {
   border: 1px solid var(--bbc-light-gray);
-  border-radius: 0;
+  border-radius: 3px;
   font-size: 1rem;
   padding: 0.75rem;
   color: var(--bbc-black);
@@ -89,7 +89,7 @@
   background-color: var(--bbc-black) !important;
   border: 2px solid var(--bbc-black) !important;
   color: var(--bbc-white) !important;
-  border-radius: 0;
+  border-radius: 3px;
   font-weight: 500;
   font-size: 1rem;
   padding: 0.875rem 1.5rem;

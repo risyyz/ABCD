@@ -26,7 +26,7 @@ import { NotificationService, NotificationMessage } from '../services/notificati
       margin-bottom: 10px;
       box-shadow: 0 2px 8px rgba(26, 26, 26, 0.1);
       animation: slideIn 0.3s ease-out;
-      border-radius: 0;
+      border-radius: 3px;
       border: 1px solid var(--bbc-very-light-gray);
       font-family: Arial, Helvetica, sans-serif;
       font-size: 0.95rem;

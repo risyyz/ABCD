@@ -76,7 +76,7 @@ p, .content {
 /* Button styles */
 .button {
   font-family: inherit;
-  border-radius: 0;
+  border-radius: 3px;
   font-weight: 500;
   text-transform: none;
   border: 2px solid var(--bbc-black);
@@ -107,7 +107,7 @@ p, .content {
 
 /* Input styles */
 .input, .textarea {
-  border-radius: 0;
+  border-radius: 3px;
   border: 1px solid var(--bbc-light-gray);
   font-family: inherit;
   color: var(--bbc-black);
@@ -132,9 +132,9 @@ p, .content {
   max-width: 1200px;
 }
 
-/* Remove rounded corners for a more editorial look */
+/* Subtle rounded corners for content boxes */
 .box, .card {
-  border-radius: 0;
+  border-radius: 4px;
   box-shadow: 0 1px 3px rgba(26, 26, 26, 0.1);
   border: 1px solid var(--bbc-very-light-gray);
 }
