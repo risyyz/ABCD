@@ -85,7 +85,7 @@ namespace ABCD.Server.Tests.Controllers {
             // Assert
             var okResult = result as OkObjectResult;
             okResult.Should().NotBeNull();
-            okResult.Value.Should().BeEquivalentTo(new { token = jwt, refreshToken = refreshToken });
+            okResult.Value.Should().BeEquivalentTo(new { success = true, token = jwt, refreshToken = refreshToken });
         }
 
         [Fact]
@@ -137,7 +137,7 @@ namespace ABCD.Server.Tests.Controllers {
             // Assert
             var okResult = result as OkObjectResult;
             okResult.Should().NotBeNull();
-            okResult.Value.Should().BeEquivalentTo(new { token = jwt, refreshToken = newRefreshToken });
+            okResult.Value.Should().BeEquivalentTo(new { success = true, token = jwt, refreshToken = newRefreshToken });
         }
 
         [Fact]
