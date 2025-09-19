@@ -1,22 +1,129 @@
-/* Custom styles for login component using Bulma */
+/* BBC-inspired login component styles */
 
-/* Ensure proper checkbox styling */
-.checkbox input[type="checkbox"] {
-  margin-right: 8px;
+/* Hero section with clean background */
+.hero.is-light {
+  background-color: var(--bbc-off-white) !important;
 }
 
-/* Loading button animation */
+/* Login box styling */
+.box {
+  background-color: var(--bbc-white);
+  border: 1px solid var(--bbc-very-light-gray);
+  border-radius: 0;
+  box-shadow: 0 2px 8px rgba(26, 26, 26, 0.08);
+  padding: 3rem;
+}
+
+/* Typography */
+.title.is-3 {
+  color: var(--bbc-black);
+  font-weight: 700;
+  font-size: 2rem;
+  line-height: 1.1;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.02em;
+}
+
+.subtitle.is-6 {
+  color: var(--bbc-dark-gray);
+  font-weight: 400;
+  font-size: 1rem;
+  line-height: 1.4;
+  margin-bottom: 2rem;
+}
+
+/* Form inputs */
+.input {
+  border: 1px solid var(--bbc-light-gray);
+  border-radius: 3px;
+  font-size: 1rem;
+  padding: 0.75rem;
+  color: var(--bbc-black);
+  background-color: var(--bbc-white);
+}
+
+.input:focus {
+  border-color: var(--bbc-black);
+  box-shadow: 0 0 0 0.125em rgba(26, 26, 26, 0.15);
+}
+
+.input.is-danger {
+  border-color: var(--bbc-accent);
+}
+
+.input.is-danger:focus {
+  border-color: var(--bbc-accent);
+  box-shadow: 0 0 0 0.125em rgba(184, 0, 0, 0.15);
+}
+
+/* Form field styling */
+.field {
+  margin-bottom: 1.5rem;
+}
+
+/* Icons */
+.icon {
+  color: var(--bbc-medium-gray);
+}
+
+/* Error messages */
+.help.is-danger {
+  color: var(--bbc-accent);
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+/* Checkbox styling */
+.checkbox {
+  color: var(--bbc-black);
+  font-size: 0.95rem;
+}
+
+.checkbox input[type="checkbox"] {
+  margin-right: 8px;
+  accent-color: var(--bbc-black);
+}
+
+/* Submit button */
+.button.is-primary {
+  background-color: var(--bbc-black) !important;
+  border: 2px solid var(--bbc-black) !important;
+  color: var(--bbc-white) !important;
+  border-radius: 3px;
+  font-weight: 500;
+  font-size: 1rem;
+  padding: 0.875rem 1.5rem;
+  height: auto;
+  transition: all 0.2s ease;
+}
+
+.button.is-primary:hover:not(:disabled) {
+  background-color: var(--bbc-dark-gray) !important;
+  border-color: var(--bbc-dark-gray) !important;
+}
+
+.button.is-primary:disabled {
+  background-color: var(--bbc-light-gray) !important;
+  border-color: var(--bbc-light-gray) !important;
+  opacity: 0.7;
+}
+
+/* Loading button animation - simplified */
 .button.is-loading::after {
   animation: spinAround 500ms infinite linear;
   border: 2px solid transparent;
-  border-radius: 290486px;
-  border-right-color: white;
-  border-top-color: white;
+  border-radius: 50%;
+  border-right-color: var(--bbc-white);
+  border-top-color: var(--bbc-white);
   content: "";
   display: block;
   height: 16px;
-  position: relative;
+  position: absolute;
   width: 16px;
+  left: 50%;
+  top: 50%;
+  margin-left: -8px;
+  margin-top: -8px;
 }
 
 @keyframes spinAround {
@@ -32,5 +139,13 @@
 @media (max-width: 768px) {
   .column.is-4 {
     margin: 0 1rem;
+  }
+  
+  .box {
+    padding: 2rem;
+  }
+  
+  .title.is-3 {
+    font-size: 1.75rem;
   }
 }
