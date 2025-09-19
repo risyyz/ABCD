@@ -1,22 +1,45 @@
-﻿:host {
+﻿/* BBC-inspired app component styles */
+
+:host {
     max-width: 1280px;
     padding: 2rem;
-    text-align: center;
+    text-align: left; /* BBC uses left-aligned text for better readability */
+    margin: 0 auto;
 }
 
-tr:nth-child(even) {
-    background: #F2F2F2;
-}
-
-tr:nth-child(odd) {
-    background: #FFF;
+/* Table styling - BBC editorial approach */
+table {
+    margin: 0 auto;
+    border-collapse: collapse;
+    width: 100%;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.95rem;
+    line-height: 1.5;
 }
 
 th, td {
-    padding-left: 1rem;
-    padding-right: 1rem;
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--bbc-very-light-gray);
 }
 
-table {
-    margin: 0 auto;
+th {
+    background-color: var(--bbc-off-white);
+    font-weight: 700;
+    color: var(--bbc-black);
+    text-transform: none; /* BBC doesn't use uppercase headers */
+}
+
+/* Remove alternating row colors for cleaner look */
+tr:nth-child(even) {
+    background: var(--bbc-white);
+}
+
+tr:nth-child(odd) {
+    background: var(--bbc-white);
+}
+
+/* Add subtle hover effect */
+tr:hover {
+    background-color: var(--bbc-off-white);
 }

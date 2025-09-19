@@ -24,8 +24,43 @@ import { NotificationService, NotificationMessage } from '../services/notificati
     
     .notification {
       margin-bottom: 10px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 8px rgba(26, 26, 26, 0.1);
       animation: slideIn 0.3s ease-out;
+      border-radius: 0;
+      border: 1px solid var(--bbc-very-light-gray);
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 0.95rem;
+      line-height: 1.4;
+      padding: 1rem 1.25rem;
+    }
+    
+    .notification.is-danger {
+      background-color: var(--bbc-accent);
+      color: var(--bbc-white);
+      border-color: var(--bbc-accent);
+    }
+    
+    .notification.is-success {
+      background-color: var(--bbc-dark-gray);
+      color: var(--bbc-white);
+      border-color: var(--bbc-dark-gray);
+    }
+    
+    .notification .delete {
+      background-color: transparent;
+      border: none;
+      border-radius: 0;
+      width: 20px;
+      height: 20px;
+      right: 0.75rem;
+      top: 0.75rem;
+    }
+    
+    .notification .delete:before,
+    .notification .delete:after {
+      background-color: currentColor;
+      width: 12px;
+      height: 1px;
     }
     
     @keyframes slideIn {
