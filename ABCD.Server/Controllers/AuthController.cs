@@ -61,7 +61,7 @@ namespace ABCD.Server.Controllers {
                     JWT = token
                 };
                 var result = await _authService.RefreshToken(refreshment);
-                return Ok(new { token = result.JWT, refreshToken = result.RefreshToken });
+                return Ok(new { success = true, token = result.JWT, refreshToken = result.RefreshToken });
             } catch (ValidationException ex) {
                 return BadRequest(string.Join(" ", ex.Errors.Select(e => e.ErrorMessage)));
             } catch (SecurityTokenException ex) {
