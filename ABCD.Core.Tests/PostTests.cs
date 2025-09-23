@@ -185,8 +185,8 @@ public class PostTests
         Assert.Equal(2, post.Fragments.Count);
         Assert.Equal(0, fragment1.Position);
         Assert.Equal(1, fragment2.Position);
-        Assert.Equal(post.Id, fragment1.PostId);
-        Assert.Equal(post.Id, fragment2.PostId);
+        Assert.Equal(post.PostId, fragment1.PostId);
+        Assert.Equal(post.PostId, fragment2.PostId);
     }
 
     [Fact]
@@ -203,7 +203,7 @@ public class PostTests
 
         var fragment1 = new Fragment
         {
-            Id = 1,
+            FragmentId = 1,
             Title = "Fragment 1",
             Content = "Content 1",
             Type = FragmentType.Text,
@@ -213,7 +213,7 @@ public class PostTests
 
         var fragment2 = new Fragment
         {
-            Id = 2,
+            FragmentId = 2,
             Title = "Fragment 2",
             Content = "Content 2",
             Type = FragmentType.Html,
@@ -246,7 +246,7 @@ public class PostTests
 
         var fragment1 = new Fragment
         {
-            Id = 1,
+            FragmentId = 1,
             Title = "Fragment 1",
             Content = "Content 1",
             Type = FragmentType.Text,
@@ -256,7 +256,7 @@ public class PostTests
 
         var fragment2 = new Fragment
         {
-            Id = 2,
+            FragmentId = 2,
             Title = "Fragment 2",
             Content = "Content 2",
             Type = FragmentType.Html,

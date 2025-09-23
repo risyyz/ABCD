@@ -10,7 +10,7 @@ public class Blog : AuditableEntity
     private readonly List<BlogDomain> _domains = new();
     private readonly List<Post> _posts = new();
 
-    public int Id { get; set; }
+    public int BlogId { get; set; }
     public required string Title { get; set; }
     
     // Collections with rich behaviors
@@ -59,7 +59,7 @@ public class Blog : AuditableEntity
 
         var blogDomain = new BlogDomain
         {
-            BlogId = Id,
+            BlogId = BlogId,
             Domain = domain.ToLowerInvariant(),
             Blog = this
         };
@@ -105,7 +105,7 @@ public class Blog : AuditableEntity
         if (_posts.Any(p => p.SeoFriendlyLink.Equals(post.SeoFriendlyLink, StringComparison.OrdinalIgnoreCase)))
             throw new InvalidOperationException($"A post with SEO link '{post.SeoFriendlyLink}' already exists in this blog");
 
-        post.BlogId = Id;
+        post.BlogId = BlogId;
         post.Blog = this;
         _posts.Add(post);
         UpdateAuditFields(updatedBy);
@@ -118,7 +118,7 @@ public class Blog : AuditableEntity
     /// <param name="updatedBy">The user removing the post</param>
     public void RemovePost(int postId, string updatedBy)
     {
-        var post = _posts.FirstOrDefault(p => p.Id == postId);
+        var post = _posts.FirstOrDefault(p => p.PostId == postId);
         if (post == null)
             throw new ArgumentException("Post not found", nameof(postId));
 

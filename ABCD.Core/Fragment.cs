@@ -22,7 +22,7 @@ public enum FragmentStatus
 /// </summary>
 public class Fragment : AuditableEntity
 {
-    public int Id { get; set; }
+    public int FragmentId { get; set; }
     public int PostId { get; set; }
     public required string Title { get; set; }
     public required string Content { get; set; }

@@ -15,7 +15,7 @@ public class Post : AuditableEntity
 {
     private readonly List<Fragment> _fragments = new();
 
-    public int Id { get; set; }
+    public int PostId { get; set; }
     public int BlogId { get; set; }
     public required string Title { get; set; }
     public required string SeoFriendlyLink { get; set; }
@@ -104,7 +104,7 @@ public class Post : AuditableEntity
         if (fragment == null)
             throw new ArgumentNullException(nameof(fragment));
 
-        fragment.PostId = Id;
+        fragment.PostId = PostId;
         fragment.Position = _fragments.Count;
         _fragments.Add(fragment);
         UpdateAuditFields(updatedBy);
@@ -117,7 +117,7 @@ public class Post : AuditableEntity
     /// <param name="updatedBy">The user removing the fragment</param>
     public void RemoveFragment(int fragmentId, string updatedBy)
     {
-        var fragment = _fragments.FirstOrDefault(f => f.Id == fragmentId);
+        var fragment = _fragments.FirstOrDefault(f => f.FragmentId == fragmentId);
         if (fragment == null)
             throw new ArgumentException("Fragment not found", nameof(fragmentId));
 
@@ -132,7 +132,7 @@ public class Post : AuditableEntity
     /// <param name="updatedBy">The user moving the fragment</param>
     public void MoveFragmentUp(int fragmentId, string updatedBy)
     {
-        var fragment = _fragments.FirstOrDefault(f => f.Id == fragmentId);
+        var fragment = _fragments.FirstOrDefault(f => f.FragmentId == fragmentId);
         if (fragment == null)
             throw new ArgumentException("Fragment not found", nameof(fragmentId));
 
@@ -153,7 +153,7 @@ public class Post : AuditableEntity
     /// <param name="updatedBy">The user moving the fragment</param>
     public void MoveFragmentDown(int fragmentId, string updatedBy)
     {
-        var fragment = _fragments.FirstOrDefault(f => f.Id == fragmentId);
+        var fragment = _fragments.FirstOrDefault(f => f.FragmentId == fragmentId);
         if (fragment == null)
             throw new ArgumentException("Fragment not found", nameof(fragmentId));
 

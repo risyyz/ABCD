@@ -179,7 +179,7 @@ public class BlogTests
         // Arrange
         var blog = new Blog
         {
-            Id = 1,
+            BlogId = 1,
             Title = "Test Blog",
             CreatedBy = "creator",
             LastUpdatedBy = "creator"
@@ -208,7 +208,7 @@ public class BlogTests
         // Arrange
         var blog = new Blog
         {
-            Id = 1,
+            BlogId = 1,
             Title = "Test Blog",
             CreatedBy = "creator",
             LastUpdatedBy = "creator"
