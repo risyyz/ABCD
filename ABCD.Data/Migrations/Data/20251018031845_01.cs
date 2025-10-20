@@ -16,7 +16,7 @@ namespace ABCD.Data.Migrations.Data
                 {
                     BlogId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Title = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -24,29 +24,36 @@ namespace ABCD.Data.Migrations.Data
                 });
 
             migrationBuilder.CreateTable(
-                name: "BlogDomains",
+                name: "Posts",
                 columns: table => new
                 {
+                    PostId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     BlogId = table.Column<int>(type: "int", nullable: false),
-                    Domain = table.Column<string>(type: "nvarchar(253)", maxLength: 253, nullable: false)
+                    Title = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_BlogDomains", x => new { x.BlogId, x.Domain });
+                    table.PrimaryKey("PK_Posts", x => x.PostId);
                     table.ForeignKey(
-                        name: "FK_BlogDomains_Blogs_BlogId",
+                        name: "FK_Posts_Blogs_BlogId",
                         column: x => x.BlogId,
                         principalTable: "Blogs",
                         principalColumn: "BlogId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Posts_BlogId",
+                table: "Posts",
+                column: "BlogId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "BlogDomains");
+                name: "Posts");
 
             migrationBuilder.DropTable(
                 name: "Blogs");

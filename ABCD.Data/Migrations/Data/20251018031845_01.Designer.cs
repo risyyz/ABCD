@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ABCD.Data.Migrations.Data
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20241218020705_01")]
+    [Migration("20251018031845_01")]
     partial class _01
     {
         /// <inheritdoc />
@@ -19,7 +19,7 @@ namespace ABCD.Data.Migrations.Data
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.0")
+                .HasAnnotation("ProductVersion", "9.0.9")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -32,44 +32,51 @@ namespace ABCD.Data.Migrations.Data
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BlogId"));
 
-                    b.Property<string>("Title")
+                    b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.HasKey("BlogId");
 
                     b.ToTable("Blogs", (string)null);
                 });
 
-            modelBuilder.Entity("ABCD.Core.BlogDomain", b =>
+            modelBuilder.Entity("ABCD.Core.Post", b =>
                 {
+                    b.Property<int>("PostId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PostId"));
+
                     b.Property<int>("BlogId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Domain")
-                        .HasMaxLength(253)
-                        .HasColumnType("nvarchar(253)");
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
 
-                    b.HasKey("BlogId", "Domain");
+                    b.HasKey("PostId");
 
-                    b.ToTable("BlogDomains", (string)null);
+                    b.HasIndex("BlogId");
+
+                    b.ToTable("Posts", (string)null);
                 });
 
-            modelBuilder.Entity("ABCD.Core.BlogDomain", b =>
+            modelBuilder.Entity("ABCD.Core.Post", b =>
                 {
-                    b.HasOne("ABCD.Core.Blog", "Blog")
-                        .WithMany("Domains")
+                    b.HasOne("ABCD.Core.Blog", null)
+                        .WithMany("_posts")
                         .HasForeignKey("BlogId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("Blog");
                 });
 
             modelBuilder.Entity("ABCD.Core.Blog", b =>
                 {
-                    b.Navigation("Domains");
+                    b.Navigation("_posts");
                 });
 #pragma warning restore 612, 618
         }

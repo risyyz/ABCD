@@ -11,7 +11,6 @@ using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -92,6 +91,12 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<BearerTokenReader>();
 
+builder.Services.AddScoped<RequestContextAccessor>();
+builder.Services.AddScoped<RequestContext>(ctx => {
+    var contextAccessor = ctx.GetRequiredService<RequestContextAccessor>();
+    return contextAccessor.RequestContext;
+});
+
 var mapper = AutoMapperConfig.Initialize();
 builder.Services.AddSingleton(mapper);
 builder.Services.AddSingleton<IClassMapper, ClassMapper>();
@@ -108,6 +113,9 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseMiddleware<TokenValidationMiddleware>();
 app.UseAuthorization();
+app.UseMiddleware<RequestContextMiddleware>();
+
+
 //var summaries = new[]
 //{
 //    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"

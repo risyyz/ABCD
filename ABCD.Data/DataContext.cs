@@ -13,44 +13,65 @@ namespace ABCD.Data {
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<Blog>(entity => {
-                entity.ToTable("Blogs"); // Set table name
+                entity.ToTable("Blogs");
                 entity.HasKey(e => e.BlogId);
+
                 entity.Property(e => e.BlogId)
-                      .ValueGeneratedOnAdd()
+                      .ValueGeneratedOnAdd();
+
+                entity.Property(e => e.Name)
+                      .IsRequired()
+                      .HasMaxLength(255);
+
+                entity.Ignore(b => b.Domains); 
+                entity.HasMany<BlogDomain>("_domains")
+                      .WithOne()
+                      .HasForeignKey(p => p.BlogId)
+                      .IsRequired()
+                      .OnDelete(DeleteBehavior.Restrict); // Enforce restrict delete
+
+                entity.Ignore(b => b.Posts);
+                entity.HasMany<Post>("_posts")
+                     .WithOne()
+                     .HasForeignKey(p => p.BlogId)
+                     .IsRequired()
+                     .OnDelete(DeleteBehavior.Restrict); // Enforce restrict delete
+            });
+
+            modelBuilder.Entity<BlogDomain>(entity => {
+                entity.ToTable("BlogDomains");
+
+                // Composite primary key
+                entity.HasKey(e => new { e.BlogId, e.Domain });
+
+                // Make Domain required and set max length if needed
+                entity.Property(e => e.Domain)
+                      .IsRequired()
+                      .HasMaxLength(253); // Use a suitable max length for domains
+
+                // Make BlogId required (already enforced by being part of PK and constructor)
+                entity.Property(e => e.BlogId)
                       .IsRequired();
+            });
+
+            modelBuilder.Entity<Post>(entity => {
+                entity.ToTable("Posts");
+                entity.HasKey(e => e.PostId);
+
+                entity.Property(e => e.PostId)
+                      .ValueGeneratedOnAdd(); // Auto-increment identity
+
                 entity.Property(e => e.Title)
                       .IsRequired()
                       .HasMaxLength(250);
 
-                entity.HasMany(e => e.Domains)
-                      .WithOne(d => d.Blog)
-                      .HasForeignKey(d => d.BlogId)
-                      .OnDelete(DeleteBehavior.Cascade)
+                entity.Property(e => e.BlogId)
                       .IsRequired();
             });
-
-            modelBuilder.Entity<BlogDomain>(entity => {
-                entity.ToTable("BlogDomains"); // Set table name
-                entity.HasKey(e => new { e.BlogId, e.Domain });
-                entity.Property(e => e.Domain)
-                      .IsRequired()
-                      .HasMaxLength(253);
-
-                entity.HasOne(d => d.Blog)
-                      .WithMany(b => b.Domains)
-                      .HasForeignKey(d => d.BlogId)
-                      .OnDelete(DeleteBehavior.Cascade);
-            });
-
-            // Configure other entities if needed
         }
 
-
-
-        // Define your DbSets here
         public DbSet<Blog> Blogs { get; set; }
         public DbSet<BlogDomain> BlogDomains { get; set; }
-        //public DbSet<Post> Posts { get; set; }
-        //public DbSet<PostFragment> PostFragments { get; set; }
+        public DbSet<Post> Posts { get; set; }
     }
 }
