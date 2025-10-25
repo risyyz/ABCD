@@ -1,11 +1,33 @@
+using System.Text.RegularExpressions;
+
 namespace ABCD.Core;
 
 /// <summary>
 /// Rich domain model for blogs with post management and domain behaviors
 /// </summary>
 public class Blog {
-    public int BlogId { get; set; }
-    public string Name { get; set; } = string.Empty;
+    public required int BlogId { get; set; }
+    private string _name = string.Empty;
+    public required string Name {
+        get => _name;
+        set {
+            if (string.IsNullOrWhiteSpace(value))
+                throw new ArgumentException("Name cannot be null or empty.", nameof(Name));
+
+            _name = value.Trim();
+        }
+    }
+
+    private  string _description = string.Empty;
+    public string Description {
+        get => _description;
+        set {
+            if (string.IsNullOrWhiteSpace(value))
+                throw new ArgumentException("Description cannot be null or empty.", nameof(Description));
+
+            _description = value.Trim();
+        }
+    }
 
     // Backing field for EF Core
     private readonly List<Post> _posts = new();
@@ -13,18 +35,16 @@ public class Blog {
 
     private readonly List<BlogDomain> _domains = new();
     public IReadOnlyCollection<BlogDomain> Domains => _domains;
-}
+    public void AddDomain(string domain) {
+        if (string.IsNullOrWhiteSpace(domain))
+            throw new ArgumentException("Domain cannot be null or whitespace.", nameof(domain));
 
-public class BlogDomain {
-    public int BlogId { get; }
-    public string Domain { get; set; } = string.Empty;
-
-    public BlogDomain(int blogId) {
-        if (blogId <= 0)
-            throw new ArgumentOutOfRangeException(nameof(blogId), "BlogId must be greater than 0.");
-
-        BlogId = blogId;
+        var domainName = new DomainName(domain);
+        if (!_domains.Any(d => d.Domain.Equals(domainName)))
+            _domains.Add(new BlogDomain(BlogId, domainName));
     }
 
-    private BlogDomain() { }
+    public void ClearDomains() {
+        _domains.Clear();
+    }
 }

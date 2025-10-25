@@ -46,12 +46,15 @@ namespace ABCD.Data {
 
                 // Make Domain required and set max length if needed
                 entity.Property(e => e.Domain)
-                      .IsRequired()
-                      .HasMaxLength(253); // Use a suitable max length for domains
+                    .HasConversion(
+                        v => v.Value, // to store in db
+                        v => new DomainName(v)) // to read from db
+                    .IsRequired()
+                    .HasMaxLength(253); // Use a suitable max length for domains
 
                 // Make BlogId required (already enforced by being part of PK and constructor)
                 entity.Property(e => e.BlogId)
-                      .IsRequired();
+                    .IsRequired();
             });
 
             modelBuilder.Entity<Post>(entity => {

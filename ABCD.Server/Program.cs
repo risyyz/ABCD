@@ -22,7 +22,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add configuration sources
 builder.Configuration
     .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName.ToLowerInvariant()}.json", optional: true, reloadOnChange: true)
     .AddEnvironmentVariables();
 
 if (builder.Environment.IsDevelopment()) {
@@ -47,6 +47,7 @@ builder.Services.Configure<Settings>(options => {
 });
 
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection(JwtSettings.SectionName));
+builder.Services.Configure<CachingSettings>(builder.Configuration.GetSection(CachingSettings.SectionName));
 
 // Add services to the container.
 var connectionString = configuration.GetConnectionString("DefaultConnection");
@@ -109,6 +110,7 @@ if (app.Environment.IsDevelopment()) {
 }
 
 // Configure the HTTP request pipeline.
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseMiddleware<TokenValidationMiddleware>();
