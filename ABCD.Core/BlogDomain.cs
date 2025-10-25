@@ -3,7 +3,7 @@
 namespace ABCD.Core {
     public class BlogDomain {
         public int BlogId { get; }
-        public DomainName Domain { get; set; }
+        public DomainName DomainName { get; set; }
 
         public BlogDomain(int blogId, DomainName domain) {
             if (blogId <= 0)
@@ -13,10 +13,10 @@ namespace ABCD.Core {
                 throw new ArgumentException("Domain cannot be null or whitespace.", nameof(domain));
 
             BlogId = blogId;
-            Domain = domain;
+            DomainName = domain;
         }
 
-        private BlogDomain() { Domain = new DomainName(""); }
+        private BlogDomain() { DomainName = new DomainName(""); }
     }
 
 

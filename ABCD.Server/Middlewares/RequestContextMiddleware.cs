@@ -26,7 +26,7 @@ namespace ABCD.Server.Middlewares {
                 blog = await (
                     from d in dataContext.BlogDomains
                     join b in dataContext.Blogs on d.BlogId equals b.BlogId
-                    where d.Domain.Value.ToLowerInvariant() == domain
+                    where d.DomainName.Value.ToLowerInvariant() == domain
                     select b
                 ).FirstOrDefaultAsync();
 

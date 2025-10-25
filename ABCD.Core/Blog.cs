@@ -40,7 +40,7 @@ public class Blog {
             throw new ArgumentException("Domain cannot be null or whitespace.", nameof(domain));
 
         var domainName = new DomainName(domain);
-        if (!_domains.Any(d => d.Domain.Equals(domainName)))
+        if (!_domains.Any(d => d.DomainName.Equals(domainName)))
             _domains.Add(new BlogDomain(BlogId, domainName));
     }
 

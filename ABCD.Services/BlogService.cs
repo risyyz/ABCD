@@ -17,7 +17,7 @@ namespace ABCD.Services {
                 blog.BlogId,
                 blog.Name,
                 blog.Description,
-                blog.Domains.Select(d => d.Domain.Value).ToImmutableList()
+                blog.Domains.Select(d => d.DomainName.Value).ToImmutableList()
             );
         }
 
@@ -37,7 +37,7 @@ namespace ABCD.Services {
                 updated.BlogId,
                 updated.Name,
                 updated.Description,
-                updated.Domains.Select(d => d.Domain.Value).ToImmutableList()
+                updated.Domains.Select(d => d.DomainName.Value).ToImmutableList()
             );
         }
 
