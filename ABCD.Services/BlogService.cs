@@ -1,13 +1,18 @@
 ﻿using System.Collections.Immutable;
 
 using ABCD.Core;
+using ABCD.Lib;
 using ABCD.Lib.Exceptions;
 using ABCD.Services.Models;
 
+using Microsoft.EntityFrameworkCore;
+
 namespace ABCD.Services {
     public class BlogService : IBlogService {
+        private readonly RequestContext _context;
         private readonly IBlogRepository _repository;
-        public BlogService(IBlogRepository repository) {
+        public BlogService(RequestContext context, IBlogRepository repository) {
+            _context = context;
             _repository = repository;
         }
 
@@ -17,7 +22,7 @@ namespace ABCD.Services {
                 blog.BlogId,
                 blog.Name,
                 blog.Description,
-                blog.Domains.Select(d => d.DomainName.Value).ToImmutableList()
+                blog.Domains.Select(d => d.Domain.Name).ToImmutableList()
             );
         }
 
@@ -37,7 +42,7 @@ namespace ABCD.Services {
                 updated.BlogId,
                 updated.Name,
                 updated.Description,
-                updated.Domains.Select(d => d.DomainName.Value).ToImmutableList()
+                updated.Domains.Select(d => d.Domain.Name).ToImmutableList()
             );
         }
 

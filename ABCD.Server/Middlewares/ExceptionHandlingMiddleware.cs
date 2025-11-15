@@ -1,7 +1,5 @@
-using System.Net;
 using System.Text.Json;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
+
 using ABCD.Lib.Exceptions; // Ensure this namespace is included
 
 namespace ABCD.Server.Middlewares {

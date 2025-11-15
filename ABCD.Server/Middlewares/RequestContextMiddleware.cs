@@ -23,21 +23,22 @@ namespace ABCD.Server.Middlewares {
 
             var domain = httpContext.Request.Host.Host.ToLowerInvariant();
             if (!_cache.TryGetValue(domain, out Blog? blog)) {
-                blog = await (
-                    from d in dataContext.BlogDomains
-                    join b in dataContext.Blogs on d.BlogId equals b.BlogId
-                    where d.DomainName.Value.ToLowerInvariant() == domain
-                    select b
-                ).FirstOrDefaultAsync();
+                var blogId = await dataContext.Set<BlogDomain>()
+                    .Where(d => d.Domain == new Domain(domain))
+                    .Select(d => d.BlogId)
+                    .FirstOrDefaultAsync();
 
-                if (blog != null) {
-                    _cache.Set(domain, blog, TimeSpan.FromMinutes(_cachingSettings.DomainCacheDurationInMinutes));
+                if(blogId != 0) {
+                    blog = await dataContext.Set<Blog>()
+                        .Include(b => EF.Property<ICollection<BlogDomain>>(b, "_domains"))
+                        .FirstOrDefaultAsync(b => b.BlogId == blogId);
                 }
             }
 
             if (blog == null)
                 throw new RequestContextException($"Unable to resolve blog from domain '{domain}'");
 
+            _cache.Set(domain, blog, TimeSpan.FromMinutes(_cachingSettings.DomainCacheDurationInMinutes));
             contextAccessor.RequestContext = new RequestContext(blog);
             await _next(httpContext);
         }

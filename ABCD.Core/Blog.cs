@@ -1,5 +1,3 @@
-using System.Text.RegularExpressions;
-
 namespace ABCD.Core;
 
 /// <summary>
@@ -29,18 +27,14 @@ public class Blog {
         }
     }
 
-    // Backing field for EF Core
     private readonly List<Post> _posts = new();
     public IReadOnlyCollection<Post> Posts => _posts;
 
     private readonly List<BlogDomain> _domains = new();
     public IReadOnlyCollection<BlogDomain> Domains => _domains;
-    public void AddDomain(string domain) {
-        if (string.IsNullOrWhiteSpace(domain))
-            throw new ArgumentException("Domain cannot be null or whitespace.", nameof(domain));
-
-        var domainName = new DomainName(domain);
-        if (!_domains.Any(d => d.DomainName.Equals(domainName)))
+    public void AddDomain(string name) {
+        var domainName = new Domain(name);
+        if (!_domains.Any(d => d.Domain.Equals(domainName)))
             _domains.Add(new BlogDomain(BlogId, domainName));
     }
 

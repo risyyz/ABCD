@@ -1,5 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 
+using ABCD.Core;
 using ABCD.Data;
 using ABCD.Lib;
 using ABCD.Server;
@@ -97,6 +98,9 @@ builder.Services.AddScoped<RequestContext>(ctx => {
     var contextAccessor = ctx.GetRequiredService<RequestContextAccessor>();
     return contextAccessor.RequestContext;
 });
+
+builder.Services.AddScoped<IBlogRepository, BlogRepository>();
+builder.Services.AddScoped<IBlogService, BlogService>();
 
 var mapper = AutoMapperConfig.Initialize();
 builder.Services.AddSingleton(mapper);

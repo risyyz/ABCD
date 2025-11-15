@@ -42,13 +42,13 @@ namespace ABCD.Data {
                 entity.ToTable("BlogDomains");
 
                 // Composite primary key
-                entity.HasKey(e => new { e.BlogId, e.DomainName });
+                entity.HasKey(e => new { e.BlogId, e.Domain });
 
                 // Make Domain required and set max length if needed
-                entity.Property(e => e.DomainName)
+                entity.Property(e => e.Domain)                    
                     .HasConversion(
-                        v => v.Value, // to store in db
-                        v => new DomainName(v)) // to read from db
+                        v => v.Name, // to store in db
+                        v => new Domain(v)) // to read from db
                     .IsRequired()
                     .HasMaxLength(253); // Use a suitable max length for domains
 
