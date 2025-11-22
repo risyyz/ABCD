@@ -1,5 +1,5 @@
 using ABCD.Server.Requests;
-using ABCD.Services.Models;
+using ABCD.Application.Models;
 
 public static class BlogMappingExtensions
 {

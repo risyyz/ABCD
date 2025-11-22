@@ -1,11 +1,11 @@
 using System.IdentityModel.Tokens.Jwt;
 
-using ABCD.Core;
-using ABCD.Data;
+using ABCD.Domain;
+using ABCD.Infra;
 using ABCD.Lib;
 using ABCD.Server;
 using ABCD.Server.Middlewares;
-using ABCD.Services;
+using ABCD.Application;
 
 using FluentValidation;
 

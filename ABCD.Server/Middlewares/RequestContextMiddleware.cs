@@ -1,5 +1,5 @@
-﻿using ABCD.Core;
-using ABCD.Data;
+﻿using ABCD.Domain;
+using ABCD.Infra;
 using ABCD.Lib;
 using ABCD.Lib.Exceptions;
 
@@ -24,7 +24,7 @@ namespace ABCD.Server.Middlewares {
             var domain = httpContext.Request.Host.Host.ToLowerInvariant();
             if (!_cache.TryGetValue(domain, out Blog? blog)) {
                 var blogId = await dataContext.Set<BlogDomain>()
-                    .Where(d => d.Domain == new Domain(domain))
+                    .Where(d => d.Domain == new ABCD.Domain.Domain(domain))
                     .Select(d => d.BlogId)
                     .FirstOrDefaultAsync();
 

@@ -15,13 +15,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ABCD.Application\ABCD.Application.csproj" />
     <ProjectReference Include="..\abcd.client\abcd.client.esproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="..\ABCD.Core\ABCD.Core.csproj" />
-    <ProjectReference Include="..\ABCD.Data\ABCD.Data.csproj" />
     <ProjectReference Include="..\ABCD.Lib\ABCD.Lib.csproj" />
-    <ProjectReference Include="..\ABCD.Services\ABCD.Services.csproj" />
   </ItemGroup>
 
   <ItemGroup>
