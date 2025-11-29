@@ -1,4 +1,5 @@
-﻿using ABCD.Lib;
+﻿using ABCD.Infra.Data;
+using ABCD.Lib;
 using ABCD.Lib.Exceptions;
 
 using FluentValidation;

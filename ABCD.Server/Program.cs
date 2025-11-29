@@ -1,7 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 
 using ABCD.Domain;
-using ABCD.Infra;
 using ABCD.Lib;
 using ABCD.Server;
 using ABCD.Server.Middlewares;
@@ -17,6 +16,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 using Swashbuckle.AspNetCore.Filters;
+using ABCD.Infra.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 

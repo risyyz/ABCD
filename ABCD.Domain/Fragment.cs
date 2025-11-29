@@ -1,5 +1,3 @@
-using ABCD.Domain.Common;
-
 namespace ABCD.Domain;
 
 public enum FragmentType
@@ -19,7 +17,7 @@ public enum FragmentStatus
 /// <summary>
 /// Rich domain model for post fragments with positioning and status behaviors
 /// </summary>
-public class Fragment : AuditableEntity
+public class Fragment 
 {
     public int FragmentId { get; set; }
     public int PostId { get; set; }

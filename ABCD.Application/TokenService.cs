@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
+using ABCD.Infra.Data;
 using ABCD.Lib;
 
 using Microsoft.Extensions.Options;

@@ -18,8 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Migrations\Auth\" />
-    <Folder Include="Migrations\Data\" />
+    <Folder Include="Search\" />
   </ItemGroup>
 
 </Project>

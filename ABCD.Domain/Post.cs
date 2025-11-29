@@ -7,12 +7,12 @@ public enum PostStatus
 }
 
 public class Post {
-    public int BlogId { get; }
-    public int PostId { get; set; }
+    public BlogId BlogId { get; }
+    public PostId PostId { get; set; }
     public required string Title { get; set; }
 
-    public Post(int blogId) {
-        if (blogId <= 0)
+    public Post(BlogId blogId) {
+        if (blogId.Value <= 0)
             throw new ArgumentOutOfRangeException(nameof(blogId), "BlogId must be greater than 0.");
 
         BlogId = blogId;

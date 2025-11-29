@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using System.Text;
 
+using ABCD.Infra.Data;
 using ABCD.Lib;
 
 using FluentAssertions;

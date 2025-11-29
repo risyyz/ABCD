@@ -15,33 +15,35 @@ namespace ABCD.Application {
         }
 
         public async Task<BlogModel> GetBlogByIdAsync(int blogId) {
-            var blog = await FindBlogByIdAsync(blogId);
-            return new BlogModel(
-                blog.BlogId,
-                blog.Name,
-                blog.Description,
-                blog.Domains.Select(d => d.Domain.Name).ToImmutableList()
-            );
+            //var blog = await FindBlogByIdAsync(blogId);
+            //return new BlogModel(
+            //    //blog.BlogId,
+            //    blog.Name,
+            //    blog.Description,
+            //    blog.Domains.Select(d => d.DomainName).ToImmutableList()
+            //);
+            throw new NotImplementedException();
         }
 
         public async Task<BlogModel> UpdateBlogAsync(BlogModel blogModel) {
-            var blog = await FindBlogByIdAsync(blogModel.BlogId);
-            blog.Name = blogModel.Name;
-            blog.Description = blogModel.Description;
-            blog.ClearDomains();
+            //var blog = await FindBlogByIdAsync(blogModel.BlogId);
+            //blog.Name = blogModel.Name;
+            //blog.Description = blogModel.Description;
+            //blog.ClearDomains();
 
-            foreach (var domain in blogModel.Domains) {
-                blog.AddDomain(domain);
-            }
+            //foreach (var domain in blogModel.Domains) {
+            //    blog.AddDomain(domain);
+            //}
 
-            var updated = await _repository.UpdateAsync(blog);
+            //var updated = await _repository.UpdateAsync(blog);
 
-            return new BlogModel(
-                updated.BlogId,
-                updated.Name,
-                updated.Description,
-                updated.Domains.Select(d => d.Domain.Name).ToImmutableList()
-            );
+            //return new BlogModel(
+            //    updated.BlogId,
+            //    updated.Name,
+            //    updated.Description,
+            //    updated.Domains.Select(d => d.Domain.Name).ToImmutableList()
+            //);
+            throw new NotImplementedException();
         }
 
         private async Task<Blog> FindBlogByIdAsync(int blogId) {

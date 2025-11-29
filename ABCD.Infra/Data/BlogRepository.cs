@@ -2,16 +2,17 @@
 
 using Microsoft.EntityFrameworkCore;
 
-namespace ABCD.Infra {
+namespace ABCD.Infra.Data {
     public class BlogRepository : IBlogRepository {
         private readonly DataContext _context;
         public BlogRepository(DataContext context) => _context = context;
 
         public async Task<Blog?> GetByIdAsync(int blogId) {
-            return await _context.Blogs
-                .AsNoTracking()
-                .Include(b => b.Domains)
-                .FirstOrDefaultAsync(b => b.BlogId == blogId);
+            throw new NotImplementedException();
+            //return await _context.Blogs
+            //    .AsNoTracking()
+            //    .Include(b => b.Domains)
+            //    .FirstOrDefaultAsync(b => b.BlogId == blogId);
         }
 
         public async Task<Blog> UpdateAsync(Blog blog) {

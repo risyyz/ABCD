@@ -1,4 +1,6 @@
-﻿namespace ABCD.Application {
+﻿using ABCD.Infra.Data;
+
+namespace ABCD.Application {
 
     public interface IUserService {
         Task<IEnumerable<ApplicationUser>> GetUsers();
