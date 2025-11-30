@@ -53,7 +53,7 @@ public class Post {
         int fragmentCount = _fragments.Count;
         int insertPosition = position ?? (fragmentCount == 0 ? Fragment.MinPosition : fragmentCount + Fragment.MinPosition);
         if (insertPosition < Fragment.MinPosition || insertPosition > fragmentCount + Fragment.MinPosition)
-            throw new ArgumentOutOfRangeException(nameof(position), $"Position must be between {Fragment.MinPosition} and {fragmentCount + Fragment.MinPosition}.");
+            throw new FragmentPositionException($"Position must be between {Fragment.MinPosition} and {fragmentCount + Fragment.MinPosition}.");
 
         var fragment = new Fragment(this.PostId!, fragmentType, insertPosition) { Content = content };
 

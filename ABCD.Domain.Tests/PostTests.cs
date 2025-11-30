@@ -1,3 +1,6 @@
+using System;
+using System.Linq;
+using Xunit;
 using ABCD.Domain.Exceptions;
 
 namespace ABCD.Domain.Tests
@@ -160,7 +163,8 @@ namespace ABCD.Domain.Tests
             post.AddFragment(FragmentType.Text, "Second");
             post.AddFragment(FragmentType.Text, "Third");
 
-            Assert.Throws<ArgumentOutOfRangeException>(() => post.AddFragment(FragmentType.Text, "Invalid", invalidPosition));
+            var ex = Assert.Throws<FragmentPositionException>(() => post.AddFragment(FragmentType.Text, "Invalid", invalidPosition));
+            Assert.Contains("Position must be between", ex.Message);
         }
 
         [Fact]
@@ -178,7 +182,8 @@ namespace ABCD.Domain.Tests
 
             // Invalid: position 2
             var post2 = new Post(blogId, postId, "Title", PostStatus.Draft, null);
-            Assert.Throws<ArgumentOutOfRangeException>(() => post2.AddFragment(FragmentType.Text, "Invalid", 2));
+            var ex = Assert.Throws<FragmentPositionException>(() => post2.AddFragment(FragmentType.Text, "Invalid", 2));
+            Assert.Contains("Position must be between", ex.Message);
         }
 
         [Theory]
