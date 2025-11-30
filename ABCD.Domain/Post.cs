@@ -50,16 +50,16 @@ public class Post {
     public void AddFragment(FragmentType fragmentType, string? content, int? position = null)
     {
         int fragmentCount = _fragments.Count;
-        int insertPosition = position ?? (fragmentCount == 0 ? 1 : fragmentCount + 1);
-        if (insertPosition < 1 || insertPosition > fragmentCount + 1)
-            throw new ArgumentOutOfRangeException(nameof(position), $"Position must be between 1 and {fragmentCount + 1}.");
+        int insertPosition = position ?? (fragmentCount == 0 ? Fragment.MinPosition : fragmentCount + Fragment.MinPosition);
+        if (insertPosition < Fragment.MinPosition || insertPosition > fragmentCount + Fragment.MinPosition)
+            throw new ArgumentOutOfRangeException(nameof(position), $"Position must be between {Fragment.MinPosition} and {fragmentCount + Fragment.MinPosition}.");
 
         var fragment = new Fragment(this.PostId!, fragmentType, insertPosition) { Content = content };
 
         // Shift positions of fragments at or after the insert position
         foreach (var f in _fragments.Where(f => f.Position >= insertPosition))
         {
-            f.MoveDown(fragmentCount + 1); // MoveDown will increment position
+            f.MoveDown(fragmentCount + Fragment.MinPosition); // MoveDown will increment position
         }
 
         _fragments.Add(fragment);
@@ -76,6 +76,46 @@ public class Post {
 
     public void UnPublish() {
         Status = PostStatus.Draft;
+    }
+
+    public void MoveFragmentUp(int currentFragmentPosition)
+    {
+        ValidateFragmentMovement(currentFragmentPosition);
+        if (currentFragmentPosition == Fragment.MinPosition)
+            throw new InvalidOperationException($"Fragment at position {currentFragmentPosition} is already at the top.");
+
+        var fragment = _fragments.FirstOrDefault(f => f.Position == currentFragmentPosition);
+        if (fragment == null)
+            throw new ArgumentException($"No fragment found at position {currentFragmentPosition}.", nameof(currentFragmentPosition));
+
+        var prevFragment = _fragments.First(f => f.Position == currentFragmentPosition - 1);
+        prevFragment.MoveDown(_fragments.Count);
+        fragment.MoveUp();
+        _fragments.Sort((a, b) => a.Position.CompareTo(b.Position));
+    }
+
+    public void MoveFragmentDown(int currentFragmentPosition)
+    {
+        ValidateFragmentMovement(currentFragmentPosition);
+        if (currentFragmentPosition == _fragments.Count)
+            throw new InvalidOperationException($"Fragment at position {currentFragmentPosition} is already at the bottom.");
+
+        var fragment = _fragments.FirstOrDefault(f => f.Position == currentFragmentPosition);
+        if (fragment == null)
+            throw new ArgumentException($"No fragment found at position {currentFragmentPosition}.", nameof(currentFragmentPosition));
+
+        var nextFragment = _fragments.First(f => f.Position == currentFragmentPosition + 1);
+        nextFragment.MoveUp();
+        fragment.MoveDown(_fragments.Count);
+        _fragments.Sort((a, b) => a.Position.CompareTo(b.Position));
+    }
+
+    private void ValidateFragmentMovement(int currentFragmentPosition) {
+        if (_fragments.Count <= 1)
+            throw new InvalidOperationException($"Cannot move fragment when {_fragments.Count} fragment exists.");
+
+        if (currentFragmentPosition < Fragment.MinPosition || currentFragmentPosition > _fragments.Count)
+            throw new ArgumentOutOfRangeException(nameof(currentFragmentPosition), $"Position must be between {Fragment.MinPosition} and {_fragments.Count}.");
     }
 
     private bool ContainsWord(string input) {

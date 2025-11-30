@@ -1,7 +1,3 @@
-using System;
-using System.Linq;
-using Xunit;
-
 namespace ABCD.Domain.Tests
 {
     public class PostTests
@@ -181,6 +177,120 @@ namespace ABCD.Domain.Tests
             // Invalid: position 2
             var post2 = new Post(blogId, postId, "Title", PostStatus.Draft, null);
             Assert.Throws<ArgumentOutOfRangeException>(() => post2.AddFragment(FragmentType.Text, "Invalid", 2));
+        }
+
+        [Theory]
+        [InlineData(0)]
+        [InlineData(-1)]
+        [InlineData(5)] // out of range for 3 fragments
+        public void MoveFragmentUp_ShouldThrow_WhenPositionIsOutOfRange(int invalidPosition)
+        {
+            var blogId = new BlogId(200);
+            var postId = new PostId(200);
+            var post = new Post(blogId, postId, "Title", PostStatus.Draft, null);
+            post.AddFragment(FragmentType.Text, "First");
+            post.AddFragment(FragmentType.Text, "Second");
+            post.AddFragment(FragmentType.Text, "Third");
+            var ex = Assert.Throws<ArgumentOutOfRangeException>(() => post.MoveFragmentUp(invalidPosition));
+            Assert.Contains("Position must be between", ex.Message);
+        }
+
+        [Theory]
+        [InlineData(0)]
+        [InlineData(-1)]
+        [InlineData(5)] // out of range for 3 fragments
+        public void MoveFragmentDown_ShouldThrow_WhenPositionIsOutOfRange(int invalidPosition)
+        {
+            var blogId = new BlogId(201);
+            var postId = new PostId(201);
+            var post = new Post(blogId, postId, "Title", PostStatus.Draft, null);
+            post.AddFragment(FragmentType.Text, "First");
+            post.AddFragment(FragmentType.Text, "Second");
+            post.AddFragment(FragmentType.Text, "Third");
+            var ex = Assert.Throws<ArgumentOutOfRangeException>(() => post.MoveFragmentDown(invalidPosition));
+            Assert.Contains("Position must be between", ex.Message);
+        }
+
+        [Fact]
+        public void MoveFragmentUp_ShouldThrow_WhenNoFragmentsExist()
+        {
+            var blogId = new BlogId(202);
+            var postId = new PostId(202);
+            var post = new Post(blogId, postId, "Title", PostStatus.Draft, null);
+            var ex = Assert.Throws<InvalidOperationException>(() => post.MoveFragmentUp(1));
+            Assert.Equal("Cannot move fragment when 0 fragment exists.", ex.Message);
+        }
+
+        [Fact]
+        public void MoveFragmentDown_ShouldThrow_WhenNoFragmentsExist()
+        {
+            var blogId = new BlogId(203);
+            var postId = new PostId(203);
+            var post = new Post(blogId, postId, "Title", PostStatus.Draft, null);
+            var ex = Assert.Throws<InvalidOperationException>(() => post.MoveFragmentDown(1));
+            Assert.Equal("Cannot move fragment when 0 fragment exists.", ex.Message);
+        }
+
+        [Fact]
+        public void MoveFragmentUp_ShouldThrow_WhenOnlyOneFragmentExists()
+        {
+            var blogId = new BlogId(204);
+            var postId = new PostId(204);
+            var post = new Post(blogId, postId, "Title", PostStatus.Draft, null);
+            post.AddFragment(FragmentType.Text, "First");
+            var ex = Assert.Throws<InvalidOperationException>(() => post.MoveFragmentUp(1));
+            Assert.Equal("Cannot move fragment when 1 fragment exists.", ex.Message);
+        }
+
+        [Fact]
+        public void MoveFragmentDown_ShouldThrow_WhenOnlyOneFragmentExists()
+        {
+            var blogId = new BlogId(205);
+            var postId = new PostId(205);
+            var post = new Post(blogId, postId, "Title", PostStatus.Draft, null);
+            post.AddFragment(FragmentType.Text, "First");
+            var ex = Assert.Throws<InvalidOperationException>(() => post.MoveFragmentDown(1));
+            Assert.Equal("Cannot move fragment when 1 fragment exists.", ex.Message);
+        }
+
+        [Fact]
+        public void MoveFragmentUp_ShouldMoveFragmentUp_WhenPossible()
+        {
+            var blogId = new BlogId(104);
+            var postId = new PostId(104);
+            var post = new Post(blogId, postId, "Title", PostStatus.Draft, null);
+            post.AddFragment(FragmentType.Text, "First"); // pos 1
+            post.AddFragment(FragmentType.Text, "Second"); // pos 2
+            post.AddFragment(FragmentType.Text, "Third"); // pos 3
+
+            post.MoveFragmentUp(2); // Move "Second" up
+
+            var positions = post.Fragments.Select(f => f.Position).ToArray();
+            var contents = post.Fragments.Select(f => f.Content).ToArray();
+            Assert.Equal(new[] {1, 2, 3}, positions);
+            Assert.Equal("Second", contents[0]);
+            Assert.Equal("First", contents[1]);
+            Assert.Equal("Third", contents[2]);
+        }
+
+        [Fact]
+        public void MoveFragmentDown_ShouldMoveFragmentDown_WhenPossible()
+        {
+            var blogId = new BlogId(105);
+            var postId = new PostId(105);
+            var post = new Post(blogId, postId, "Title", PostStatus.Draft, null);
+            post.AddFragment(FragmentType.Text, "First"); // pos 1
+            post.AddFragment(FragmentType.Text, "Second"); // pos 2
+            post.AddFragment(FragmentType.Text, "Third"); // pos 3
+
+            post.MoveFragmentDown(2); // Move "Second" down
+
+            var positions = post.Fragments.Select(f => f.Position).ToArray();
+            var contents = post.Fragments.Select(f => f.Content).ToArray();
+            Assert.Equal(new[] {1, 2, 3}, positions);
+            Assert.Equal("First", contents[0]);
+            Assert.Equal("Third", contents[1]);
+            Assert.Equal("Second", contents[2]);
         }
     }
 }

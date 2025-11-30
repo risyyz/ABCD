@@ -11,7 +11,7 @@ public enum FragmentType
 
 public class Fragment 
 {
-    private const int MinPosition = 1;
+    public static readonly int MinPosition = 1;
 
     public PostId PostId { get; }
     public FragmentType FragmentType { get; }
