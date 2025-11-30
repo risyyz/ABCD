@@ -22,6 +22,9 @@ public class Post {
         }
     }
 
+    private readonly List<Fragment> _fragments = new();
+    public IReadOnlyCollection<Fragment> Fragments => _fragments.AsReadOnly();
+
     public Post(BlogId blogId, string title) {
         Initialize(blogId, null, title, PostStatus.Draft, null);
     }
@@ -42,6 +45,26 @@ public class Post {
         Title = title;
         Status = status;
         DateLastPublished = dateLastPublished;
+    }
+
+    public void AddFragment(FragmentType fragmentType, string? content, int? position = null)
+    {
+        int fragmentCount = _fragments.Count;
+        int insertPosition = position ?? (fragmentCount == 0 ? 1 : fragmentCount + 1);
+        if (insertPosition < 1 || insertPosition > fragmentCount + 1)
+            throw new ArgumentOutOfRangeException(nameof(position), $"Position must be between 1 and {fragmentCount + 1}.");
+
+        var fragment = new Fragment(this.PostId!, fragmentType, insertPosition) { Content = content };
+
+        // Shift positions of fragments at or after the insert position
+        foreach (var f in _fragments.Where(f => f.Position >= insertPosition))
+        {
+            f.MoveDown(fragmentCount + 1); // MoveDown will increment position
+        }
+
+        _fragments.Add(fragment);
+        // Re-sort fragments by position
+        _fragments.Sort((a, b) => a.Position.CompareTo(b.Position));
     }
 
     public void Publish() {
