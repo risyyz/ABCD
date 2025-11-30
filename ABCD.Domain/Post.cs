@@ -23,22 +23,25 @@ public class Post {
     }
 
     public Post(BlogId blogId, string title) {
-        Initialize(blogId, null, title, PostStatus.Draft);
+        Initialize(blogId, null, title, PostStatus.Draft, null);
     }
 
-    public Post(BlogId blogId, PostId postId, string title, PostStatus status) {
+    public Post(BlogId blogId, PostId postId, string title, PostStatus status, DateTime? dateLastPublished) {
         if (postId == null)
             throw new ArgumentNullException(nameof(postId));
 
-        Initialize(blogId, postId, title, status);
+        if (status == PostStatus.Published && (!dateLastPublished.HasValue || dateLastPublished.Value == default))
+            throw new ArgumentException("DateLastPublished must be set when status is Published.", nameof(dateLastPublished));
+        
+        Initialize(blogId, postId, title, status, dateLastPublished);
     }
 
-    private void Initialize(BlogId blogId, PostId? postId, string title, PostStatus status) {
+    private void Initialize(BlogId blogId, PostId? postId, string title, PostStatus status, DateTime? dateLastPublished) {
         BlogId = blogId ?? throw new ArgumentNullException(nameof(blogId));
         PostId = postId;
         Title = title;
         Status = status;
-        DateLastPublished = null;
+        DateLastPublished = dateLastPublished;
     }
 
     public void Publish() {
