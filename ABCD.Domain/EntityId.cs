@@ -1,4 +1,6 @@
-﻿namespace ABCD.Domain {
+﻿using ABCD.Domain.Exceptions;
+
+namespace ABCD.Domain {
     public abstract class EntityId<T> : IEquatable<EntityId<T>>
     where T : struct {
         public T Value { get; }
@@ -16,14 +18,14 @@
     public sealed class BlogId : EntityId<int> {
         public BlogId(int value) : base(value) {
             if (value <= 0)
-                throw new ArgumentOutOfRangeException(nameof(value), "BlogId must be greater than 0.");
+                throw new ValidationException("BlogId must be greater than 0.", new ArgumentOutOfRangeException(nameof(value)));
         }
     }
 
     public sealed class PostId : EntityId<int> {
         public PostId(int value) : base(value) {
             if (value <= 0)
-                throw new ArgumentOutOfRangeException(nameof(value), "PostId must be greater than 0.");
+                throw new ValidationException("PostId must be greater than 0.", new ArgumentOutOfRangeException(nameof(value)));
         }
     }
 }

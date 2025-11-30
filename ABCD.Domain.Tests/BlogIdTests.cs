@@ -1,3 +1,5 @@
+using ABCD.Domain.Exceptions;
+
 namespace ABCD.Domain.Tests
 {
     public class BlogIdTests
@@ -14,8 +16,10 @@ namespace ABCD.Domain.Tests
         [InlineData(-1)]
         public void BlogId_InvalidValue_ShouldThrow(int value)
         {
-            var ex = Assert.Throws<ArgumentOutOfRangeException>(() => new BlogId(value));
-            Assert.Contains("BlogId must be greater than 0.", ex.Message);
+            var ex = Assert.Throws<ValidationException>(() => new BlogId(value));
+            Assert.Equal("BlogId must be greater than 0.", ex.Message);
+            Assert.IsType<ArgumentOutOfRangeException>(ex.InnerException);
+            Assert.Equal("value", ((ArgumentOutOfRangeException)ex.InnerException!).ParamName);
         }
 
         [Fact]

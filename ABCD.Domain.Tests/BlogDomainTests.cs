@@ -1,3 +1,5 @@
+using ABCD.Domain.Exceptions;
+
 namespace ABCD.Domain.Tests;
 
 public class BlogDomainTests
@@ -16,11 +18,23 @@ public class BlogDomainTests
     [InlineData(null)]
     [InlineData("")]
     [InlineData("   ")]
+    public void Constructor_ShouldThrow_OnNullOrWhitespace(string? input)
+    {
+        var ex = Assert.Throws<ValidationException>(() => new BlogDomain(input!));
+        Assert.Equal("Domain name cannot be null, empty or whitespace.", ex.Message);
+        Assert.IsType<ArgumentNullException>(ex.InnerException);
+        Assert.Equal("domainName", ((ArgumentNullException)ex.InnerException!).ParamName);
+    }
+
+    [Theory]
     [InlineData("invalid_domain!")]
     [InlineData(".com")]
-    public void Constructor_ShouldThrow_OnInvalidDomain(string? input)
+    public void Constructor_ShouldThrow_OnInvalidDomainFormat(string input)
     {
-        Assert.ThrowsAny<ArgumentException>(() => new BlogDomain(input!));
+        var ex = Assert.Throws<ValidationException>(() => new BlogDomain(input));
+        Assert.Contains($"'{input}' is not a valid domain name.", ex.Message);
+        Assert.IsType<ArgumentException>(ex.InnerException);
+        Assert.Equal("domainName", ((ArgumentException)ex.InnerException!).ParamName);
     }
 
     [Theory]
