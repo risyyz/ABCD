@@ -27,7 +27,10 @@ namespace ABCD.Domain.Tests
         [Fact]
         public void Constructor_ShouldThrow_WhenPostIdIsNull()
         {
-            Assert.Throws<ArgumentNullException>(() => new Fragment(null!, FragmentType.Text, 1));
+            var ex = Assert.Throws<DomainException>(() => new Fragment(null!, FragmentType.Text, 1));
+            Assert.Equal("PostId cannot be null.", ex.Message);
+            Assert.IsType<ArgumentNullException>(ex.InnerException);
+            Assert.Equal("postId", ((ArgumentNullException)ex.InnerException!).ParamName);
         }
 
         [Theory]
