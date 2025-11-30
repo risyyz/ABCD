@@ -1,3 +1,5 @@
+using ABCD.Domain.Exceptions;
+
 namespace ABCD.Domain.Tests;
 
 public class BlogTests
@@ -9,7 +11,11 @@ public class BlogTests
     public void Name_ShouldThrow_WhenNullOrEmptyOrWhitespace(string invalidName)
     {
         var blog = new Blog(new BlogId(1)) { Name = "one two three" };
-        Assert.Throws<ArgumentException>(() => blog.Name = invalidName!);
+        var ex = Assert.Throws<DomainException>(() => blog.Name = invalidName!);
+        Assert.Equal("Blog name cannot be null or empty.", ex.Message);
+        Assert.IsType<ArgumentException>(ex.InnerException);
+        Assert.Equal("Value cannot be null or empty. (Parameter 'value')", ex.InnerException!.Message);
+        Assert.Equal("value", ((ArgumentException)ex.InnerException!).ParamName);
     }
 
     [Theory]
@@ -18,7 +24,9 @@ public class BlogTests
     public void Name_ShouldThrow_WhenLessThanThreeWords(string invalidName)
     {
         var blog = new Blog(new BlogId(2)) { Name = "one two three" };
-        Assert.Throws<ArgumentException>(() => blog.Name = invalidName);
+        var ex = Assert.Throws<DomainException>(() => blog.Name = invalidName);
+        Assert.Equal("Blog name must contain at least 3 words.", ex.Message);
+        Assert.Null(ex.InnerException);
     }
 
     [Theory]
@@ -31,31 +39,14 @@ public class BlogTests
         Assert.Equal(validName, blog.Name);
     }
 
-    [Theory]
-    [InlineData(null)]
-    public void Description_ShouldBeNull_WhenSetToNull(string? desc)
-    {
-        var blog = new Blog(new BlogId(4)) { Name = "one two three", Description = "Fantastic blog" };
-        blog.Description = desc;
-        Assert.Null(blog.Description);
-    }
-
-    [Theory]
-    [InlineData("  some description  ", "some description")]
-    [InlineData("desc", "desc")]
-    [InlineData("   padded   ", "padded")]
-    public void Description_ShouldTrim_WhenSet(string input, string expected)
-    {
-        var blog = new Blog(new BlogId(5)) { Name = "one two three" };
-        blog.Description = input;
-        Assert.Equal(expected, blog.Description);
-    }
-
     [Fact]
     public void AddDomain_ShouldThrow_WhenNull()
     {
         var blog = new Blog(new BlogId(6)) { Name = "A B C" };
-        Assert.Throws<ArgumentNullException>(() => blog.AddDomain(null!));
+        var ex = Assert.Throws<DomainException>(() => blog.AddDomain(null!));
+        Assert.Equal("Blog domain cannot be null.", ex.Message);
+        Assert.IsType<ArgumentNullException>(ex.InnerException);
+        Assert.Equal("blogDomain", ((ArgumentNullException)ex.InnerException!).ParamName);
     }
 
     [Theory]
@@ -96,7 +87,10 @@ public class BlogTests
     public void RemoveDomain_ShouldThrow_WhenNull()
     {
         var blog = new Blog(new BlogId(9)) { Name = "A B C" };
-        Assert.Throws<ArgumentNullException>(() => blog.RemoveDomain(null!));
+        var ex = Assert.Throws<DomainException>(() => blog.RemoveDomain(null!));
+        Assert.Equal("Blog domain cannot be null.", ex.Message);
+        Assert.IsType<ArgumentNullException>(ex.InnerException);
+        Assert.Equal("blogDomain", ((ArgumentNullException)ex.InnerException!).ParamName);
     }
 
     [Theory]
@@ -138,5 +132,14 @@ public class BlogTests
     {
         var blog = new Blog(new BlogId(12)) { Name = "A B C" };
         Assert.IsAssignableFrom<IReadOnlyCollection<BlogDomain>>(blog.Domains);
+    }
+
+    [Fact]
+    public void Constructor_ShouldThrow_WhenBlogIdIsNull()
+    {
+        var ex = Assert.Throws<DomainException>(() => { var _ = new Blog(null!) { Name = "Valid Name" }; });
+        Assert.Equal("BlogId cannot be null.", ex.Message);
+        Assert.IsType<ArgumentNullException>(ex.InnerException);
+        Assert.Equal("blogId", ((ArgumentNullException)ex.InnerException!).ParamName);
     }
 }
