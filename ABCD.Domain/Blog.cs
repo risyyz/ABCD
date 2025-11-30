@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 namespace ABCD.Domain;
 
 public class Blog {
-    public required BlogId BlogId { get; set; }
+    public BlogId BlogId { get; }
     
     private const int MinNameWordCount = 3;
 
@@ -46,5 +46,9 @@ public class Blog {
         var toRemove = _domains.FirstOrDefault(d => d.Equals(blogDomain));
         if (toRemove != null)
             _domains.Remove(toRemove);
+    }
+
+    public Blog(BlogId blogId) {
+        BlogId = blogId ?? throw new ArgumentNullException(nameof(blogId));
     }
 }

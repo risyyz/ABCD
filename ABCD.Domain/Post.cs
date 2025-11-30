@@ -34,10 +34,7 @@ public class Post {
     }
 
     private void Initialize(BlogId blogId, PostId? postId, string title, PostStatus status) {
-        if (blogId == null)
-            throw new ArgumentNullException(nameof(blogId));
-
-        BlogId = blogId;
+        BlogId = blogId ?? throw new ArgumentNullException(nameof(blogId));
         PostId = postId;
         Title = title;
         Status = status;

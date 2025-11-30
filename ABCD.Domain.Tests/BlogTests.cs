@@ -8,7 +8,7 @@ public class BlogTests
     [InlineData("   ")]
     public void Name_ShouldThrow_WhenNullOrEmptyOrWhitespace(string invalidName)
     {
-        var blog = new Blog { BlogId = new BlogId(1), Name = "one two three" };
+        var blog = new Blog(new BlogId(1)) { Name = "one two three" };
         Assert.Throws<ArgumentException>(() => blog.Name = invalidName!);
     }
 
@@ -17,7 +17,7 @@ public class BlogTests
     [InlineData("singleword")]
     public void Name_ShouldThrow_WhenLessThanThreeWords(string invalidName)
     {
-        var blog = new Blog { BlogId = new BlogId(2), Name = "one two three" };
+        var blog = new Blog(new BlogId(2)) { Name = "one two three" };
         Assert.Throws<ArgumentException>(() => blog.Name = invalidName);
     }
 
@@ -26,7 +26,7 @@ public class BlogTests
     [InlineData("One two three four")]
     public void Name_ShouldSet_WhenValid(string validName)
     {
-        var blog = new Blog { BlogId = new BlogId(3), Name = "one two three" };
+        var blog = new Blog(new BlogId(3)) { Name = "one two three" };
         blog.Name = validName;
         Assert.Equal(validName, blog.Name);
     }
@@ -35,7 +35,7 @@ public class BlogTests
     [InlineData(null)]
     public void Description_ShouldBeNull_WhenSetToNull(string? desc)
     {
-        var blog = new Blog { BlogId = new BlogId(4), Name = "one two three", Description = "Fantastic blog" };
+        var blog = new Blog(new BlogId(4)) { Name = "one two three", Description = "Fantastic blog" };
         blog.Description = desc;
         Assert.Null(blog.Description);
     }
@@ -46,7 +46,7 @@ public class BlogTests
     [InlineData("   padded   ", "padded")]
     public void Description_ShouldTrim_WhenSet(string input, string expected)
     {
-        var blog = new Blog { BlogId = new BlogId(5), Name = "one two three" };
+        var blog = new Blog(new BlogId(5)) { Name = "one two three" };
         blog.Description = input;
         Assert.Equal(expected, blog.Description);
     }
@@ -54,7 +54,7 @@ public class BlogTests
     [Fact]
     public void AddDomain_ShouldThrow_WhenNull()
     {
-        var blog = new Blog { BlogId = new BlogId(6), Name = "A B C" };
+        var blog = new Blog(new BlogId(6)) { Name = "A B C" };
         Assert.Throws<ArgumentNullException>(() => blog.AddDomain(null!));
     }
 
@@ -63,7 +63,7 @@ public class BlogTests
     [InlineData("another.com")]
     public void AddDomain_ShouldAdd_WhenNotDuplicate(string domainName)
     {
-        var blog = new Blog { BlogId = new BlogId(7), Name = "A B C" };
+        var blog = new Blog(new BlogId(7)) { Name = "A B C" };
         var domain = new BlogDomain(domainName);
         blog.AddDomain(domain);
         Assert.Contains(domain, blog.Domains);
@@ -73,7 +73,7 @@ public class BlogTests
     [Fact]
     public void AddDomain_ShouldNotAdd_WhenDuplicate()
     {
-        var blog = new Blog { BlogId = new BlogId(8), Name = "A B C" };
+        var blog = new Blog(new BlogId(8)) { Name = "A B C" };
         var domain = new BlogDomain("example.com");
         blog.AddDomain(domain);
         blog.AddDomain(new BlogDomain("example.com"));
@@ -86,7 +86,7 @@ public class BlogTests
     [InlineData("MiXeDcAsE.com", "mixedcase.COM")]
     public void AddDomain_ShouldNotAdd_WhenDuplicate_CaseInsensitive(string domain1, string domain2)
     {
-        var blog = new Blog { BlogId = new BlogId(13), Name = "A B C" };
+        var blog = new Blog(new BlogId(13)) { Name = "A B C" };
         blog.AddDomain(new BlogDomain(domain1));
         blog.AddDomain(new BlogDomain(domain2));
         Assert.Single(blog.Domains);
@@ -95,7 +95,7 @@ public class BlogTests
     [Fact]
     public void RemoveDomain_ShouldThrow_WhenNull()
     {
-        var blog = new Blog { BlogId = new BlogId(9), Name = "A B C" };
+        var blog = new Blog(new BlogId(9)) { Name = "A B C" };
         Assert.Throws<ArgumentNullException>(() => blog.RemoveDomain(null!));
     }
 
@@ -104,7 +104,7 @@ public class BlogTests
     [InlineData("another.com")]
     public void RemoveDomain_ShouldRemove_WhenPresent(string domainName)
     {
-        var blog = new Blog { BlogId = new BlogId(10), Name = "A B C" };
+        var blog = new Blog(new BlogId(10)) { Name = "A B C" };
         var domain = new BlogDomain(domainName);
         blog.AddDomain(domain);
         blog.RemoveDomain(domain);
@@ -114,7 +114,7 @@ public class BlogTests
     [Fact]
     public void RemoveDomain_ShouldNotRemove_WhenNotPresent()
     {
-        var blog = new Blog { BlogId = new BlogId(11), Name = "A B C" };
+        var blog = new Blog(new BlogId(11)) { Name = "A B C" };
         var domain = new BlogDomain("example.com");
         blog.RemoveDomain(domain);
         Assert.Empty(blog.Domains);
@@ -126,7 +126,7 @@ public class BlogTests
     [InlineData("MiXeDcAsE.com", "mixedcase.COM")]
     public void RemoveDomain_ShouldRemove_CaseInsensitive(string domain1, string domain2)
     {
-        var blog = new Blog { BlogId = new BlogId(14), Name = "A B C" };
+        var blog = new Blog(new BlogId(14)) { Name = "A B C" };
         var d1 = new BlogDomain(domain1);
         blog.AddDomain(d1);
         blog.RemoveDomain(new BlogDomain(domain2));
@@ -136,7 +136,7 @@ public class BlogTests
     [Fact]
     public void Domains_ShouldBeReadOnly()
     {
-        var blog = new Blog { BlogId = new BlogId(12), Name = "A B C" };
+        var blog = new Blog(new BlogId(12)) { Name = "A B C" };
         Assert.IsAssignableFrom<IReadOnlyCollection<BlogDomain>>(blog.Domains);
     }
 }
