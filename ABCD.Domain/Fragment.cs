@@ -1,5 +1,7 @@
 namespace ABCD.Domain;
 
+using ABCD.Domain.Exceptions;
+
 public enum FragmentType
 {
     Code,
@@ -23,7 +25,7 @@ public class Fragment
     {
         PostId = postId ?? throw new ArgumentNullException(nameof(postId));
         if (position < MinPosition)
-            throw new ArgumentOutOfRangeException(nameof(position), $"Position must be at least {MinPosition}.");
+            throw new FragmentPositionException($"Position must be at least {MinPosition}.");
 
         FragmentType = type;        
         Position = position;
@@ -32,7 +34,7 @@ public class Fragment
     public void MoveUp()
     {
         if (Position == MinPosition)
-            throw new InvalidOperationException($"Cannot move up. Position is already at minimum value {MinPosition}.");
+            throw new FragmentPositionException($"Cannot move up. Position is already at minimum value {MinPosition}.");
 
         Position--;
     }
@@ -40,7 +42,7 @@ public class Fragment
     public void MoveDown(int maxPosition)
     {
         if (Position >= maxPosition)
-            throw new InvalidOperationException($"Cannot move down. Position is already at maximum value {maxPosition}.");
+            throw new FragmentPositionException($"Cannot move down. Position is already at maximum value {maxPosition}.");
         
         Position++;
     }

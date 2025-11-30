@@ -1,4 +1,5 @@
 namespace ABCD.Domain;
+using ABCD.Domain.Exceptions;
 
 public enum PostStatus
 {
@@ -82,11 +83,11 @@ public class Post {
     {
         ValidateFragmentMovement(currentFragmentPosition);
         if (currentFragmentPosition == Fragment.MinPosition)
-            throw new InvalidOperationException($"Fragment at position {currentFragmentPosition} is already at the top.");
+            throw new FragmentPositionException($"Fragment at position {currentFragmentPosition} is already at the top.");
 
         var fragment = _fragments.FirstOrDefault(f => f.Position == currentFragmentPosition);
         if (fragment == null)
-            throw new ArgumentException($"No fragment found at position {currentFragmentPosition}.", nameof(currentFragmentPosition));
+            throw new FragmentPositionException($"No fragment found at position {currentFragmentPosition}.");
 
         var prevFragment = _fragments.First(f => f.Position == currentFragmentPosition - 1);
         prevFragment.MoveDown(_fragments.Count);
@@ -98,11 +99,11 @@ public class Post {
     {
         ValidateFragmentMovement(currentFragmentPosition);
         if (currentFragmentPosition == _fragments.Count)
-            throw new InvalidOperationException($"Fragment at position {currentFragmentPosition} is already at the bottom.");
+            throw new FragmentPositionException($"Fragment at position {currentFragmentPosition} is already at the bottom.");
 
         var fragment = _fragments.FirstOrDefault(f => f.Position == currentFragmentPosition);
         if (fragment == null)
-            throw new ArgumentException($"No fragment found at position {currentFragmentPosition}.", nameof(currentFragmentPosition));
+            throw new FragmentPositionException($"No fragment found at position {currentFragmentPosition}.");
 
         var nextFragment = _fragments.First(f => f.Position == currentFragmentPosition + 1);
         nextFragment.MoveUp();
@@ -112,10 +113,10 @@ public class Post {
 
     private void ValidateFragmentMovement(int currentFragmentPosition) {
         if (_fragments.Count <= 1)
-            throw new InvalidOperationException($"Cannot move fragment when {_fragments.Count} fragment exists.");
+            throw new FragmentPositionException($"Cannot move fragment when {_fragments.Count} fragment exists.");
 
         if (currentFragmentPosition < Fragment.MinPosition || currentFragmentPosition > _fragments.Count)
-            throw new ArgumentOutOfRangeException(nameof(currentFragmentPosition), $"Position must be between {Fragment.MinPosition} and {_fragments.Count}.");
+            throw new FragmentPositionException($"Position must be between {Fragment.MinPosition} and {_fragments.Count}.");
     }
 
     private bool ContainsWord(string input) {

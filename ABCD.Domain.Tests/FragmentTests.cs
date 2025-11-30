@@ -1,5 +1,6 @@
 using System;
 using Xunit;
+using ABCD.Domain.Exceptions;
 
 namespace ABCD.Domain.Tests
 {
@@ -37,7 +38,8 @@ namespace ABCD.Domain.Tests
         public void Constructor_ShouldThrow_WhenPositionIsLessThanMin(int position)
         {
             var postId = new PostId(3);
-            Assert.Throws<ArgumentOutOfRangeException>(() => new Fragment(postId, FragmentType.Text, position));
+            var ex = Assert.Throws<FragmentPositionException>(() => new Fragment(postId, FragmentType.Text, position));
+            Assert.Contains("Position must be at least", ex.Message);
         }
 
         [Fact]
@@ -54,7 +56,8 @@ namespace ABCD.Domain.Tests
         {
             var postId = new PostId(5);
             var fragment = new Fragment(postId, FragmentType.Text, 1);
-            Assert.Throws<InvalidOperationException>(() => fragment.MoveUp());
+            var ex = Assert.Throws<FragmentPositionException>(() => fragment.MoveUp());
+            Assert.Contains("Cannot move up. Position is already at minimum value", ex.Message);
         }
 
         [Fact]
@@ -71,7 +74,8 @@ namespace ABCD.Domain.Tests
         {
             var postId = new PostId(7);
             var fragment = new Fragment(postId, FragmentType.Text, 3);
-            Assert.Throws<InvalidOperationException>(() => fragment.MoveDown(3));
+            var ex = Assert.Throws<FragmentPositionException>(() => fragment.MoveDown(3));
+            Assert.Contains("Cannot move down. Position is already at maximum value", ex.Message);
         }
 
         [Fact]

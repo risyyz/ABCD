@@ -1,3 +1,5 @@
+using ABCD.Domain.Exceptions;
+
 namespace ABCD.Domain.Tests
 {
     public class PostTests
@@ -191,7 +193,7 @@ namespace ABCD.Domain.Tests
             post.AddFragment(FragmentType.Text, "First");
             post.AddFragment(FragmentType.Text, "Second");
             post.AddFragment(FragmentType.Text, "Third");
-            var ex = Assert.Throws<ArgumentOutOfRangeException>(() => post.MoveFragmentUp(invalidPosition));
+            var ex = Assert.Throws<FragmentPositionException>(() => post.MoveFragmentUp(invalidPosition));
             Assert.Contains("Position must be between", ex.Message);
         }
 
@@ -207,7 +209,7 @@ namespace ABCD.Domain.Tests
             post.AddFragment(FragmentType.Text, "First");
             post.AddFragment(FragmentType.Text, "Second");
             post.AddFragment(FragmentType.Text, "Third");
-            var ex = Assert.Throws<ArgumentOutOfRangeException>(() => post.MoveFragmentDown(invalidPosition));
+            var ex = Assert.Throws<FragmentPositionException>(() => post.MoveFragmentDown(invalidPosition));
             Assert.Contains("Position must be between", ex.Message);
         }
 
@@ -217,7 +219,7 @@ namespace ABCD.Domain.Tests
             var blogId = new BlogId(202);
             var postId = new PostId(202);
             var post = new Post(blogId, postId, "Title", PostStatus.Draft, null);
-            var ex = Assert.Throws<InvalidOperationException>(() => post.MoveFragmentUp(1));
+            var ex = Assert.Throws<FragmentPositionException>(() => post.MoveFragmentUp(1));
             Assert.Equal("Cannot move fragment when 0 fragment exists.", ex.Message);
         }
 
@@ -227,7 +229,7 @@ namespace ABCD.Domain.Tests
             var blogId = new BlogId(203);
             var postId = new PostId(203);
             var post = new Post(blogId, postId, "Title", PostStatus.Draft, null);
-            var ex = Assert.Throws<InvalidOperationException>(() => post.MoveFragmentDown(1));
+            var ex = Assert.Throws<FragmentPositionException>(() => post.MoveFragmentDown(1));
             Assert.Equal("Cannot move fragment when 0 fragment exists.", ex.Message);
         }
 
@@ -238,7 +240,7 @@ namespace ABCD.Domain.Tests
             var postId = new PostId(204);
             var post = new Post(blogId, postId, "Title", PostStatus.Draft, null);
             post.AddFragment(FragmentType.Text, "First");
-            var ex = Assert.Throws<InvalidOperationException>(() => post.MoveFragmentUp(1));
+            var ex = Assert.Throws<FragmentPositionException>(() => post.MoveFragmentUp(1));
             Assert.Equal("Cannot move fragment when 1 fragment exists.", ex.Message);
         }
 
@@ -249,8 +251,32 @@ namespace ABCD.Domain.Tests
             var postId = new PostId(205);
             var post = new Post(blogId, postId, "Title", PostStatus.Draft, null);
             post.AddFragment(FragmentType.Text, "First");
-            var ex = Assert.Throws<InvalidOperationException>(() => post.MoveFragmentDown(1));
+            var ex = Assert.Throws<FragmentPositionException>(() => post.MoveFragmentDown(1));
             Assert.Equal("Cannot move fragment when 1 fragment exists.", ex.Message);
+        }
+
+        [Fact]
+        public void MoveFragmentUp_ShouldThrow_WhenFragmentIsAtTop()
+        {
+            var blogId = new BlogId(102);
+            var postId = new PostId(102);
+            var post = new Post(blogId, postId, "Title", PostStatus.Draft, null);
+            post.AddFragment(FragmentType.Text, "First");
+            post.AddFragment(FragmentType.Text, "Second");
+            var ex = Assert.Throws<FragmentPositionException>(() => post.MoveFragmentUp(1));
+            Assert.Equal("Fragment at position 1 is already at the top.", ex.Message);
+        }
+
+        [Fact]
+        public void MoveFragmentDown_ShouldThrow_WhenFragmentIsAtBottom()
+        {
+            var blogId = new BlogId(103);
+            var postId = new PostId(103);
+            var post = new Post(blogId, postId, "Title", PostStatus.Draft, null);
+            post.AddFragment(FragmentType.Text, "First");
+            post.AddFragment(FragmentType.Text, "Second");
+            var ex = Assert.Throws<FragmentPositionException>(() => post.MoveFragmentDown(2));
+            Assert.Equal("Fragment at position 2 is already at the bottom.", ex.Message);
         }
 
         [Fact]
