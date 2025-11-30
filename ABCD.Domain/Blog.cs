@@ -23,7 +23,7 @@ public class Blog {
         }
     }
 
-    private  string? _description;
+    private string? _description;
     public string? Description {
         get => _description;
         set => _description = value?.Trim();

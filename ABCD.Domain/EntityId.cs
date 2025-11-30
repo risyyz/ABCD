@@ -4,8 +4,6 @@
         public T Value { get; }
 
         protected EntityId(T value) {
-            if (EqualityComparer<T>.Default.Equals(value, default))
-                throw new ArgumentException("Id value cannot be default.", nameof(value));
             Value = value;
         }
 
@@ -16,11 +14,16 @@
     }
 
     public sealed class BlogId : EntityId<int> {
-        public BlogId(int value) : base(value) { }
+        public BlogId(int value) : base(value) {
+            if (value <= 0)
+                throw new ArgumentOutOfRangeException(nameof(value), "BlogId must be greater than 0.");
+        }
     }
 
     public sealed class PostId : EntityId<int> {
-        public PostId(int value) : base(value) { }
+        public PostId(int value) : base(value) {
+            if (value <= 0)
+                throw new ArgumentOutOfRangeException(nameof(value), "PostId must be greater than 0.");
+        }
     }
-
 }

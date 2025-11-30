@@ -1,5 +1,3 @@
-using Xunit;
-
 namespace ABCD.Domain.Tests;
 
 public class BlogTests
