@@ -18,7 +18,7 @@ public class Post {
         get => _title;
         set {
             if (string.IsNullOrWhiteSpace(value) || !ContainsWord(value))
-                throw new DomainException("Title must contain at least one word and cannot be null, empty, or whitespace.", new ArgumentException("Value must contain at least one word and cannot be null, empty, or whitespace.", nameof(value)));
+                throw new ValidationException("Title must contain at least one word and cannot be null, empty, or whitespace.", new ArgumentException("Value must contain at least one word and cannot be null, empty, or whitespace.", nameof(value)));
             _title = value;
         }
     }
@@ -32,16 +32,16 @@ public class Post {
 
     public Post(BlogId blogId, PostId postId, string title, PostStatus status, DateTime? dateLastPublished) {
         if (postId == null)
-            throw new DomainException("PostId cannot be null.", new ArgumentNullException(nameof(postId)));
+            throw new ValidationException("PostId cannot be null.", new ArgumentNullException(nameof(postId)));
 
         if (status == PostStatus.Published && (!dateLastPublished.HasValue || dateLastPublished.Value == default))
-            throw new DomainException("DateLastPublished must be set when status is Published.", new ArgumentException("Value must be set when status is Published.", nameof(dateLastPublished)));
+            throw new ValidationException("DateLastPublished must be set when status is Published.", new ArgumentException("Value must be set when status is Published.", nameof(dateLastPublished)));
         
         Initialize(blogId, postId, title, status, dateLastPublished);
     }
 
     private void Initialize(BlogId blogId, PostId? postId, string title, PostStatus status, DateTime? dateLastPublished) {
-        BlogId = blogId ?? throw new DomainException("BlogId cannot be null.", new ArgumentNullException(nameof(blogId)));
+        BlogId = blogId ?? throw new ValidationException("BlogId cannot be null.", new ArgumentNullException(nameof(blogId)));
         PostId = postId;
         Title = title;
         Status = status;

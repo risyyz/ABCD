@@ -23,7 +23,7 @@ public class Fragment
 
     public Fragment(PostId postId, FragmentType type, int position)
     {
-        PostId = postId ?? throw new DomainException("PostId cannot be null.", new ArgumentNullException(nameof(postId)));
+        PostId = postId ?? throw new ValidationException("PostId cannot be null.", new ArgumentNullException(nameof(postId)));
         if (position < MinPosition)
             throw new FragmentPositionException($"Position must be at least {MinPosition}.");
 

@@ -22,7 +22,7 @@ namespace ABCD.Domain.Tests
         [Fact]
         public void Constructor_ShouldThrow_WhenBlogIdIsNull()
         {
-            var ex = Assert.Throws<DomainException>(() => new Post(null!, "Valid Title"));
+            var ex = Assert.Throws<ValidationException>(() => new Post(null!, "Valid Title"));
             Assert.Equal("BlogId cannot be null.", ex.Message);
             Assert.IsType<ArgumentNullException>(ex.InnerException);
             Assert.Equal("blogId", ((ArgumentNullException)ex.InnerException!).ParamName);
@@ -36,7 +36,7 @@ namespace ABCD.Domain.Tests
         {
             var blogId = new BlogId(2);
             var post = new Post(blogId, "Valid Title");
-            var ex = Assert.Throws<DomainException>(() => post.Title = invalidTitle!);
+            var ex = Assert.Throws<ValidationException>(() => post.Title = invalidTitle!);
             Assert.Equal("Title must contain at least one word and cannot be null, empty, or whitespace.", ex.Message);
             Assert.IsType<ArgumentException>(ex.InnerException);
             Assert.Equal("value", ((ArgumentException)ex.InnerException!).ParamName);
@@ -107,7 +107,7 @@ namespace ABCD.Domain.Tests
         public void Constructor_WithPostId_ShouldThrow_WhenPostIdIsNull()
         {
             var blogId = new BlogId(9);
-            var ex = Assert.Throws<DomainException>(() => new Post(blogId, null!, "Valid Title", PostStatus.Draft, null));
+            var ex = Assert.Throws<ValidationException>(() => new Post(blogId, null!, "Valid Title", PostStatus.Draft, null));
             Assert.Equal("PostId cannot be null.", ex.Message);
             Assert.IsType<ArgumentNullException>(ex.InnerException);
             Assert.Equal("postId", ((ArgumentNullException)ex.InnerException!).ParamName);
@@ -118,12 +118,12 @@ namespace ABCD.Domain.Tests
         {
             var blogId = new BlogId(10);
             var postId = new PostId(12);
-            var ex1 = Assert.Throws<DomainException>(() => new Post(blogId, postId, "Valid Title", PostStatus.Published, null));
+            var ex1 = Assert.Throws<ValidationException>(() => new Post(blogId, postId, "Valid Title", PostStatus.Published, null));
             Assert.Equal("DateLastPublished must be set when status is Published.", ex1.Message);
             Assert.IsType<ArgumentException>(ex1.InnerException);
             Assert.Equal("dateLastPublished", ((ArgumentException)ex1.InnerException!).ParamName);
 
-            var ex2 = Assert.Throws<DomainException>(() => new Post(blogId, postId, "Valid Title", PostStatus.Published, default));
+            var ex2 = Assert.Throws<ValidationException>(() => new Post(blogId, postId, "Valid Title", PostStatus.Published, default));
             Assert.Equal("DateLastPublished must be set when status is Published.", ex2.Message);
             Assert.IsType<ArgumentException>(ex2.InnerException);
             Assert.Equal("dateLastPublished", ((ArgumentException)ex2.InnerException!).ParamName);
