@@ -60,7 +60,7 @@ namespace ABCD.Domain.Tests
             var post = new Post(blogId, "Valid Title");
             post.Publish();
             var publishedDate = post.DateLastPublished;
-            post.SetAsDraft();
+            post.UnPublish();
             Assert.Equal(PostStatus.Draft, post.Status);
             Assert.Equal(publishedDate, post.DateLastPublished);
         }

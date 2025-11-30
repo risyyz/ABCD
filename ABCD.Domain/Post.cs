@@ -51,7 +51,7 @@ public class Post {
         }
     }
 
-    public void SetAsDraft() {
+    public void UnPublish() {
         Status = PostStatus.Draft;
     }
 
