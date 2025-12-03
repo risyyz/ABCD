@@ -1,5 +1,4 @@
-﻿using ABCD.Domain;
-using ABCD.Lib;
+﻿using ABCD.Lib;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -12,69 +11,57 @@ namespace ABCD.Infra.Data {
         protected override void OnModelCreating(ModelBuilder modelBuilder) {
             base.OnModelCreating(modelBuilder);
 
-            //modelBuilder.Entity<Blog>(entity => {
-            //    entity.ToTable("Blogs");
-            //    entity.HasKey(e => e.BlogId);
+            modelBuilder.Entity<BlogRecord>(entity => {
+                entity.ToTable("Blogs");
+                entity.HasKey(e => e.BlogId);
+                entity.Property(e => e.BlogId).ValueGeneratedOnAdd();
+                entity.Property(e => e.Name).IsRequired().HasMaxLength(255);
+                entity.Property(e => e.Description);
+                entity.HasMany(e => e.Domains)
+                      .WithOne(e => e.Blog)
+                      .HasForeignKey(e => e.BlogId)
+                      .IsRequired()
+                      .OnDelete(DeleteBehavior.Restrict);
+                entity.HasMany(e => e.Posts)
+                      .WithOne(e => e.Blog)
+                      .HasForeignKey(e => e.BlogId)
+                      .IsRequired()
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
 
-            //    entity.Property(e => e.BlogId)
-            //          .ValueGeneratedOnAdd();
+            modelBuilder.Entity<DomainRecord>(entity => {
+                entity.ToTable("Domains");
+                entity.HasKey(e => new { e.BlogId, e.Domain });
+                entity.Property(e => e.Domain).IsRequired().HasMaxLength(253);
+                entity.Property(e => e.BlogId).IsRequired();
+            });
 
-            //    entity.Property(e => e.Name)
-            //          .IsRequired()
-            //          .HasMaxLength(255);
+            modelBuilder.Entity<PostRecord>(entity => {
+                entity.ToTable("Posts");
+                entity.HasKey(e => e.PostId);
+                entity.Property(e => e.PostId).ValueGeneratedOnAdd();
+                entity.Property(e => e.Title).IsRequired().HasMaxLength(250);
+                entity.Property(e => e.Content);
+                entity.Property(e => e.BlogId).IsRequired();
+                entity.HasMany(e => e.Fragments)
+                      .WithOne(e => e.Post)
+                      .HasForeignKey(e => e.PostId)
+                      .IsRequired()
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
 
-            //    entity.Ignore(b => b.Domains);
-            //    entity.HasMany<BlogDomain>("_domains")
-            //          .WithOne()
-            //          .HasForeignKey(p => p.BlogId)
-            //          .IsRequired()
-            //          .OnDelete(DeleteBehavior.Restrict); // Enforce restrict delete
-
-            //    entity.Ignore(b => b.Posts);
-            //    entity.HasMany<Post>("_posts")
-            //         .WithOne()
-            //         .HasForeignKey(p => p.BlogId)
-            //         .IsRequired()
-            //         .OnDelete(DeleteBehavior.Restrict); // Enforce restrict delete
-            //});
-
-            //modelBuilder.Entity<BlogDomain>(entity => {
-            //    entity.ToTable("BlogDomains");
-
-            //    // Composite primary key
-            //    entity.HasKey(e => new { e.BlogId, e.Domain });
-
-            //    // Make Domain required and set max length if needed
-            //    entity.Property(e => e.Domain)
-            //        .HasConversion(
-            //            v => v.Name, // to store in db
-            //            v => new Domain.Domain(v)) // to read from db
-            //        .IsRequired()
-            //        .HasMaxLength(253); // Use a suitable max length for domains
-
-            //    // Make BlogId required (already enforced by being part of PK and constructor)
-            //    entity.Property(e => e.BlogId)
-            //        .IsRequired();
-            //});
-
-            //modelBuilder.Entity<Post>(entity => {
-            //    entity.ToTable("Posts");
-            //    entity.HasKey(e => e.PostId);
-
-            //    entity.Property(e => e.PostId)
-            //          .ValueGeneratedOnAdd(); // Auto-increment identity
-
-            //    entity.Property(e => e.Title)
-            //          .IsRequired()
-            //          .HasMaxLength(250);
-
-            //    entity.Property(e => e.BlogId)
-            //          .IsRequired();
-            //});
+            modelBuilder.Entity<FragmentRecord>(entity => {
+                entity.ToTable("Fragments");
+                entity.HasKey(e => new { e.PostId, e.Position });
+                entity.Property(e => e.PostId).IsRequired();
+                entity.Property(e => e.Position).IsRequired();
+                entity.Property(e => e.Content).IsRequired();
+            });
         }
 
-        public DbSet<Blog> Blogs { get; set; }
-        public DbSet<BlogDomain> BlogDomains { get; set; }
-        public DbSet<Post> Posts { get; set; }
+        public DbSet<BlogRecord> Blogs { get; set; }
+        public DbSet<DomainRecord> Domains { get; set; }
+        public DbSet<PostRecord> Posts { get; set; }
+        public DbSet<FragmentRecord> Fragments { get; set; }
     }
 }
