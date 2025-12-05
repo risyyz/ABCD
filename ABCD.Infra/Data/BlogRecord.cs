@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace ABCD.Infra.Data {
     public class BlogRecord {
         public int BlogId { get; set; }

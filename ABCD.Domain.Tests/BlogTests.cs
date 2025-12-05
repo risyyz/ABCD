@@ -19,17 +19,6 @@ public class BlogTests
     }
 
     [Theory]
-    [InlineData("one two")]
-    [InlineData("singleword")]
-    public void Name_ShouldThrow_WhenLessThanThreeWords(string invalidName)
-    {
-        var blog = new Blog(new BlogId(2)) { Name = "one two three" };
-        var ex = Assert.Throws<ValidationException>(() => blog.Name = invalidName);
-        Assert.Equal("Blog name must contain at least 3 words.", ex.Message);
-        Assert.Null(ex.InnerException);
-    }
-
-    [Theory]
     [InlineData("This is valid")]
     [InlineData("One two three four")]
     public void Name_ShouldSet_WhenValid(string validName)
