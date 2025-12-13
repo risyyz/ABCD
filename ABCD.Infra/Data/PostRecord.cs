@@ -12,9 +12,9 @@ namespace ABCD.Infra.Data {
 
         // New properties
         public PostStatus Status { get; set; } = PostStatus.Draft; // Use enum, default to Draft
-        public DateTime DateCreated { get; set; }
+        public DateTime CreatedDate { get; set; }
         public string CreatedBy { get; set; } = string.Empty;
-        public DateTime DateUpdated { get; set; }
+        public DateTime UpdatedDate { get; set; }
         public string UpdatedBy { get; set; } = string.Empty;
         public string Synopsis { get; set; } = string.Empty; // NVarchar(1000) - enforce max length at DB/validation
         public int? ParentPostId { get; set; } // nullable for root posts

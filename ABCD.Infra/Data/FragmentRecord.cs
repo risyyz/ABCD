@@ -14,5 +14,10 @@ namespace ABCD.Infra.Data {
         public bool? Excluded { get; set; } // When true, the fragment will not be part of the final post body
 
         public FragmentType FragmentType { get; set; } // Use enum from domain model
+
+        public string CreatedBy { get; set; } = string.Empty;
+        public DateTime CreatedDate { get; set; }
+        public string UpdatedBy { get; set; } = string.Empty;
+        public DateTime UpdatedDate { get; set; }
     }
 }

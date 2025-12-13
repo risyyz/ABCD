@@ -46,11 +46,7 @@ namespace ABCD.Infra.Data {
                 entity.Property(e => e.Status)
                       .HasConversion<string>()
                       .IsRequired()
-                      .HasMaxLength(15);
-                entity.Property(e => e.CreatedBy).IsRequired().HasMaxLength(450);
-                entity.Property(e => e.UpdatedBy).IsRequired().HasMaxLength(450);
-                entity.Property(e => e.DateCreated).IsRequired();
-                entity.Property(e => e.DateUpdated).IsRequired();
+                      .HasMaxLength(15);                
                 entity.Property(e => e.Slug).HasMaxLength(250);
                 entity.HasIndex(e => e.Slug).IsUnique();
                 entity.HasMany(e => e.Fragments)
@@ -58,6 +54,10 @@ namespace ABCD.Infra.Data {
                       .HasForeignKey(e => e.PostId)
                       .IsRequired()
                       .OnDelete(DeleteBehavior.Cascade);
+                entity.Property(e => e.CreatedBy).IsRequired().HasMaxLength(450);
+                entity.Property(e => e.CreatedDate).IsRequired();
+                entity.Property(e => e.UpdatedBy).IsRequired().HasMaxLength(450);
+                entity.Property(e => e.UpdatedDate).IsRequired();
             });
 
             modelBuilder.Entity<FragmentRecord>(entity => {
@@ -71,6 +71,10 @@ namespace ABCD.Infra.Data {
                       .HasConversion<string>()
                       .IsRequired()
                       .HasMaxLength(15);
+                entity.Property(e => e.CreatedBy).IsRequired().HasMaxLength(450);                
+                entity.Property(e => e.CreatedDate).IsRequired();
+                entity.Property(e => e.UpdatedBy).IsRequired().HasMaxLength(450);
+                entity.Property(e => e.UpdatedDate).IsRequired();
             });
         }
 
