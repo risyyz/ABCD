@@ -43,6 +43,16 @@ namespace ABCD.Infra.Data {
                 entity.Property(e => e.Title).IsRequired().HasMaxLength(250);
                 entity.Property(e => e.Content);
                 entity.Property(e => e.BlogId).IsRequired();
+                entity.Property(e => e.Status)
+                      .HasConversion<string>()
+                      .IsRequired()
+                      .HasMaxLength(15);
+                entity.Property(e => e.CreatedBy).IsRequired().HasMaxLength(450);
+                entity.Property(e => e.UpdatedBy).IsRequired().HasMaxLength(450);
+                entity.Property(e => e.DateCreated).IsRequired();
+                entity.Property(e => e.DateUpdated).IsRequired();
+                entity.Property(e => e.Slug).HasMaxLength(250);
+                entity.HasIndex(e => e.Slug).IsUnique();
                 entity.HasMany(e => e.Fragments)
                       .WithOne(e => e.Post)
                       .HasForeignKey(e => e.PostId)
@@ -56,6 +66,11 @@ namespace ABCD.Infra.Data {
                 entity.Property(e => e.PostId).IsRequired();
                 entity.Property(e => e.Position).IsRequired();
                 entity.Property(e => e.Content).IsRequired();
+                entity.Property(e => e.Excluded).IsRequired(false);
+                entity.Property(e => e.FragmentType)
+                      .HasConversion<string>()
+                      .IsRequired()
+                      .HasMaxLength(15);
             });
         }
 
