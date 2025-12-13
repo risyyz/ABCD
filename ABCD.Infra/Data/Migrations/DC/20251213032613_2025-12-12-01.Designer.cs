@@ -4,6 +4,7 @@ using ABCD.Infra.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ABCD.Infra.Data.Migrations.DC
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20251213032613_2025-12-12-01")]
+    partial class _2025121201
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -69,29 +72,8 @@ namespace ABCD.Infra.Data.Migrations.DC
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<bool?>("Excluded")
                         .HasColumnType("bit");
-
-                    b.Property<string>("FragmentType")
-                        .IsRequired()
-                        .HasMaxLength(15)
-                        .HasColumnType("nvarchar(15)");
-
-                    b.Property<string>("UpdatedBy")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime>("UpdatedDate")
-                        .HasColumnType("datetime2");
 
                     b.HasKey("PostId", "Position");
 
@@ -117,7 +99,10 @@ namespace ABCD.Infra.Data.Migrations.DC
                         .HasMaxLength(450)
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<DateTime>("CreatedDate")
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DateUpdated")
                         .HasColumnType("datetime2");
 
                     b.Property<int?>("ParentPostId")
@@ -130,8 +115,7 @@ namespace ABCD.Infra.Data.Migrations.DC
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasMaxLength(15)
-                        .HasColumnType("nvarchar(15)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Synopsis")
                         .IsRequired()
@@ -146,9 +130,6 @@ namespace ABCD.Infra.Data.Migrations.DC
                         .IsRequired()
                         .HasMaxLength(450)
                         .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime>("UpdatedDate")
-                        .HasColumnType("datetime2");
 
                     b.HasKey("PostId");
 
