@@ -5,48 +5,29 @@
         <div class="column is-4">
           <div class="box">
             <div class="has-text-centered mb-5">
-              <h1 class="title is-3">Sign In</h1>
-              <p class="subtitle is-6">Please enter your credentials</p>
+              <h1 class="subtitle is-2">Sign In</h1>
+              <p class="subtitle is-5">Please enter your credentials</p>
             </div>
 
             <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
               <!-- Email Field -->
               <div class="field">
-                <div class="control has-icons-left">
-                  <input 
-                    class="input" 
-                    type="email" 
-                    formControlName="email" 
-                    placeholder="Enter your email"
-                    [class.is-danger]="email?.invalid && email?.touched">
-                  <span class="icon is-small is-left">
-                    <i class="fas fa-envelope"></i>
-                  </span>
-                </div>
-                <p class="help is-danger" *ngIf="email?.invalid && email?.touched">
-                  <span *ngIf="email?.errors?.['required']">Email is required</span>
-                  <span *ngIf="email?.errors?.['email']">Please enter a valid email address</span>
-                </p>
+                <div class="control has-floating-label">
+                  <input class="input is-medium with-floating-label" id="email" placeholder=" " type="text" required formControlName="email">
+                  <label class="label is-floating-label" for="email">Email</label>
+                </div>                
               </div>
 
               <!-- Password Field -->
               <div class="field">
-                <div class="control has-icons-left">
-                  <input 
-                    class="input" 
-                    type="password" 
-                    formControlName="password" 
-                    placeholder="Enter your password"
-                    [class.is-danger]="password?.invalid && password?.touched">
-                  <span class="icon is-small is-left">
-                    <i class="fas fa-lock"></i>
-                  </span>
+                <div class="control has-floating-label">
+                  <input class="input is-medium with-floating-label" id="password" placeholder=" " type="password" required formControlName="password">
+                  <label class="label is-floating-label" for="password">Password</label>
                 </div>
                 <p class="help is-danger" *ngIf="password?.invalid && password?.touched">
                   <span *ngIf="password?.errors?.['required']">Password is required</span>
                 </p>
               </div>
-
               <!-- Captcha Checkbox -->
               <div class="field">
                 <div class="control">
@@ -67,7 +48,7 @@
               <div class="field">
                 <div class="control">
                   <button 
-                    class="button is-primary is-fullwidth is-medium"
+                    class="button is-dark is-fullwidth is-medium"
                     type="submit"
                     [disabled]="isSignInDisabled()"
                     [class.is-loading]="isLoading">

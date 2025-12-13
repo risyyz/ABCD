@@ -1,17 +1,17 @@
 using System.IdentityModel.Tokens.Jwt;
 
-using ABCD.Data;
+using ABCD.Application;
+using ABCD.Domain;
+using ABCD.Infra.Data;
 using ABCD.Lib;
 using ABCD.Server;
 using ABCD.Server.Middlewares;
-using ABCD.Services;
 
 using FluentValidation;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -23,7 +23,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add configuration sources
 builder.Configuration
     .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName.ToLowerInvariant()}.json", optional: true, reloadOnChange: true)
     .AddEnvironmentVariables();
 
 if (builder.Environment.IsDevelopment()) {
@@ -48,6 +48,7 @@ builder.Services.Configure<Settings>(options => {
 });
 
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection(JwtSettings.SectionName));
+builder.Services.Configure<CachingSettings>(builder.Configuration.GetSection(CachingSettings.SectionName));
 
 // Add services to the container.
 var connectionString = configuration.GetConnectionString("DefaultConnection");
@@ -92,6 +93,15 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<BearerTokenReader>();
 
+builder.Services.AddScoped<RequestContextAccessor>();
+builder.Services.AddScoped<RequestContext>(ctx => {
+    var contextAccessor = ctx.GetRequiredService<RequestContextAccessor>();
+    return contextAccessor.RequestContext;
+});
+
+builder.Services.AddScoped<IBlogRepository, BlogRepository>();
+builder.Services.AddScoped<IBlogService, BlogService>();
+
 var mapper = AutoMapperConfig.Initialize();
 builder.Services.AddSingleton(mapper);
 builder.Services.AddSingleton<IClassMapper, ClassMapper>();
@@ -104,29 +114,15 @@ if (app.Environment.IsDevelopment()) {
 }
 
 // Configure the HTTP request pipeline.
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseMiddleware<TokenValidationMiddleware>();
 app.UseAuthorization();
-//var summaries = new[]
-//{
-//    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-//};
-
-//app.MapGet("/weatherforecast", (HttpContext httpContext, IOptions<WeatherForecastOptions> options) => {
-//    var summaries = options.Value.Summaries;
-//    var forecast = Enumerable.Range(1, 5).Select(index =>
-//        new WeatherForecast {
-//            Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-//            TemperatureC = Random.Shared.Next(-20, 55)
-//        })
-//        .ToArray();
-//    return forecast;
-//}).RequireAuthorization();
-
+app.UseMiddleware<RequestContextMiddleware>();
 app.MapControllers();
 
 // Apply migrations
-MigrationHelper.ApplyMigrations(app.Services);
+//MigrationHelper.ApplyMigrations(app.Services);
 
 app.Run();

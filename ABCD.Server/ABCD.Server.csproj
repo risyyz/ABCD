@@ -11,13 +11,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="RequestContextAccessor.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ABCD.Application\ABCD.Application.csproj" />
     <ProjectReference Include="..\abcd.client\abcd.client.esproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="..\ABCD.Core\ABCD.Core.csproj" />
-    <ProjectReference Include="..\ABCD.Data\ABCD.Data.csproj" />
     <ProjectReference Include="..\ABCD.Lib\ABCD.Lib.csproj" />
-    <ProjectReference Include="..\ABCD.Services\ABCD.Services.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -28,8 +30,8 @@
     <PackageReference Include="Microsoft.AspNetCore.SpaProxy">
       <Version>8.*-*</Version>
     </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.0">
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.9" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.9">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -39,7 +41,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Update="appsettings.Development.json">
+    <Content Update="appsettings.development.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Update="appsettings.json">

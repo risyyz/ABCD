@@ -1,9 +1,8 @@
-<div class="dashboard-container">
-  <nav class="navbar is-primary" role="navigation" aria-label="main navigation">
+<div class="dashboard-container has-background-black-ter">
+  <nav class="navbar has-background-black" role="navigation" aria-label="main navigation">
     <div class="navbar-brand">
-      <h1 class="navbar-item is-size-4 has-text-weight-bold">Welcome to Dashboard</h1>
+      <h1 class="navbar-item is-size-4 has-text-weight-bold has-text-white">Posts Dashboard</h1>
     </div>
-    
     <div class="navbar-menu">
       <div class="navbar-end">
         <div class="navbar-item">
@@ -21,31 +20,42 @@
   <main class="section">
     <div class="container">
       <div class="columns is-centered">
-        <div class="column is-8">
-          <div class="box">
-            <div class="content has-text-centered">
-              <h2 class="title is-2">Dashboard</h2>
-              <p class="subtitle is-5">You have successfully logged in!</p>
-              
-              <div class="mt-5">
-                <p class="is-size-5">This is your dashboard where you can manage your application.</p>
-                <p class="is-size-5">You can add more features and components here as needed.</p>
+        <div class="column is-10">
+          <div class="box has-background-black-ter">
+            <div class="content">
+              <div class="field mb-5">
+                <div class="control">
+                  <input
+                    class="input has-background-black has-text-white"
+                    type="text"
+                    placeholder="Search posts by title..."
+                    [(ngModel)]="searchTerm"
+                  />
+                </div>
               </div>
-              
-              <div class="buttons is-centered mt-6">
-                <button class="button is-primary is-medium">
-                  <span class="icon">
-                    <i class="fas fa-plus"></i>
-                  </span>
-                  <span>Add New Item</span>
-                </button>
-                <button class="button is-info is-medium">
-                  <span class="icon">
-                    <i class="fas fa-cog"></i>
-                  </span>
-                  <span>Settings</span>
-                </button>
-              </div>
+              <table class="table is-fullwidth is-striped has-background-black has-text-white">
+                <thead>
+                  <tr class="has-background-grey-darker">
+                    <th class="has-text-white">Title</th>
+                    <th class="has-text-white">Status</th>
+                    <th class="has-text-white">Date Published</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let post of filteredPosts" class="has-background-black has-text-white">
+                    <td>{{ post.title }}</td>
+                    <td>{{ post.status }}</td>
+                    <td>
+                      <span *ngIf="post.status === 'published'">
+                        {{ post.datePublished | date:'mediumDate' }}
+                      </span>
+                    </td>
+                  </tr>
+                  <tr *ngIf="filteredPosts.length === 0">
+                    <td colspan="3" class="has-text-centered has-text-grey">No posts found.</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
