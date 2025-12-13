@@ -120,27 +120,9 @@ app.UseAuthentication();
 app.UseMiddleware<TokenValidationMiddleware>();
 app.UseAuthorization();
 app.UseMiddleware<RequestContextMiddleware>();
-
-
-//var summaries = new[]
-//{
-//    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-//};
-
-//app.MapGet("/weatherforecast", (HttpContext httpContext, IOptions<WeatherForecastOptions> options) => {
-//    var summaries = options.Value.Summaries;
-//    var forecast = Enumerable.Range(1, 5).Select(index =>
-//        new WeatherForecast {
-//            Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-//            TemperatureC = Random.Shared.Next(-20, 55)
-//        })
-//        .ToArray();
-//    return forecast;
-//}).RequireAuthorization();
-
 app.MapControllers();
 
 // Apply migrations
-MigrationHelper.ApplyMigrations(app.Services);
+//MigrationHelper.ApplyMigrations(app.Services);
 
 app.Run();

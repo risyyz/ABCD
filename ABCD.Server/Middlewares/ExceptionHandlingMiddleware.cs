@@ -27,10 +27,13 @@ namespace ABCD.Server.Middlewares {
 
             switch (exception) {
                 case SignInFailedException:
-                case RequestContextException:
-                case BlogNotFoundException:
+                case RequestContextException:                
                     statusCode = StatusCodes.Status401Unauthorized;
                     break;
+
+                case BlogNotFoundException:
+                    statusCode = StatusCodes.Status404NotFound;
+                    break;  
 
                 default:
                     statusCode = StatusCodes.Status500InternalServerError;

@@ -1,8 +1,8 @@
-﻿using ABCD.Application.Models;
+﻿using ABCD.Domain;
 
 namespace ABCD.Application {
     public interface IBlogService {
-        Task<BlogModel> GetBlogByIdAsync(int blogId);
-        Task<BlogModel> UpdateBlogAsync(BlogModel blogModel);
+        Task<Blog> GetBlogByIdAsync(int blogId);
+        Task<Blog> UpdateBlogAsync(Blog blog);
     }
 }

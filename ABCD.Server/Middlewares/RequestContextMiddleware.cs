@@ -1,9 +1,7 @@
 ﻿using ABCD.Domain;
-using ABCD.Infra.Data;
 using ABCD.Lib;
 using ABCD.Lib.Exceptions;
 
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 
@@ -19,27 +17,16 @@ namespace ABCD.Server.Middlewares {
             _cachingSettings = cachingSettings.Value;
         }
 
-        public async Task InvokeAsync(HttpContext httpContext, DataContext dataContext, RequestContextAccessor contextAccessor) {
+        public async Task InvokeAsync(HttpContext httpContext, RequestContextAccessor contextAccessor, IBlogRepository blogRepository) {
+            var domain = httpContext.Request.Host.Host.ToLowerInvariant();
+            if (!_cache.TryGetValue(domain, out Blog? blog)) 
+                blog = await blogRepository.GetByDomainAsync(domain);            
 
-            //var domain = httpContext.Request.Host.Host.ToLowerInvariant();
-            //if (!_cache.TryGetValue(domain, out Blog? blog)) {
-            //    var blogId = await dataContext.Set<BlogDomain>()
-            //        .Where(d => d.Domain == new ABCD.Domain.Domain(domain))
-            //        .Select(d => d.BlogId)
-            //        .FirstOrDefaultAsync();
+            if (blog == null)
+                throw new RequestContextException($"Unable to resolve blog from domain '{domain}'");
 
-            //    if(blogId != 0) {
-            //        blog = await dataContext.Set<Blog>()
-            //            .Include(b => EF.Property<ICollection<BlogDomain>>(b, "_domains"))
-            //            .FirstOrDefaultAsync(b => b.BlogId == blogId);
-            //    }
-            //}
-
-            //if (blog == null)
-            //    throw new RequestContextException($"Unable to resolve blog from domain '{domain}'");
-
-            //_cache.Set(domain, blog, TimeSpan.FromMinutes(_cachingSettings.DomainCacheDurationInMinutes));
-            //contextAccessor.RequestContext = new RequestContext(blog);
+            _cache.Set(domain, blog, TimeSpan.FromMinutes(_cachingSettings.DomainCacheDurationInMinutes));
+            contextAccessor.RequestContext = new RequestContext(blog);
             await _next(httpContext);
         }
     }

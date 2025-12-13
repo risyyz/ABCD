@@ -3,10 +3,12 @@ using ABCD.Application;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ABCD.Server.Requests;
+using FluentValidation;
 
 namespace ABCD.Server.Controllers {
 
-    [Authorize]
+    //[Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class UsersController : ControllerBase {
@@ -19,12 +21,6 @@ namespace ABCD.Server.Controllers {
 
         [HttpGet]
         public async Task<IActionResult> GetUsers() {
-            var users = await _userService.GetUsers();
-            return Ok(users);
-        }
-
-        [HttpPost("register")]
-        public async Task<IActionResult> Register() {
             var users = await _userService.GetUsers();
             return Ok(users);
         }
@@ -50,17 +46,16 @@ namespace ABCD.Server.Controllers {
         //    return Ok("User deleted successfully.");
         //}
 
-        //[Authorize]
-        //[HttpPost("register")]
-        //public async Task<IActionResult> Register(RegisterRequestModel registerRequest) {
-        //    try {
-        //        var userRegistration = _mapper.Map<UserRegistration>(registerRequest);
-        //        await _userService.RegisterUser(userRegistration);
-        //    } catch (ValidationException ex) {
-        //        return BadRequest(string.Join(" ", ex.Errors.Select(e => e.ErrorMessage)));
-        //    }
+        [HttpPost("register")]
+        public async Task<IActionResult> Register(RegisterRequest registerRequest) {
+            try {
+                var userRegistration = _mapper.Map<RegisterRequest, UserRegistration>(registerRequest);
+                await _userService.RegisterUser(userRegistration);
+            } catch (ValidationException ex) {
+                return BadRequest(string.Join(" ", ex.Errors.Select(e => e.ErrorMessage)));
+            }
 
-        //    return Ok("User registered successfully.");
-        //}
+            return Ok("User registered successfully.");
+        }
     }
 }

@@ -6,6 +6,15 @@ namespace ABCD.Infra.Data {
         private readonly DataContext _context;
         public BlogRepository(DataContext context) => _context = context;
 
+        public async Task<Blog?> GetByDomainAsync(string domain) {
+            var record = await _context.Blogs
+                .Include(b => b.Domains)
+                .FirstOrDefaultAsync(b => b.Domains.Any(d => d.Domain == domain));
+
+            if (record == null) return null;
+            return MapToDomain(record);
+        }
+
         public async Task<Blog?> GetByIdAsync(int blogId) {
             var record = await _context.Blogs
                 .Include(b => b.Domains)
@@ -36,6 +45,6 @@ namespace ABCD.Infra.Data {
             foreach (var d in record.Domains)
                 blog.AddDomain(new BlogDomain(d.Domain));
             return blog;
-        }
+        }        
     }
 }

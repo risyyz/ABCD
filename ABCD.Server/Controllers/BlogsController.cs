@@ -17,14 +17,14 @@ namespace ABCD.Server.Controllers {
             return Ok(blog);
         }
 
-        [HttpPut("{blogId:int}")]
-        public async Task<IActionResult> Update(int blogId, [FromBody] BlogUpdateRequest request) {
-            if (blogId != request.BlogId)
-                return BadRequest("Blog ID in URL and body do not match.");
+        //[HttpPut("{blogId:int}")]
+        //public async Task<IActionResult> Update(int blogId, [FromBody] BlogUpdateRequest request) {
+        //    if (blogId != request.BlogId)
+        //        return BadRequest("Blog ID in URL and body do not match.");
 
-            var blogModel = request.ToBlogModel();
-            var updated = await _blogService.UpdateBlogAsync(blogModel);
-            return Ok(updated);
-        }
+        //    var blogModel = request.ToBlogModel();
+        //    var updated = await _blogService.UpdateBlogAsync(blogModel);
+        //    return Ok(updated);
+        //}
     }
 }

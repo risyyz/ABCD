@@ -1,162 +1,49 @@
 /* BBC-inspired global styles for blog engine */
 @import 'bulma/css/bulma.css';
 
-/* BBC-inspired typography and color scheme */
-:root {
-  --bbc-black: #1a1a1a;
-  --bbc-dark-gray: #404040;
-  --bbc-medium-gray: #666666;
-  --bbc-light-gray: #8c8c8c;
-  --bbc-very-light-gray: #e6e6e6;
-  --bbc-off-white: #fafafa;
-  --bbc-white: #ffffff;
-  --bbc-accent: #b80000; /* BBC red for minimal accents */
+.control.has-floating-label {
+  position: relative;
 }
 
-html, body { 
-  height: 100%; 
-  margin: 0; 
-  font-family: Arial, Helvetica, sans-serif; /* BBC uses Arial as primary font */
-  font-size: 16px;
-  line-height: 1.5;
-  color: var(--bbc-black);
-  background-color: var(--bbc-white);
+.control.has-floating-label .label.is-floating-label {
+  font-weight: normal;
+  position: absolute;
+  line-height: 1;
 }
 
-/* Override Bulma's default colors with BBC-inspired palette */
-.title, .subtitle {
-  color: var(--bbc-black);
+  .control.has-floating-label .input.is-medium {
+    height: 3.75rem;
+    transition-duration: 0.2s;
+    color: #000;
+  }
+
+  .control.has-floating-label .input.is-medium:placeholder-shown + .label.is-floating-label {
+    color: #4b5370;
+    display: block;
+    top: 1.375rem;
+    left: 0.75rem;
+    z-index: 0;
+  }
+
+  .control.has-floating-label .input.is-medium:hover + .label.is-floating-label {
+    z-index: 2;
+  }
+
+  .control.has-floating-label .input.is-medium:focus, .control.has-floating-label .input.is-medium:not(:placeholder-shown) {
+    padding-top: 1.5rem;
+  }
+
+  .control.has-floating-label .input.is-medium:focus + .label.is-floating-label, .control.has-floating-label .input.is-medium:not(:placeholder-shown) + .label.is-floating-label {
+    color: #868585;
+    top: 0.5rem;
+    left: 0.75rem;
+    z-index: 11;
+  }
+
+.field.has-addons .control.has-floating-label .input {
+  position: static;
 }
 
-.title {
-  font-weight: 700;
-  line-height: 1.2;
-  margin-bottom: 0.75rem;
+body {
+  font-family: 'Open Sans', Helvetica, sans-serif;
 }
-
-.subtitle {
-  font-weight: 400;
-  color: var(--bbc-dark-gray);
-  margin-bottom: 1.5rem;
-}
-
-/* Text hierarchy */
-h1, .is-size-1 { font-size: 2.5rem; }
-h2, .is-size-2 { font-size: 2rem; }
-h3, .is-size-3 { font-size: 1.75rem; }
-h4, .is-size-4 { font-size: 1.5rem; }
-h5, .is-size-5 { font-size: 1.25rem; }
-h6, .is-size-6 { font-size: 1rem; }
-
-/* Body text improvements */
-p, .content {
-  line-height: 1.6;
-  margin-bottom: 1.25rem;
-  color: var(--bbc-black);
-}
-
-/* Notification styles with BBC palette */
-.notification.is-danger {
-  background-color: var(--bbc-accent);
-  color: var(--bbc-white);
-  border: none;
-}
-
-.notification.is-success {
-  background-color: var(--bbc-dark-gray);
-  color: var(--bbc-white);
-  border: none;
-}
-
-.notification {
-  border-radius: 0;
-  box-shadow: 0 2px 4px rgba(26, 26, 26, 0.1);
-}
-
-/* Button styles */
-.button {
-  font-family: inherit;
-  border-radius: 3px;
-  font-weight: 500;
-  text-transform: none;
-  border: 2px solid var(--bbc-black);
-  transition: all 0.2s ease;
-}
-
-.button.is-primary {
-  background-color: var(--bbc-black);
-  color: var(--bbc-white);
-  border-color: var(--bbc-black);
-}
-
-.button.is-primary:hover {
-  background-color: var(--bbc-dark-gray);
-  border-color: var(--bbc-dark-gray);
-}
-
-.button.is-light {
-  background-color: var(--bbc-white);
-  color: var(--bbc-black);
-  border-color: var(--bbc-medium-gray);
-}
-
-.button.is-light:hover {
-  background-color: var(--bbc-very-light-gray);
-  border-color: var(--bbc-dark-gray);
-}
-
-/* Input styles */
-.input, .textarea {
-  border-radius: 3px;
-  border: 1px solid var(--bbc-light-gray);
-  font-family: inherit;
-  color: var(--bbc-black);
-}
-
-.input:focus, .textarea:focus {
-  border-color: var(--bbc-black);
-  box-shadow: 0 0 0 0.125em rgba(26, 26, 26, 0.25);
-}
-
-/* Layout utilities */
-.full-height {
-  min-height: 100vh;
-}
-
-/* BBC-style sections and containers */
-.section {
-  padding: 2rem 1.5rem;
-}
-
-.container {
-  max-width: 1200px;
-}
-
-/* Subtle rounded corners for content boxes */
-.box, .card {
-  border-radius: 4px;
-  box-shadow: 0 1px 3px rgba(26, 26, 26, 0.1);
-  border: 1px solid var(--bbc-very-light-gray);
-}
-
-/* Navbar styling */
-.navbar {
-  border-radius: 0;
-  border-bottom: 1px solid var(--bbc-very-light-gray);
-  box-shadow: none;
-}
-
-.navbar.is-primary {
-  background-color: var(--bbc-white);
-  border-bottom: 2px solid var(--bbc-black);
-}
-
-.navbar-item {
-  color: var(--bbc-black);
-}
-
-/* Improved spacing */
-.mt-5 { margin-top: 2rem; }
-.mb-5 { margin-bottom: 2rem; }
-.mt-6 { margin-top: 2.5rem; }
-.mb-6 { margin-bottom: 2.5rem; }

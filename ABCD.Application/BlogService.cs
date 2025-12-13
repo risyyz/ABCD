@@ -1,9 +1,6 @@
-﻿using System.Collections.Immutable;
-
-using ABCD.Domain;
+﻿using ABCD.Domain;
 using ABCD.Lib;
 using ABCD.Lib.Exceptions;
-using ABCD.Application.Models;
 
 namespace ABCD.Application {
     public class BlogService : IBlogService {
@@ -14,44 +11,16 @@ namespace ABCD.Application {
             _repository = repository;
         }
 
-        public async Task<BlogModel> GetBlogByIdAsync(int blogId) {
-            //var blog = await FindBlogByIdAsync(blogId);
-            //return new BlogModel(
-            //    //blog.BlogId,
-            //    blog.Name,
-            //    blog.Description,
-            //    blog.Domains.Select(d => d.DomainName).ToImmutableList()
-            //);
-            throw new NotImplementedException();
-        }
-
-        public async Task<BlogModel> UpdateBlogAsync(BlogModel blogModel) {
-            //var blog = await FindBlogByIdAsync(blogModel.BlogId);
-            //blog.Name = blogModel.Name;
-            //blog.Description = blogModel.Description;
-            //blog.ClearDomains();
-
-            //foreach (var domain in blogModel.Domains) {
-            //    blog.AddDomain(domain);
-            //}
-
-            //var updated = await _repository.UpdateAsync(blog);
-
-            //return new BlogModel(
-            //    updated.BlogId,
-            //    updated.Name,
-            //    updated.Description,
-            //    updated.Domains.Select(d => d.Domain.Name).ToImmutableList()
-            //);
-            throw new NotImplementedException();
-        }
-
-        private async Task<Blog> FindBlogByIdAsync(int blogId) {
+        public async Task<Blog> GetBlogByIdAsync(int blogId) {
             var blog = await _repository.GetByIdAsync(blogId);
             if (blog == null)
-                throw new BlogNotFoundException($"Blog with ID {blogId} not found.");
+                throw new BlogNotFoundException($"Blog with Id {blogId} does not exist.");
 
             return blog;
+        }
+
+        public Task<Blog> UpdateBlogAsync(Blog blog) {
+            throw new NotImplementedException();
         }
     }
 }
