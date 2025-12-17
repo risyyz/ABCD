@@ -332,5 +332,56 @@ namespace ABCD.Domain.Tests
             Assert.Equal("Third", contents[1]);
             Assert.Equal("Second", contents[2]);
         }
+
+        [Fact]
+        public void Parent_CanBeSetToNull()
+        {
+            var blogId = new BlogId(1);
+            var post = new Post(blogId, "Title");
+            post.Parent = null;
+            Assert.Null(post.Parent);
+        }
+
+        [Fact]
+        public void Parent_CanBeSetToAnotherPost()
+        {
+            var blogId = new BlogId(1);
+            var parent = new Post(blogId, new PostId(2), "Parent", PostStatus.Draft);
+            var child = new Post(blogId, new PostId(3), "Child", PostStatus.Draft);
+            child.Parent = parent;
+            Assert.Equal(parent, child.Parent);
+        }
+
+        [Fact]
+        public void Parent_Throws_WhenSetToSelf()
+        {
+            var blogId = new BlogId(1);
+            var post = new Post(blogId, new PostId(2), "Title", PostStatus.Draft);
+            var ex = Assert.Throws<ValidationException>(() => post.Parent = post);
+            Assert.Equal("A post cannot be its own ancestor.", ex.Message);
+        }
+
+        [Fact]
+        public void Parent_Throws_WhenSetToAncestor()
+        {
+            var blogId = new BlogId(1);
+            var grandparent = new Post(blogId, new PostId(1), "Grandparent", PostStatus.Draft);
+            var parent = new Post(blogId, new PostId(2), "Parent", PostStatus.Draft);
+            var child = new Post(blogId, new PostId(3), "Child", PostStatus.Draft);
+            parent.Parent = grandparent;
+            child.Parent = parent;
+            var ex = Assert.Throws<ValidationException>(() => grandparent.Parent = child);
+            Assert.Equal("A post cannot be its own ancestor.", ex.Message);
+        }
+
+        [Fact]
+        public void Parent_DoesNotThrow_WhenPostIdIsNull()
+        {
+            var blogId = new BlogId(1);
+            var parent = new Post(blogId, "Parent");
+            var child = new Post(blogId, "Child");
+            child.Parent = parent;
+            Assert.Equal(parent, child.Parent);
+        }
     }
 }
