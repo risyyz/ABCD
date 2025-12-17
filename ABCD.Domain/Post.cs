@@ -23,29 +23,40 @@ public class Post {
         }
     }
 
+    private PathSegment? _pathSegment;
+    public PathSegment? PathSegment {
+        get => _pathSegment;
+        set => _pathSegment = value;
+    }
+
     private readonly List<Fragment> _fragments = new();
     public IReadOnlyCollection<Fragment> Fragments => _fragments.AsReadOnly();
 
-    public Post(BlogId blogId, string title) {
-        Initialize(blogId, null, title, PostStatus.Draft, null);
+    public Post(BlogId blogId, string title)
+    {
+        Initialize(blogId, null, title, PostStatus.Draft);
     }
 
-    public Post(BlogId blogId, PostId postId, string title, PostStatus status, DateTime? dateLastPublished) {
+    public Post(BlogId blogId, PostId postId, string title, PostStatus status)
+    {
         if (postId == null)
             throw new ValidationException("PostId cannot be null.", new ArgumentNullException(nameof(postId)));
-
-        if (status == PostStatus.Published && (!dateLastPublished.HasValue || dateLastPublished.Value == default))
-            throw new ValidationException("DateLastPublished must be set when status is Published.", new ArgumentException("Value must be set when status is Published.", nameof(dateLastPublished)));
-        
-        Initialize(blogId, postId, title, status, dateLastPublished);
+        if (status == PostStatus.Published)
+            throw new ValidationException("DateLastPublished must be set when status is Published.", new ArgumentException("Value must be set when status is Published.", nameof(status)));
+        Initialize(blogId, postId, title, status);
     }
 
-    private void Initialize(BlogId blogId, PostId? postId, string title, PostStatus status, DateTime? dateLastPublished) {
-        BlogId = blogId ?? throw new ValidationException("BlogId cannot be null.", new ArgumentNullException(nameof(blogId)));
+    private void Initialize(BlogId blogId, PostId? postId, string title, PostStatus status) {
+        if (blogId == null)
+            throw new ValidationException("BlogId cannot be null.", new ArgumentNullException(nameof(blogId)));
+        if (string.IsNullOrWhiteSpace(title) || !ContainsWord(title))
+            throw new ValidationException("Title must contain at least one word and cannot be null, empty, or whitespace.", new ArgumentException("Value must contain at least one word and cannot be null, empty, or whitespace.", nameof(title)));
+        if (!Enum.IsDefined(typeof(PostStatus), status))
+            throw new ValidationException("Status is required and must be a valid PostStatus.", new ArgumentException("Invalid PostStatus.", nameof(status)));
+        BlogId = blogId;
         PostId = postId;
         Title = title;
         Status = status;
-        DateLastPublished = dateLastPublished;
     }
 
     public void AddFragment(FragmentType fragmentType, string? content, int? position = null)

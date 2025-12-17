@@ -81,7 +81,7 @@ namespace ABCD.Domain.Tests
         {
             var blogId = new BlogId(7);
             var postId = new PostId(10);
-            var post = new Post(blogId, postId, "Valid Title", PostStatus.Draft, null);
+            var post = new Post(blogId, postId, "Valid Title", PostStatus.Draft);
             Assert.Equal(blogId, post.BlogId);
             Assert.Equal(postId, post.PostId);
             Assert.Equal("Valid Title", post.Title);
@@ -94,39 +94,32 @@ namespace ABCD.Domain.Tests
         {
             var blogId = new BlogId(8);
             var postId = new PostId(11);
-            var publishedDate = DateTime.UtcNow;
-            var post = new Post(blogId, postId, "Valid Title", PostStatus.Published, publishedDate);
-            Assert.Equal(blogId, post.BlogId);
-            Assert.Equal(postId, post.PostId);
-            Assert.Equal("Valid Title", post.Title);
-            Assert.Equal(PostStatus.Published, post.Status);
-            Assert.Equal(publishedDate, post.DateLastPublished);
+            // The constructor should throw because Published requires DateLastPublished
+            var ex = Assert.Throws<ValidationException>(() => new Post(blogId, postId, "Valid Title", PostStatus.Published));
+            Assert.Equal("DateLastPublished must be set when status is Published.", ex.Message);
+            Assert.IsType<ArgumentException>(ex.InnerException);
+            Assert.Equal("status", ((ArgumentException)ex.InnerException!).ParamName);
         }
 
         [Fact]
         public void Constructor_WithPostId_ShouldThrow_WhenPostIdIsNull()
         {
             var blogId = new BlogId(9);
-            var ex = Assert.Throws<ValidationException>(() => new Post(blogId, null!, "Valid Title", PostStatus.Draft, null));
+            var ex = Assert.Throws<ValidationException>(() => new Post(blogId, null!, "Valid Title", PostStatus.Draft));
             Assert.Equal("PostId cannot be null.", ex.Message);
             Assert.IsType<ArgumentNullException>(ex.InnerException);
             Assert.Equal("postId", ((ArgumentNullException)ex.InnerException!).ParamName);
         }
 
         [Fact]
-        public void Constructor_WithPostId_ShouldThrow_WhenPublishedAndDateIsNullOrDefault()
+        public void Constructor_WithPostId_ShouldThrow_WhenPublished()
         {
             var blogId = new BlogId(10);
             var postId = new PostId(12);
-            var ex1 = Assert.Throws<ValidationException>(() => new Post(blogId, postId, "Valid Title", PostStatus.Published, null));
-            Assert.Equal("DateLastPublished must be set when status is Published.", ex1.Message);
-            Assert.IsType<ArgumentException>(ex1.InnerException);
-            Assert.Equal("dateLastPublished", ((ArgumentException)ex1.InnerException!).ParamName);
-
-            var ex2 = Assert.Throws<ValidationException>(() => new Post(blogId, postId, "Valid Title", PostStatus.Published, default));
-            Assert.Equal("DateLastPublished must be set when status is Published.", ex2.Message);
-            Assert.IsType<ArgumentException>(ex2.InnerException);
-            Assert.Equal("dateLastPublished", ((ArgumentException)ex2.InnerException!).ParamName);
+            var ex = Assert.Throws<ValidationException>(() => new Post(blogId, postId, "Valid Title", PostStatus.Published));
+            Assert.Equal("DateLastPublished must be set when status is Published.", ex.Message);
+            Assert.IsType<ArgumentException>(ex.InnerException);
+            Assert.Equal("status", ((ArgumentException)ex.InnerException!).ParamName);
         }
 
         [Fact]
@@ -134,7 +127,7 @@ namespace ABCD.Domain.Tests
         {
             var blogId = new BlogId(1);
             var postId = new PostId(1);
-            var post = new Post(blogId, postId, "Title", PostStatus.Draft, null);
+            var post = new Post(blogId, postId, "Title", PostStatus.Draft);
             post.AddFragment(FragmentType.Text, "First");
             post.AddFragment(FragmentType.Text, "Second");
             post.AddFragment(FragmentType.Text, "Third");
@@ -149,7 +142,7 @@ namespace ABCD.Domain.Tests
         {
             var blogId = new BlogId(2);
             var postId = new PostId(2);
-            var post = new Post(blogId, postId, "Title", PostStatus.Draft, null);
+            var post = new Post(blogId, postId, "Title", PostStatus.Draft);
             post.AddFragment(FragmentType.Text, "First"); // pos 1
             post.AddFragment(FragmentType.Text, "Second"); // pos 2
             post.AddFragment(FragmentType.Text, "Third"); // pos 3
@@ -174,7 +167,7 @@ namespace ABCD.Domain.Tests
         {
             var blogId = new BlogId(3);
             var postId = new PostId(3);
-            var post = new Post(blogId, postId, "Title", PostStatus.Draft, null);
+            var post = new Post(blogId, postId, "Title", PostStatus.Draft);
             post.AddFragment(FragmentType.Text, "First");
             post.AddFragment(FragmentType.Text, "Second");
             post.AddFragment(FragmentType.Text, "Third");
@@ -188,7 +181,7 @@ namespace ABCD.Domain.Tests
         {
             var blogId = new BlogId(4);
             var postId = new PostId(4);
-            var post = new Post(blogId, postId, "Title", PostStatus.Draft, null);
+            var post = new Post(blogId, postId, "Title", PostStatus.Draft);
 
             // Valid: position 1
             post.AddFragment(FragmentType.Text, "First", 1);
@@ -197,7 +190,7 @@ namespace ABCD.Domain.Tests
             Assert.Equal("First", post.Fragments.First().Content);
 
             // Invalid: position 2
-            var post2 = new Post(blogId, postId, "Title", PostStatus.Draft, null);
+            var post2 = new Post(blogId, postId, "Title", PostStatus.Draft);
             var ex = Assert.Throws<FragmentPositionException>(() => post2.AddFragment(FragmentType.Text, "Invalid", 2));
             Assert.Contains("Position must be between", ex.Message);
         }
@@ -210,7 +203,7 @@ namespace ABCD.Domain.Tests
         {
             var blogId = new BlogId(200);
             var postId = new PostId(200);
-            var post = new Post(blogId, postId, "Title", PostStatus.Draft, null);
+            var post = new Post(blogId, postId, "Title", PostStatus.Draft);
             post.AddFragment(FragmentType.Text, "First");
             post.AddFragment(FragmentType.Text, "Second");
             post.AddFragment(FragmentType.Text, "Third");
@@ -226,7 +219,7 @@ namespace ABCD.Domain.Tests
         {
             var blogId = new BlogId(201);
             var postId = new PostId(201);
-            var post = new Post(blogId, postId, "Title", PostStatus.Draft, null);
+            var post = new Post(blogId, postId, "Title", PostStatus.Draft);
             post.AddFragment(FragmentType.Text, "First");
             post.AddFragment(FragmentType.Text, "Second");
             post.AddFragment(FragmentType.Text, "Third");
@@ -239,7 +232,7 @@ namespace ABCD.Domain.Tests
         {
             var blogId = new BlogId(202);
             var postId = new PostId(202);
-            var post = new Post(blogId, postId, "Title", PostStatus.Draft, null);
+            var post = new Post(blogId, postId, "Title", PostStatus.Draft);
             var ex = Assert.Throws<FragmentPositionException>(() => post.MoveFragmentUp(1));
             Assert.Equal("Cannot move fragment when 0 fragment exists.", ex.Message);
         }
@@ -249,7 +242,7 @@ namespace ABCD.Domain.Tests
         {
             var blogId = new BlogId(203);
             var postId = new PostId(203);
-            var post = new Post(blogId, postId, "Title", PostStatus.Draft, null);
+            var post = new Post(blogId, postId, "Title", PostStatus.Draft);
             var ex = Assert.Throws<FragmentPositionException>(() => post.MoveFragmentDown(1));
             Assert.Equal("Cannot move fragment when 0 fragment exists.", ex.Message);
         }
@@ -259,7 +252,7 @@ namespace ABCD.Domain.Tests
         {
             var blogId = new BlogId(204);
             var postId = new PostId(204);
-            var post = new Post(blogId, postId, "Title", PostStatus.Draft, null);
+            var post = new Post(blogId, postId, "Title", PostStatus.Draft);
             post.AddFragment(FragmentType.Text, "First");
             var ex = Assert.Throws<FragmentPositionException>(() => post.MoveFragmentUp(1));
             Assert.Equal("Cannot move fragment when 1 fragment exists.", ex.Message);
@@ -270,7 +263,7 @@ namespace ABCD.Domain.Tests
         {
             var blogId = new BlogId(205);
             var postId = new PostId(205);
-            var post = new Post(blogId, postId, "Title", PostStatus.Draft, null);
+            var post = new Post(blogId, postId, "Title", PostStatus.Draft);
             post.AddFragment(FragmentType.Text, "First");
             var ex = Assert.Throws<FragmentPositionException>(() => post.MoveFragmentDown(1));
             Assert.Equal("Cannot move fragment when 1 fragment exists.", ex.Message);
@@ -281,7 +274,7 @@ namespace ABCD.Domain.Tests
         {
             var blogId = new BlogId(102);
             var postId = new PostId(102);
-            var post = new Post(blogId, postId, "Title", PostStatus.Draft, null);
+            var post = new Post(blogId, postId, "Title", PostStatus.Draft);
             post.AddFragment(FragmentType.Text, "First");
             post.AddFragment(FragmentType.Text, "Second");
             var ex = Assert.Throws<FragmentPositionException>(() => post.MoveFragmentUp(1));
@@ -293,7 +286,7 @@ namespace ABCD.Domain.Tests
         {
             var blogId = new BlogId(103);
             var postId = new PostId(103);
-            var post = new Post(blogId, postId, "Title", PostStatus.Draft, null);
+            var post = new Post(blogId, postId, "Title", PostStatus.Draft);
             post.AddFragment(FragmentType.Text, "First");
             post.AddFragment(FragmentType.Text, "Second");
             var ex = Assert.Throws<FragmentPositionException>(() => post.MoveFragmentDown(2));
@@ -305,7 +298,7 @@ namespace ABCD.Domain.Tests
         {
             var blogId = new BlogId(104);
             var postId = new PostId(104);
-            var post = new Post(blogId, postId, "Title", PostStatus.Draft, null);
+            var post = new Post(blogId, postId, "Title", PostStatus.Draft);
             post.AddFragment(FragmentType.Text, "First"); // pos 1
             post.AddFragment(FragmentType.Text, "Second"); // pos 2
             post.AddFragment(FragmentType.Text, "Third"); // pos 3
@@ -325,7 +318,7 @@ namespace ABCD.Domain.Tests
         {
             var blogId = new BlogId(105);
             var postId = new PostId(105);
-            var post = new Post(blogId, postId, "Title", PostStatus.Draft, null);
+            var post = new Post(blogId, postId, "Title", PostStatus.Draft);
             post.AddFragment(FragmentType.Text, "First"); // pos 1
             post.AddFragment(FragmentType.Text, "Second"); // pos 2
             post.AddFragment(FragmentType.Text, "Third"); // pos 3
