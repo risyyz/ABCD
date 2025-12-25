@@ -46,29 +46,28 @@ namespace ABCD.Domain.Tests
         public void Publish_ShouldSetStatusAndDate_WhenDraft()
         {
             var blogId = new BlogId(4);
-            var post = new Post(blogId, "Valid Title");
+            var post = new Post(blogId, "Valid Title") { PathSegment = new PathSegment("valid-segment") };
             post.Publish();
             Assert.Equal(PostStatus.Published, post.Status);
             Assert.NotNull(post.DateLastPublished);
         }
 
         [Fact]
-        public void Publish_ShouldNotChangeDate_WhenAlreadyPublished()
+        public void Publish_ShouldThrow_WhenAlreadyPublished()
         {
             var blogId = new BlogId(5);
-            var post = new Post(blogId, "Valid Title");
+            var post = new Post(blogId, "Valid Title") { PathSegment = new PathSegment("valid-segment") };
             post.Publish();
-            var firstDate = post.DateLastPublished;
-            post.Publish();
-            Assert.Equal(PostStatus.Published, post.Status);
-            Assert.Equal(firstDate, post.DateLastPublished);
+            var ex = Assert.Throws<ValidationException>(() => post.Publish());
+            Assert.Contains("Post cannot be published because it does not meet all publishing requirements.", ex.Message);
+            Assert.Contains("Post status must be Draft", ex.Message);
         }
 
         [Fact]
         public void SetAsDraft_ShouldSetStatusToDraft()
         {
             var blogId = new BlogId(6);
-            var post = new Post(blogId, "Valid Title");
+            var post = new Post(blogId, "Valid Title") { PathSegment = new PathSegment("valid-segment") }; ;
             post.Publish();
             var publishedDate = post.DateLastPublished;
             post.UnPublish();
@@ -382,6 +381,111 @@ namespace ABCD.Domain.Tests
             var child = new Post(blogId, "Child");
             child.Parent = parent;
             Assert.Equal(parent, child.Parent);
+        }
+
+        [Fact]
+        public void EligibleForPublishing_ReturnsTrue_WhenDraftAndValidPathSegmentAndNoParent()
+        {
+            var blogId = new BlogId(1);
+            var post = new Post(blogId, new PostId(1), "Title", PostStatus.Draft);
+            post.PathSegment = new PathSegment("valid-segment");
+            var result = post.EligibleForPublishing();
+            Assert.True(result.CanPublish);
+            Assert.Empty(result.Reasons);
+        }
+
+        [Fact]
+        public void EligibleForPublishing_ReturnsFalse_WhenNotDraft()
+        {
+            var blogId = new BlogId(1);
+            var post = new Post(blogId, new PostId(1), "Title", PostStatus.Draft);
+            post.PathSegment = new PathSegment("valid-segment");
+            post.Publish();
+            var result = post.EligibleForPublishing();
+            Assert.False(result.CanPublish);
+            Assert.Contains("Post status must be Draft", result.Reasons, StringComparer.OrdinalIgnoreCase);
+        }
+
+        [Fact]
+        public void EligibleForPublishing_ReturnsFalse_WhenPathSegmentIsNull()
+        {
+            var blogId = new BlogId(1);
+            var post = new Post(blogId, new PostId(1), "Title", PostStatus.Draft);
+            post.PathSegment = null;
+            var result = post.EligibleForPublishing();
+            Assert.False(result.CanPublish);
+            Assert.Contains("PathSegment must be set", result.Reasons, StringComparer.OrdinalIgnoreCase);
+        }
+
+        [Fact]
+        public void EligibleForPublishing_ReturnsFalse_WhenAncestorNotPublished()
+        {
+            var blogId = new BlogId(1);
+            var parent = new Post(blogId, new PostId(2), "Parent", PostStatus.Draft);
+            parent.PathSegment = new PathSegment("parent-segment");
+            var child = new Post(blogId, new PostId(3), "Child", PostStatus.Draft);
+            child.PathSegment = new PathSegment("child-segment");
+            child.Parent = parent;
+            var result = child.EligibleForPublishing();
+            Assert.False(result.CanPublish);
+            Assert.Contains("All ancestor posts must be Published", result.Reasons, StringComparer.OrdinalIgnoreCase);
+        }
+
+        [Fact]
+        public void EligibleForPublishing_ReturnsFalse_WhenAncestorPathSegmentIsNull()
+        {
+            var blogId = new BlogId(1);
+            var parent = new Post(blogId, new PostId(2), "Parent", PostStatus.Published, DateTime.Today);
+            parent.PathSegment = null;
+            var child = new Post(blogId, new PostId(3), "Child", PostStatus.Draft);
+            child.PathSegment = new PathSegment("child-segment");
+            child.Parent = parent;
+            var result = child.EligibleForPublishing();
+            Assert.False(result.CanPublish);
+            Assert.Contains("All ancestor posts must have a PathSegment", result.Reasons, StringComparer.OrdinalIgnoreCase);
+        }
+
+        [Fact]
+        public void Publish_Throws_WhenCannotPublish()
+        {
+            var blogId = new BlogId(1);
+            var post = new Post(blogId, new PostId(1), "Title", PostStatus.Draft);
+            // No PathSegment
+            var ex = Assert.Throws<ValidationException>(() => post.Publish());
+            Assert.Contains("Post cannot be published because it does not meet all publishing requirements.", ex.Message);
+            Assert.Contains("PathSegment must be set", ex.Message);
+        }
+
+        [Fact]
+        public void Publish_SetsStatusAndDate_WhenCanPublish()
+        {
+            var blogId = new BlogId(1);
+            var post = new Post(blogId, new PostId(1), "Title", PostStatus.Draft);
+            post.PathSegment = new PathSegment("valid-segment");
+            post.Publish();
+            Assert.Equal(PostStatus.Published, post.Status);
+            Assert.NotNull(post.DateLastPublished);
+        }
+
+        [Fact]
+        public void UnPublish_SetsStatusToDraft_WhenPublished()
+        {
+            var blogId = new BlogId(1);
+            var post = new Post(blogId, new PostId(1), "Title", PostStatus.Draft);
+            post.PathSegment = new PathSegment("valid-segment");
+            post.Publish();
+            post.UnPublish();
+            Assert.Equal(PostStatus.Draft, post.Status);
+        }
+
+        [Fact]
+        public void UnPublish_Throws_WhenNotPublished()
+        {
+            var blogId = new BlogId(1);
+            var post = new Post(blogId, new PostId(1), "Title", PostStatus.Draft);
+            post.PathSegment = new PathSegment("valid-segment");
+            var ex = Assert.Throws<ValidationException>(() => post.UnPublish());
+            Assert.Equal("Post can only be unpublished if it is currently published.", ex.Message);
         }
     }
 }
