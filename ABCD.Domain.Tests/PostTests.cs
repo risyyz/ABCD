@@ -1,6 +1,3 @@
-using System;
-using System.Linq;
-using Xunit;
 using ABCD.Domain.Exceptions;
 
 namespace ABCD.Domain.Tests
@@ -443,6 +440,37 @@ namespace ABCD.Domain.Tests
             var result = child.EligibleForPublishing();
             Assert.False(result.CanPublish);
             Assert.Contains("All ancestor posts must have a PathSegment", result.Reasons, StringComparer.OrdinalIgnoreCase);
+        }
+
+        [Fact]
+        public void PublishEligibilityResult_ReturnsDuplicateReason_WhenImmediateAncestorHasSamePathSegment()
+        {
+            var blogId = new BlogId(1);
+            var parent = new Post(blogId, new PostId(2), "Parent", PostStatus.Published, DateTime.Today);
+            parent.PathSegment = new PathSegment("duplicate-segment");
+            var child = new Post(blogId, new PostId(3), "Child", PostStatus.Draft);
+            child.PathSegment = new PathSegment("duplicate-segment");
+            child.Parent = parent;
+            var result = child.EligibleForPublishing();
+            Assert.False(result.CanPublish);
+            Assert.Contains("Duplicate PathSegment value found in ancestor chain: 'duplicate-segment'.", result.Reasons, StringComparer.OrdinalIgnoreCase);
+        }
+
+        [Fact]
+        public void PublishEligibilityResult_ReturnsDuplicateReason_WhenDistantAncestorHasSamePathSegment()
+        {
+            var blogId = new BlogId(1);
+            var grandparent = new Post(blogId, new PostId(1), "Grandparent", PostStatus.Published, DateTime.Today);
+            grandparent.PathSegment = new PathSegment("duplicate-segment");
+            var parent = new Post(blogId, new PostId(2), "Parent", PostStatus.Published, DateTime.Today);
+            parent.Parent = grandparent;
+            parent.PathSegment = new PathSegment("parent-segment");
+            var child = new Post(blogId, new PostId(3), "Child", PostStatus.Draft);
+            child.Parent = parent;
+            child.PathSegment = new PathSegment("duplicate-segment");
+            var result = child.EligibleForPublishing();
+            Assert.False(result.CanPublish);
+            Assert.Contains("Duplicate PathSegment value found in ancestor chain: 'duplicate-segment'.", result.Reasons, StringComparer.OrdinalIgnoreCase);
         }
 
         [Fact]

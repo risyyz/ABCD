@@ -107,6 +107,11 @@ public class Post {
         if (PathSegment == null)
             result.AddReason("PathSegment must be set");
 
+        // Gather all path segments from this post and its ancestors
+        var pathSegments = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        if (PathSegment != null)
+            pathSegments.Add(PathSegment.Value);
+
         var ancestor = Parent;
         while (ancestor != null) {
             if (ancestor.Status != PostStatus.Published)
@@ -114,9 +119,12 @@ public class Post {
 
             if (ancestor.PathSegment == null)
                 result.AddReason("All ancestor posts must have a PathSegment");
+            else if(!pathSegments.Add(ancestor.PathSegment.Value))
+                result.AddReason($"Duplicate PathSegment value found in ancestor chain: '{ancestor.PathSegment.Value}'.");
 
             ancestor = ancestor.Parent;
         }
+       
         return result;
     }
 
