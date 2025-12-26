@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 
 import { EditorRoutingModule } from './editor-routing.module';
 import { DashboardComponent } from './dashboard/dashboard.component';
-
+import { CreatePostComponent } from './create-post/create-post.component';
 
 @NgModule({
   declarations: [
@@ -13,7 +13,8 @@ import { DashboardComponent } from './dashboard/dashboard.component';
   imports: [
     CommonModule,
     FormsModule,
-    EditorRoutingModule
+    EditorRoutingModule,
+    CreatePostComponent
   ]
 })
 export class EditorModule { }

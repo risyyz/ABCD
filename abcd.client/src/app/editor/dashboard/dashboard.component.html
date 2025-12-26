@@ -25,7 +25,7 @@
             <div class="level mb-2">
               <div class="level-left">
                 <div class="level-item">
-                  <button class="button" title="Create new post">
+                  <button class="button" title="Create new post" (click)="openCreatePost()">
                     <span class="icon">
                       <i class="fa-solid fa-folder-plus"></i>
                     </span>
@@ -52,6 +52,8 @@
                 </div>
               </div>
             </div>
+
+            <app-create-post *ngIf="showCreatePost" (close)="closeCreatePost()"></app-create-post>
 
             <table class="table is-fullwidth">
               <thead>

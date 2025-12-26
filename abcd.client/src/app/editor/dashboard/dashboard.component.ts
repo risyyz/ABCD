@@ -17,6 +17,7 @@ interface Post {
 })
 export class DashboardComponent {
   searchTerm: string = '';
+  showCreatePost = false;
   posts: Post[] = [
     { title: 'First Post', status: 'published', datePublished: new Date(), pathSegment: { value: 'first-post' } },
     { title: 'Draft Post', status: 'draft', pathSegment: { value: 'draft-post' } },
@@ -37,5 +38,13 @@ export class DashboardComponent {
   logout(): void {
     this.authService.signOut();
     this.router.navigate(['/auth/login']);
+  }
+
+  openCreatePost(): void {
+    this.showCreatePost = true;
+  }
+
+  closeCreatePost(): void {
+    this.showCreatePost = false;
   }
 }
