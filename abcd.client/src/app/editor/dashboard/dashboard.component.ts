@@ -6,6 +6,7 @@ interface Post {
   title: string;
   status: string;
   datePublished?: Date;
+  pathSegment?: { value: string };
 }
 
 @Component({
@@ -17,10 +18,9 @@ interface Post {
 export class DashboardComponent {
   searchTerm: string = '';
   posts: Post[] = [
-    // Example data; replace with real data or fetch from a service
-    { title: 'First Post', status: 'published', datePublished: new Date() },
-    { title: 'Draft Post', status: 'draft' },
-    { title: 'Second Post', status: 'published', datePublished: new Date() }
+    { title: 'First Post', status: 'published', datePublished: new Date(), pathSegment: { value: 'first-post' } },
+    { title: 'Draft Post', status: 'draft', pathSegment: { value: 'draft-post' } },
+    { title: 'Second Post', status: 'published', datePublished: new Date(), pathSegment: { value: 'second-post' } }
   ];
 
   constructor(

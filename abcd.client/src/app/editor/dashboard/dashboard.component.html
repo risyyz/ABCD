@@ -22,26 +22,58 @@
       <div class="column is-10">
         <div class="box">
           <div class="content">
-            <div class="field mb-5">
-              <div class="control">
-                <input class="input has-text-white"
-                       type="text"
-                       placeholder="Search posts by title..."
-                       [(ngModel)]="searchTerm" />
+            <div class="level mb-2">
+              <div class="level-left">
+                <div class="level-item">
+                  <button class="button" title="Create new post">
+                    <span class="icon">
+                      <i class="fa-solid fa-folder-plus"></i>
+                    </span>
+                  </button>
+                </div>
+              </div>
+              <div class="level-right">
+                <div class="level-item">
+                  <div class="field has-addons">
+                    <div class="control">
+                      <input class="input has-text-white"
+                             type="text"
+                             placeholder="Search posts by title..."
+                             [(ngModel)]="searchTerm"/>
+                    </div>
+                    <div class="control">
+                      <button class="button" title="Search">
+                        <span class="icon">
+                          <i class="fa-solid fa-magnifying-glass"></i>
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
+
             <table class="table is-fullwidth">
               <thead>
                 <tr>
                   <th>Title</th>
-                  <th>Status</th>
+                  <th>Path</th>
+                  <th class="has-text-centered">Status</th>
                   <th>Date Published</th>
                 </tr>
               </thead>
               <tbody>
                 <tr *ngFor="let post of filteredPosts">
                   <td>{{ post.title }}</td>
-                  <td>{{ post.status }}</td>
+                  <td>{{ post.pathSegment?.value }}</td>
+                  <td class="has-text-centered">
+                    <span *ngIf="post.status === 'draft'">
+                      <i class="fa-solid fa-pencil-alt"></i>
+                    </span>
+                    <span *ngIf="post.status === 'published'">
+                      <i class="fa-solid fa-tower-broadcast"></i>
+                    </span>
+                  </td>
                   <td>
                     <span *ngIf="post.status === 'published'">
                       {{ post.datePublished | date:'mediumDate' }}

@@ -129,9 +129,9 @@ public class Post {
     }
 
     public void Publish() {
-        var eligibleForPublishing = EligibleForPublishing();
-        if (!eligibleForPublishing.CanPublish) {
-            throw new ValidationException($"Post cannot be published because it does not meet all publishing requirements.\n - {string.Join("\n - ", eligibleForPublishing.Reasons)}");
+        var eligibility = EligibleForPublishing();
+        if (!eligibility.CanPublish) {
+            throw new ValidationException($"Post cannot be published because it does not meet all publishing requirements.\n - {string.Join("\n - ", eligibility.Reasons)}");
         }
         Status = PostStatus.Published;
         DateLastPublished = DateTime.UtcNow;
