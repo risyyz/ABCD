@@ -19,5 +19,12 @@ namespace ABCD.Server.Controllers
             var post = await _postService.CreatePostAsync(request);
             return CreatedAtAction(nameof(Create), new { postId = post.PostId?.Value }, post);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var posts = await _postService.GetAllAsync();
+            return Ok(posts);
+        }
     }
 }

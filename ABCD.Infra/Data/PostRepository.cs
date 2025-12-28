@@ -21,14 +21,21 @@ namespace ABCD.Infra.Data {
             return MapToDomain(record);
         }
 
+        public async Task<IEnumerable<Post>> GetAllByBlogIdAsync(int blogId) {
+            var records = await _context.Posts
+                .Where(p => p.BlogId == blogId)
+                .ToListAsync();
+            return records.Select(MapToDomain);
+        }
+
         // Map EF record to domain model
-        private static Post MapToDomain(PostRecord record) {
+        private Post MapToDomain(PostRecord record) {
             // TODO: Map all required fields and relationships
             return new Post(new BlogId(record.BlogId), new PostId(record.PostId), record.Title, (PostStatus)record.Status);
         }
 
         // Map domain model to EF record
-        private static PostRecord MapToRecord(Post post) {
+        private PostRecord MapToRecord(Post post) {
             // TODO: Map all required fields and relationships
             return new PostRecord {
                 PostId = post.PostId?.Value ?? 0,

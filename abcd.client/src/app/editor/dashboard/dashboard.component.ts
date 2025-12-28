@@ -1,6 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../auth/services/auth.service';
+import { HttpClient } from '@angular/common/http';
+import { PostService } from '../../services/post.service';
 
 interface Post {
   title: string;
@@ -15,19 +17,32 @@ interface Post {
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit {
   searchTerm: string = '';
   showCreatePost = false;
-  posts: Post[] = [
-    { title: 'First Post', status: 'published', datePublished: new Date(), pathSegment: { value: 'first-post' } },
-    { title: 'Draft Post', status: 'draft', pathSegment: { value: 'draft-post' } },
-    { title: 'Second Post', status: 'published', datePublished: new Date(), pathSegment: { value: 'second-post' } }
-  ];
+  posts: Post[] = [];
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private http: HttpClient,
+    private postService: PostService
   ) {}
+
+  ngOnInit(): void {
+    this.fetchPosts();
+  }
+
+  fetchPosts(): void {
+    this.postService.getPosts().subscribe(posts => {
+      this.posts = posts.map(post => ({
+        title: post.title,
+        status: post.status,
+        datePublished: post.dateLastPublished ? new Date(post.dateLastPublished) : undefined,
+        pathSegment: post.pathSegment ? { value: post.pathSegment } : undefined
+      }));
+    });
+  }
 
   get filteredPosts(): Post[] {
     const term = this.searchTerm.trim().toLowerCase();
@@ -46,5 +61,6 @@ export class DashboardComponent {
 
   closeCreatePost(): void {
     this.showCreatePost = false;
+    this.fetchPosts(); // Refresh posts after closing create modal
   }
 }

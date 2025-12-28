@@ -3,10 +3,12 @@ using ABCD.Domain;
 
 namespace ABCD.Application {
     public class PostService : IPostService {
+        private readonly RequestContext _requestContext;
         private readonly IPostRepository _postRepository;
         private readonly IBlogRepository _blogRepository;
 
-        public PostService(IPostRepository postRepository, IBlogRepository blogRepository) {
+        public PostService(RequestContext requestContext, IPostRepository postRepository, IBlogRepository blogRepository) {
+            _requestContext = requestContext;
             _postRepository = postRepository;
             _blogRepository = blogRepository;
         }
@@ -24,6 +26,11 @@ namespace ABCD.Application {
             // Persist
             await _postRepository.AddAsync(post);
             return post;
+        }
+
+        public async Task<IEnumerable<Post>> GetAllAsync()
+        {
+            return await _postRepository.GetAllByBlogIdAsync(_requestContext.Blog.BlogId.Value!);
         }
     }
 }
