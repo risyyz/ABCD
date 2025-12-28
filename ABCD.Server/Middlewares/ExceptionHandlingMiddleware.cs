@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-using ABCD.Lib.Exceptions; // Ensure this namespace is included
+using ABCD.Application.Exceptions;
 
 namespace ABCD.Server.Middlewares {
     public class ExceptionHandlingMiddleware {

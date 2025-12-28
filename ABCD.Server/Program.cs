@@ -81,7 +81,6 @@ builder.Services.AddScoped<ICryptoService>(provider => {
     return new CryptoService(configuration["Crypto:PassPhrase"]);
 });
 
-
 var passwordPolicy = builder.Configuration.GetSection("PasswordPolicy").Get<PasswordPolicy>();
 builder.Services.AddScoped<PasswordPolicy>(provider => passwordPolicy);
 builder.Services.AddScoped<IValidator<UserRegistration>, UserRegistrationValidator>();
@@ -94,11 +93,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<BearerTokenReader>();
 
 builder.Services.AddScoped<RequestContextAccessor>();
-builder.Services.AddScoped<RequestContext>(ctx => {
-    var contextAccessor = ctx.GetRequiredService<RequestContextAccessor>();
-    return contextAccessor.RequestContext;
-});
-
+builder.Services.AddScoped<RequestContext>(ctx => ctx.GetRequiredService<RequestContextAccessor>().RequestContext);
 builder.Services.AddScoped<IBlogRepository, BlogRepository>();
 builder.Services.AddScoped<IBlogService, BlogService>();
 

@@ -11,10 +11,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="RequestContextAccessor.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\ABCD.Application\ABCD.Application.csproj" />
     <ProjectReference Include="..\abcd.client\abcd.client.esproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>

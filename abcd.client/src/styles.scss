@@ -1,4 +1,16 @@
+
 @import 'bulma/bulma';
+
+:root {
+  --bulma-primary-h: 209deg;
+  --bulma-primary-s: 25%;
+  --bulma-primary-l: 80%;
+  --bulma-link-h: 234deg;
+  --bulma-link-l: 42%;
+  --bulma-success-h: 121deg;
+  --bulma-success-s: 73%;
+  --bulma-success-l: 36%;
+}
 
 .control.has-floating-label {
   position: relative;

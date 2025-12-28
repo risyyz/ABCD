@@ -1,6 +1,7 @@
-﻿using ABCD.Domain;
+﻿using ABCD.Application;
+using ABCD.Application.Exceptions;
+using ABCD.Domain;
 using ABCD.Lib;
-using ABCD.Lib.Exceptions;
 
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
@@ -29,5 +30,9 @@ namespace ABCD.Server.Middlewares {
             contextAccessor.RequestContext = new RequestContext(blog);
             await _next(httpContext);
         }
+    }
+
+    public class RequestContextException : Exception {
+        public RequestContextException(string message) : base(message) { }
     }
 }
