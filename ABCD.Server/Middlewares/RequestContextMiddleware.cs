@@ -1,5 +1,4 @@
 ﻿using ABCD.Application;
-using ABCD.Application.Exceptions;
 using ABCD.Domain;
 using ABCD.Lib;
 
@@ -25,6 +24,8 @@ namespace ABCD.Server.Middlewares {
 
             if (blog == null)
                 throw new RequestContextException($"Unable to resolve blog from domain '{domain}'");
+
+            //resolve user
 
             _cache.Set(domain, blog, TimeSpan.FromMinutes(_cachingSettings.DomainCacheDurationInMinutes));
             contextAccessor.RequestContext = new RequestContext(blog);

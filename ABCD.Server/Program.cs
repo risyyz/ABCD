@@ -114,7 +114,7 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseMiddleware<TokenValidationMiddleware>();
 app.UseAuthorization();
-app.UseMiddleware<RequestContextMiddleware>();
+app.UseMiddleware<RequestContextMiddleware>(); //TODO: do not use this middleware for live blog - only for backend scenarios
 app.MapControllers();
 
 // Apply migrations
