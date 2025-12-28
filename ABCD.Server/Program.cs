@@ -96,6 +96,8 @@ builder.Services.AddScoped<RequestContextAccessor>();
 builder.Services.AddScoped<RequestContext>(ctx => ctx.GetRequiredService<RequestContextAccessor>().RequestContext);
 builder.Services.AddScoped<IBlogRepository, BlogRepository>();
 builder.Services.AddScoped<IBlogService, BlogService>();
+builder.Services.AddScoped<IPostRepository, PostRepository>();
+builder.Services.AddScoped<IPostService, PostService>();
 
 var mapper = AutoMapperConfig.Initialize();
 builder.Services.AddSingleton(mapper);

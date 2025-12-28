@@ -28,7 +28,7 @@ namespace ABCD.Server.Middlewares {
             //resolve user
 
             _cache.Set(domain, blog, TimeSpan.FromMinutes(_cachingSettings.DomainCacheDurationInMinutes));
-            contextAccessor.RequestContext = new RequestContext(blog);
+            contextAccessor.RequestContext = new RequestContext(blog, null);
             await _next(httpContext);
         }
     }

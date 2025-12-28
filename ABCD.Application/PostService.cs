@@ -22,7 +22,7 @@ namespace ABCD.Application {
             post.PathSegment = new PathSegment(request.Path);
 
             // Persist
-            //await _postRepository.AddAsync(post);
+            await _postRepository.AddAsync(post);
             return post;
         }
     }

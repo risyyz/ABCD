@@ -47,8 +47,8 @@ namespace ABCD.Infra.Data {
                       .HasConversion<string>()
                       .IsRequired()
                       .HasMaxLength(15);                
-                entity.Property(e => e.Slug).HasMaxLength(250);
-                entity.HasIndex(e => e.Slug).IsUnique();
+                entity.Property(e => e.PathSegment).HasMaxLength(250);
+                entity.HasIndex(e => e.PathSegment).IsUnique();
                 entity.HasMany(e => e.Fragments)
                       .WithOne(e => e.Post)
                       .HasForeignKey(e => e.PostId)

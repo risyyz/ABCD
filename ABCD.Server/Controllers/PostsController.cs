@@ -12,6 +12,12 @@ namespace ABCD.Server.Controllers
         {
             _postService = postService;
         }
-        // Methods will be added here later
+
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] PostCreateRequest request)
+        {
+            var post = await _postService.CreatePostAsync(request);
+            return CreatedAtAction(nameof(Create), new { postId = post.PostId?.Value }, post);
+        }
     }
 }

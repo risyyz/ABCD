@@ -20,6 +20,6 @@ namespace ABCD.Infra.Data {
         public int? ParentPostId { get; set; } // nullable for root posts
         public PostRecord? ParentPost { get; set; } // navigation property (optional)
         public ICollection<PostRecord> ChildPosts { get; set; } = new List<PostRecord>(); // navigation property (optional)
-        public string Slug { get; set; } = string.Empty; // URL path to access the post
+        public string? PathSegment { get; set; } // URL path to access the post
     }
 }
