@@ -8,20 +8,24 @@ namespace ABCD.Application {
         private readonly IBlogRepository _blogRepository;
 
         public PostService(RequestContext requestContext, IPostRepository postRepository, IBlogRepository blogRepository) {
-            _requestContext = requestContext;
-            _postRepository = postRepository;
-            _blogRepository = blogRepository;
+            _requestContext = requestContext ?? throw new ArgumentNullException(nameof(requestContext));
+            if(_requestContext.Blog == null)
+                throw new ArgumentException("RequestContext must have a Blog set.", nameof(requestContext));
+            else if(_requestContext.Blog.BlogId == null)
+                throw new ArgumentException("RequestContext.Blog must have a valid BlogId", nameof(requestContext));
+
+            _postRepository = postRepository ?? throw new ArgumentNullException(nameof(postRepository));
+            _blogRepository = blogRepository ?? throw new ArgumentNullException(nameof(blogRepository));
         }
 
         public async Task<Post> CreatePostAsync(PostCreateRequest request) {
-            // Validate blog exists
-            var blog = await _blogRepository.GetByIdAsync(request.BlogId);
-            if (blog == null)
-                throw new BlogNotFoundException($"Blog with ID {request.BlogId} does not exist.");
+            var post = new Post(_requestContext.Blog.BlogId, request.Title) {
+                PathSegment = new PathSegment(request.Path) 
+            };
 
-            // Create Post aggregate
-            var post = new Post(blog.BlogId, request.Title);
-            post.PathSegment = new PathSegment(request.Path);
+            var existingPostWithSamePath = await _postRepository.GetByBlogIdAndPathSegmentAsync(_requestContext.Blog.BlogId.Value!, post.PathSegment!);
+            if(existingPostWithSamePath != null) 
+                throw new DuplicatePathSegmentException($"A post with the path segment '{post.PathSegment}' already exists in this blog.");
 
             // Persist
             await _postRepository.AddAsync(post);

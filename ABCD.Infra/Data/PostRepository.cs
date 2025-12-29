@@ -7,7 +7,7 @@ namespace ABCD.Infra.Data {
         private readonly DataContext _context;
         public PostRepository(DataContext context) => _context = context;
 
-        public async Task<Post?> GetByIdAsync(int postId) {
+        public async Task<Post?> GetByPostIdAsync(int postId) {
             var record = await _context.Posts
                 .FirstOrDefaultAsync(p => p.PostId == postId);
             if (record == null) return null;
@@ -26,6 +26,16 @@ namespace ABCD.Infra.Data {
                 .Where(p => p.BlogId == blogId)
                 .ToListAsync();
             return records.Select(MapToDomain);
+        }
+
+        public async Task<Post> GetByBlogIdAndPathSegmentAsync(int blogId, PathSegment pathSegment) {
+            var record = await _context.Posts
+                .FirstOrDefaultAsync(p => p.BlogId == blogId && p.PathSegment == pathSegment.Value);
+            
+            if (record == null) 
+                return null;
+
+            return MapToDomain(record);
         }
 
         // Map EF record to domain model

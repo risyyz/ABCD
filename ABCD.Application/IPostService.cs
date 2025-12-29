@@ -6,5 +6,5 @@ namespace ABCD.Application {
         Task<IEnumerable<Post>> GetAllAsync();
     }
 
-    public record PostCreateRequest(int BlogId, string Title, string Path);
+    public record PostCreateRequest(string Title, string Path);
 }

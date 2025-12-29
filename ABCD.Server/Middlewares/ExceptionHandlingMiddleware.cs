@@ -26,6 +26,10 @@ namespace ABCD.Server.Middlewares {
             string errorMessage = exception.Message;
 
             switch (exception) {
+                case DuplicatePathSegmentException:
+                    statusCode = StatusCodes.Status400BadRequest;
+                    break;
+
                 case SignInFailedException:
                 case RequestContextException:                
                     statusCode = StatusCodes.Status401Unauthorized;
@@ -33,7 +37,7 @@ namespace ABCD.Server.Middlewares {
 
                 case BlogNotFoundException:
                     statusCode = StatusCodes.Status404NotFound;
-                    break;  
+                    break;
 
                 default:
                     statusCode = StatusCodes.Status500InternalServerError;

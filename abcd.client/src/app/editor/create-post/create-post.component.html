@@ -19,11 +19,12 @@
             <label class="label is-floating-label" for="path">Path</label>
           </div>
         </div>
+        <div class="has-text-danger is-small">{{ errorMessage }}</div>
       </form>
     </section>
     <footer class="modal-card-foot">
       <button class="button is-primary mr-2" [disabled]="!title || !path" (click)="submit()">Create</button>
-      <button class="button" (click)="close.emit()">Cancel</button>
+      <button class="button" (click)="close.emit()">Cancel</button>      
     </footer>
   </div>
 </div>

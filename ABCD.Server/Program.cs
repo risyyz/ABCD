@@ -6,8 +6,11 @@ using ABCD.Infra.Data;
 using ABCD.Lib;
 using ABCD.Server;
 using ABCD.Server.Middlewares;
+using ABCD.Server.Models;
 
 using FluentValidation;
+
+using Mapster;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -99,9 +102,19 @@ builder.Services.AddScoped<IBlogService, BlogService>();
 builder.Services.AddScoped<IPostRepository, PostRepository>();
 builder.Services.AddScoped<IPostService, PostService>();
 
-var mapper = AutoMapperConfig.Initialize();
-builder.Services.AddSingleton(mapper);
-builder.Services.AddSingleton<IClassMapper, ClassMapper>();
+
+var config = TypeAdapterConfig.GlobalSettings;
+
+// Example: Map domain Post to PostResponseModel
+config.NewConfig<Post, PostSummaryResponseModel>()
+    .Map(dest => dest.Status, src => src.Status.ToString())
+    .Map(dest => dest.PathSegment, src => src.PathSegment != null ? src.PathSegment : null )
+    .Map(dest => dest.PostId, src => src.PostId != null ? src.PostId.Value : 0)
+    .Map(dest => dest.BlogId, src => src.BlogId.Value);
+
+// Register the config and mapper
+builder.Services.AddSingleton(config);
+builder.Services.AddSingleton<ITypeMapper, TypeMapper>();
 
 var app = builder.Build();
 

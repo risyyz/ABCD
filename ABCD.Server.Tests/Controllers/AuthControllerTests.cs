@@ -17,13 +17,13 @@ using Moq;
 namespace ABCD.Server.Tests.Controllers {
     public class AuthControllerTests {
         private readonly Mock<IAuthService> _authServiceMock;
-        private readonly Mock<IClassMapper> _mapperMock;
+        private readonly Mock<ITypeMapper> _mapperMock;
         private readonly Mock<BearerTokenReader> _tokenReaderMock;
         private readonly AuthController _controller;
 
         public AuthControllerTests() {
             _authServiceMock = new Mock<IAuthService>();
-            _mapperMock = new Mock<IClassMapper>();
+            _mapperMock = new Mock<ITypeMapper>();
             _tokenReaderMock = new Mock<BearerTokenReader>(Mock.Of<IHttpContextAccessor>());
             _controller = new AuthController(_authServiceMock.Object, _mapperMock.Object);
         }

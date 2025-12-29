@@ -13,8 +13,8 @@ namespace ABCD.Server.Controllers {
     [ApiController]
     public class UsersController : ControllerBase {
         private readonly IUserService _userService;
-        private readonly IClassMapper _mapper;
-        public UsersController(IUserService userService, IClassMapper mapper) {
+        private readonly ITypeMapper _mapper;
+        public UsersController(IUserService userService, ITypeMapper mapper) {
             _userService = userService;
             _mapper = mapper;
         }

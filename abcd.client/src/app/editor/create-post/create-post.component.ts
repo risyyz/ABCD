@@ -10,12 +10,14 @@ import { HttpClient } from '@angular/common/http';
 })
 export class CreatePostComponent {
   @Output() close = new EventEmitter<void>();
-  title = '';
-  path = '';
+  title: string = '';
+  path: string = '';
+  errorMessage: string = '';
 
   constructor(private http: HttpClient) {}
 
   submit() {
+    this.errorMessage = "";
     if (this.title && this.path) {
       this.http.post('/api/posts', {
         blogId: 1, // TODO: Replace with actual blogId as needed
@@ -24,8 +26,7 @@ export class CreatePostComponent {
       }).subscribe({
         next: () => this.close.emit(),
         error: err => {
-          // Handle error (show message, etc.)
-          console.error('Failed to create post', err);
+          this.errorMessage = err?.error?.error;
         }
       });
     }

@@ -14,9 +14,9 @@ namespace ABCD.Server.Controllers {
     [ApiController]
     public class AuthController : ControllerBase {
         private readonly IAuthService _authService;
-        private readonly IClassMapper _mapper;
+        private readonly ITypeMapper _mapper;
 
-        public AuthController(IAuthService authService, IClassMapper mapper) {
+        public AuthController(IAuthService authService, ITypeMapper mapper) {
             _authService = authService;
             _mapper = mapper;
         }
