@@ -57,7 +57,7 @@ namespace ABCD.Domain.Tests
         [InlineData("abc`def")]
         public void Constructor_InvalidValue_ShouldThrow(string input)
         {
-            var ex = Assert.Throws<ValidationException>(() => new PathSegment(input!));
+            var ex = Assert.Throws<DomainValidationException>(() => new PathSegment(input!));
             Assert.Contains("Invalid PathSegment", ex.Message);
         }
 
@@ -101,7 +101,7 @@ namespace ABCD.Domain.Tests
         [InlineData("abc-")]
         public void Constructor_ShouldThrow_WhenStartsOrEndsWithDash(string input)
         {
-            var ex = Assert.Throws<ValidationException>(() => new PathSegment(input));
+            var ex = Assert.Throws<DomainValidationException>(() => new PathSegment(input));
             Assert.Contains("Invalid PathSegment", ex.Message);
         }
 
@@ -111,7 +111,7 @@ namespace ABCD.Domain.Tests
         [InlineData("ab")]
         public void Constructor_ShouldThrow_WhenLessThanThreeChars(string input)
         {
-            var ex = Assert.Throws<ValidationException>(() => new PathSegment(input));
+            var ex = Assert.Throws<DomainValidationException>(() => new PathSegment(input));
             Assert.Contains("Invalid PathSegment", ex.Message);
         }
 
@@ -144,7 +144,7 @@ namespace ABCD.Domain.Tests
         [InlineData("abc`def")]
         public void Constructor_ShouldThrow_WhenContainsNonAlphaNumericOrDash(string input)
         {
-            var ex = Assert.Throws<ValidationException>(() => new PathSegment(input));
+            var ex = Assert.Throws<DomainValidationException>(() => new PathSegment(input));
             Assert.Contains("Invalid PathSegment", ex.Message);
         }
 
@@ -155,7 +155,7 @@ namespace ABCD.Domain.Tests
         [InlineData("abc--")]
         public void Constructor_ShouldThrow_WhenConsecutiveDashes(string input)
         {
-            var ex = Assert.Throws<ValidationException>(() => new PathSegment(input));
+            var ex = Assert.Throws<DomainValidationException>(() => new PathSegment(input));
             Assert.Contains("Invalid PathSegment", ex.Message);
         }
     }

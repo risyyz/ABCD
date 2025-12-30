@@ -18,14 +18,14 @@ namespace ABCD.Domain {
     public sealed class BlogId : EntityId<int> {
         public BlogId(int value) : base(value) {
             if (value <= 0)
-                throw new ValidationException("BlogId must be greater than 0.", new ArgumentOutOfRangeException(nameof(value)));
+                throw new DomainValidationException("BlogId must be greater than 0.", new ArgumentOutOfRangeException(nameof(value)));
         }
     }
 
     public sealed class PostId : EntityId<int> {
         public PostId(int value) : base(value) {
             if (value <= 0)
-                throw new ValidationException("PostId must be greater than 0.", new ArgumentOutOfRangeException(nameof(value)));
+                throw new DomainValidationException("PostId must be greater than 0.", new ArgumentOutOfRangeException(nameof(value)));
         }
     }
 }

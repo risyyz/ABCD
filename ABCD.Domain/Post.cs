@@ -12,7 +12,7 @@ public class Post {
         get => _title;
         set {
             if (string.IsNullOrWhiteSpace(value) || !ContainsWord(value))
-                throw new ValidationException("Title must contain at least one word and cannot be null, empty, or whitespace.", new ArgumentException("Value must contain at least one word and cannot be null, empty, or whitespace.", nameof(value)));
+                throw new DomainValidationException("Title must contain at least one word and cannot be null, empty, or whitespace.", new ArgumentException("Value must contain at least one word and cannot be null, empty, or whitespace.", nameof(value)));
             _title = value;
         }
     }
@@ -37,7 +37,7 @@ public class Post {
                 while (ancestor != null)
                 {
                     if (ancestor.PostId != null && ancestor.BlogId == BlogId && ancestor.PostId == PostId)
-                        throw new ValidationException("A post cannot be its own ancestor.", new ArgumentException("Parent cannot create an ancestor cycle.", nameof(value)));
+                        throw new DomainValidationException("A post cannot be its own ancestor.", new ArgumentException("Parent cannot create an ancestor cycle.", nameof(value)));
                     
                     ancestor = ancestor.Parent;
                 }
@@ -54,23 +54,23 @@ public class Post {
     public Post(BlogId blogId, PostId postId, string title, PostStatus status, DateTime? dateLastPublished = null)
     {
         if (postId == null)
-            throw new ValidationException("PostId cannot be null.", new ArgumentNullException(nameof(postId)));
+            throw new DomainValidationException("PostId cannot be null.", new ArgumentNullException(nameof(postId)));
                 
         Initialize(blogId, postId, title, status, dateLastPublished);
     }
 
     private void Initialize(BlogId blogId, PostId? postId, string title, PostStatus status, DateTime? dateLastPublished) {
         if (blogId == null)
-            throw new ValidationException("BlogId cannot be null.", new ArgumentNullException(nameof(blogId)));
+            throw new DomainValidationException("BlogId cannot be null.", new ArgumentNullException(nameof(blogId)));
         
         if (string.IsNullOrWhiteSpace(title) || !ContainsWord(title))
-            throw new ValidationException("Title must contain at least one word and cannot be null, empty, or whitespace.", new ArgumentException("Value must contain at least one word and cannot be null, empty, or whitespace.", nameof(title)));
+            throw new DomainValidationException("Title must contain at least one word and cannot be null, empty, or whitespace.", new ArgumentException("Value must contain at least one word and cannot be null, empty, or whitespace.", nameof(title)));
         
         if (!Enum.IsDefined(typeof(PostStatus), status))
-            throw new ValidationException("Status is required and must be a valid PostStatus.", new ArgumentException("Invalid PostStatus.", nameof(status)));
+            throw new DomainValidationException("Status is required and must be a valid PostStatus.", new ArgumentException("Invalid PostStatus.", nameof(status)));
 
         if (status == PostStatus.Published && (dateLastPublished == null || dateLastPublished.Value == default(DateTime)))
-            throw new ValidationException("DateLastPublished must be set when status is Published.", new ArgumentException("Value must be set when status is Published.", nameof(status)));
+            throw new DomainValidationException("DateLastPublished must be set when status is Published.", new ArgumentException("Value must be set when status is Published.", nameof(status)));
 
         BlogId = blogId;
         PostId = postId;
@@ -131,7 +131,7 @@ public class Post {
     public void Publish() {
         var eligibility = EligibleForPublishing();
         if (!eligibility.CanPublish) {
-            throw new ValidationException($"Post cannot be published because it does not meet all publishing requirements.\n - {string.Join("\n - ", eligibility.Reasons)}");
+            throw new DomainValidationException($"Post cannot be published because it does not meet all publishing requirements.\n - {string.Join("\n - ", eligibility.Reasons)}");
         }
         Status = PostStatus.Published;
         DateLastPublished = DateTime.UtcNow;
@@ -139,7 +139,7 @@ public class Post {
 
     public void UnPublish() {
         if (Status != PostStatus.Published) {
-            throw new ValidationException("Post can only be unpublished if it is currently published.");
+            throw new DomainValidationException("Post can only be unpublished if it is currently published.");
         }
         Status = PostStatus.Draft;
     }

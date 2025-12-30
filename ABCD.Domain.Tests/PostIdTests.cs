@@ -16,7 +16,7 @@ namespace ABCD.Domain.Tests
         [InlineData(-1)]
         public void PostId_InvalidValue_ShouldThrow(int value)
         {
-            var ex = Assert.Throws<ValidationException>(() => new PostId(value));
+            var ex = Assert.Throws<DomainValidationException>(() => new PostId(value));
             Assert.Equal("PostId must be greater than 0.", ex.Message);
             Assert.IsType<ArgumentOutOfRangeException>(ex.InnerException);
             Assert.Equal("value", ((ArgumentOutOfRangeException)ex.InnerException!).ParamName);

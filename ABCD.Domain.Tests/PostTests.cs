@@ -19,7 +19,7 @@ namespace ABCD.Domain.Tests
         [Fact]
         public void Constructor_ShouldThrow_WhenBlogIdIsNull()
         {
-            var ex = Assert.Throws<ValidationException>(() => new Post(null!, "Valid Title"));
+            var ex = Assert.Throws<DomainValidationException>(() => new Post(null!, "Valid Title"));
             Assert.Equal("BlogId cannot be null.", ex.Message);
             Assert.IsType<ArgumentNullException>(ex.InnerException);
             Assert.Equal("blogId", ((ArgumentNullException)ex.InnerException!).ParamName);
@@ -33,7 +33,7 @@ namespace ABCD.Domain.Tests
         {
             var blogId = new BlogId(2);
             var post = new Post(blogId, "Valid Title");
-            var ex = Assert.Throws<ValidationException>(() => post.Title = invalidTitle!);
+            var ex = Assert.Throws<DomainValidationException>(() => post.Title = invalidTitle!);
             Assert.Equal("Title must contain at least one word and cannot be null, empty, or whitespace.", ex.Message);
             Assert.IsType<ArgumentException>(ex.InnerException);
             Assert.Equal("value", ((ArgumentException)ex.InnerException!).ParamName);
@@ -55,7 +55,7 @@ namespace ABCD.Domain.Tests
             var blogId = new BlogId(5);
             var post = new Post(blogId, "Valid Title") { PathSegment = new PathSegment("valid-segment") };
             post.Publish();
-            var ex = Assert.Throws<ValidationException>(() => post.Publish());
+            var ex = Assert.Throws<DomainValidationException>(() => post.Publish());
             Assert.Contains("Post cannot be published because it does not meet all publishing requirements.", ex.Message);
             Assert.Contains("Post status must be Draft", ex.Message);
         }
@@ -91,7 +91,7 @@ namespace ABCD.Domain.Tests
             var blogId = new BlogId(8);
             var postId = new PostId(11);
             // The constructor should throw because Published requires DateLastPublished
-            var ex = Assert.Throws<ValidationException>(() => new Post(blogId, postId, "Valid Title", PostStatus.Published));
+            var ex = Assert.Throws<DomainValidationException>(() => new Post(blogId, postId, "Valid Title", PostStatus.Published));
             Assert.Equal("DateLastPublished must be set when status is Published.", ex.Message);
             Assert.IsType<ArgumentException>(ex.InnerException);
             Assert.Equal("status", ((ArgumentException)ex.InnerException!).ParamName);
@@ -101,7 +101,7 @@ namespace ABCD.Domain.Tests
         public void Constructor_WithPostId_ShouldThrow_WhenPostIdIsNull()
         {
             var blogId = new BlogId(9);
-            var ex = Assert.Throws<ValidationException>(() => new Post(blogId, null!, "Valid Title", PostStatus.Draft));
+            var ex = Assert.Throws<DomainValidationException>(() => new Post(blogId, null!, "Valid Title", PostStatus.Draft));
             Assert.Equal("PostId cannot be null.", ex.Message);
             Assert.IsType<ArgumentNullException>(ex.InnerException);
             Assert.Equal("postId", ((ArgumentNullException)ex.InnerException!).ParamName);
@@ -112,7 +112,7 @@ namespace ABCD.Domain.Tests
         {
             var blogId = new BlogId(10);
             var postId = new PostId(12);
-            var ex = Assert.Throws<ValidationException>(() => new Post(blogId, postId, "Valid Title", PostStatus.Published));
+            var ex = Assert.Throws<DomainValidationException>(() => new Post(blogId, postId, "Valid Title", PostStatus.Published));
             Assert.Equal("DateLastPublished must be set when status is Published.", ex.Message);
             Assert.IsType<ArgumentException>(ex.InnerException);
             Assert.Equal("status", ((ArgumentException)ex.InnerException!).ParamName);
@@ -353,7 +353,7 @@ namespace ABCD.Domain.Tests
         {
             var blogId = new BlogId(1);
             var post = new Post(blogId, new PostId(2), "Title", PostStatus.Draft);
-            var ex = Assert.Throws<ValidationException>(() => post.Parent = post);
+            var ex = Assert.Throws<DomainValidationException>(() => post.Parent = post);
             Assert.Equal("A post cannot be its own ancestor.", ex.Message);
         }
 
@@ -366,7 +366,7 @@ namespace ABCD.Domain.Tests
             var child = new Post(blogId, new PostId(3), "Child", PostStatus.Draft);
             parent.Parent = grandparent;
             child.Parent = parent;
-            var ex = Assert.Throws<ValidationException>(() => grandparent.Parent = child);
+            var ex = Assert.Throws<DomainValidationException>(() => grandparent.Parent = child);
             Assert.Equal("A post cannot be its own ancestor.", ex.Message);
         }
 
@@ -479,7 +479,7 @@ namespace ABCD.Domain.Tests
             var blogId = new BlogId(1);
             var post = new Post(blogId, new PostId(1), "Title", PostStatus.Draft);
             // No PathSegment
-            var ex = Assert.Throws<ValidationException>(() => post.Publish());
+            var ex = Assert.Throws<DomainValidationException>(() => post.Publish());
             Assert.Contains("Post cannot be published because it does not meet all publishing requirements.", ex.Message);
             Assert.Contains("PathSegment must be set", ex.Message);
         }
@@ -512,7 +512,7 @@ namespace ABCD.Domain.Tests
             var blogId = new BlogId(1);
             var post = new Post(blogId, new PostId(1), "Title", PostStatus.Draft);
             post.PathSegment = new PathSegment("valid-segment");
-            var ex = Assert.Throws<ValidationException>(() => post.UnPublish());
+            var ex = Assert.Throws<DomainValidationException>(() => post.UnPublish());
             Assert.Equal("Post can only be unpublished if it is currently published.", ex.Message);
         }
     }
