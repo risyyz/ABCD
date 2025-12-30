@@ -1,11 +1,11 @@
 namespace ABCD.Server.Models
 {
-    public record PostCreateModel {        
+    public record CreatePostRequest {        
         public required string Title { get; init; }
         public required string Path { get; init; }
     }
     
-    public record PostSummaryResponseModel
+    public record PostSummaryResponse
     {
         public int PostId { get; init; }
         public int BlogId { get; init; }
@@ -15,8 +15,7 @@ namespace ABCD.Server.Models
         public DateTime? DateLastPublished { get; init; }
     }
 
-    public record PostDetailResponseModel
-    {
+    public record PostDetailResponse {
         public int PostId { get; init; }
         public int BlogId { get; init; }
         public string Title { get; init; } = string.Empty;
@@ -31,6 +30,6 @@ namespace ABCD.Server.Models
 
     public record PostListResponseModel
     {
-        public List<PostSummaryResponseModel> Posts { get; init; } = new();
+        public List<PostSummaryResponse> Posts { get; init; } = new();
     }
 }

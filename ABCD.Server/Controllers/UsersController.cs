@@ -47,9 +47,9 @@ namespace ABCD.Server.Controllers {
         //}
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register(RegisterRequest registerRequest) {
+        public async Task<IActionResult> Register(RegisterUserRequest registerRequest) {
             try {
-                var userRegistration = _mapper.Map<RegisterRequest, UserRegistration>(registerRequest);
+                var userRegistration = _mapper.Map<RegisterUserRequest, UserRegistration>(registerRequest);
                 await _userService.RegisterUser(userRegistration);
             } catch (ValidationException ex) {
                 return BadRequest(string.Join(" ", ex.Errors.Select(e => e.ErrorMessage)));

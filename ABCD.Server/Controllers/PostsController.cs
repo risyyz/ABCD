@@ -20,9 +20,9 @@ namespace ABCD.Server.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] PostCreateModel payload)
+        public async Task<IActionResult> Create([FromBody] CreatePostRequest payload)
         {
-            var request = _typeMapper.Map<PostCreateModel, PostCreateRequest>(payload);
+            var request = _typeMapper.Map<CreatePostRequest, CreatePostCommand>(payload);
             var post = await _postService.CreatePostAsync(request);
             return CreatedAtAction(nameof(Create), new { postId = post.PostId?.Value }, post);
         }

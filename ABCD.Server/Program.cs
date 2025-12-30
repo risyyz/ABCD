@@ -106,7 +106,7 @@ builder.Services.AddScoped<IPostService, PostService>();
 var config = TypeAdapterConfig.GlobalSettings;
 
 // Example: Map domain Post to PostResponseModel
-config.NewConfig<Post, PostSummaryResponseModel>()
+config.NewConfig<Post, PostSummaryResponse>()
     .Map(dest => dest.Status, src => src.Status.ToString())
     .Map(dest => dest.PathSegment, src => src.PathSegment != null ? src.PathSegment : null )
     .Map(dest => dest.PostId, src => src.PostId != null ? src.PostId.Value : 0)

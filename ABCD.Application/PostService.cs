@@ -18,9 +18,9 @@ namespace ABCD.Application {
             _blogRepository = blogRepository ?? throw new ArgumentNullException(nameof(blogRepository));
         }
 
-        public async Task<Post> CreatePostAsync(PostCreateRequest request) {
-            var post = new Post(_requestContext.Blog.BlogId, request.Title) {
-                PathSegment = new PathSegment(request.Path) 
+        public async Task<Post> CreatePostAsync(CreatePostCommand command) {
+            var post = new Post(_requestContext.Blog.BlogId, command.Title) {
+                PathSegment = new PathSegment(command.Path) 
             };
 
             var existingPostWithSamePath = await _postRepository.GetByBlogIdAndPathSegmentAsync(_requestContext.Blog.BlogId.Value!, post.PathSegment!);

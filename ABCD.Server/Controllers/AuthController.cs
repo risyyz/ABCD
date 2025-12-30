@@ -1,6 +1,7 @@
 ﻿using ABCD.Application;
 using ABCD.Application.Exceptions;
 using ABCD.Lib;
+using ABCD.Server.Models;
 using ABCD.Server.Requests;
 
 using FluentValidation;

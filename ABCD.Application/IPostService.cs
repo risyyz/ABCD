@@ -2,9 +2,9 @@ using ABCD.Domain;
 
 namespace ABCD.Application {
     public interface IPostService {
-        Task<Post> CreatePostAsync(PostCreateRequest request);
+        Task<Post> CreatePostAsync(CreatePostCommand request);
         Task<IEnumerable<Post>> GetAllAsync();
     }
 
-    public record PostCreateRequest(string Title, string Path);
+    public record CreatePostCommand(string Title, string Path);
 }
