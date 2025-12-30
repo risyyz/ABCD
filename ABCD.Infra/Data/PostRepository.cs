@@ -1,5 +1,4 @@
 using ABCD.Domain;
-
 using Microsoft.EntityFrameworkCore;
 
 namespace ABCD.Infra.Data {
@@ -28,11 +27,23 @@ namespace ABCD.Infra.Data {
             return records.Select(MapToDomain);
         }
 
-        public async Task<Post> GetByBlogIdAndPathSegmentAsync(int blogId, PathSegment pathSegment) {
+        public async Task<Post?> GetByBlogIdAndPathSegmentAsync(int blogId, string path) {
             var record = await _context.Posts
-                .FirstOrDefaultAsync(p => p.BlogId == blogId && p.PathSegment == pathSegment.Value);
-            
-            if (record == null) 
+                .FirstOrDefaultAsync(p => p.BlogId == blogId && p.PathSegment == path);
+
+            if (record == null)
+                return null;
+
+            return MapToDomain(record);
+        }
+
+        public async Task<Post?> GetByBlogIdAndTitleAsync(int blogId, string postTitle) {
+            var record = await _context.Posts
+                .FirstOrDefaultAsync(p =>
+                    p.BlogId == blogId &&
+                    EF.Functions.Like(p.Title, postTitle));
+
+            if (record == null)
                 return null;
 
             return MapToDomain(record);

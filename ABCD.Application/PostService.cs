@@ -19,12 +19,16 @@ namespace ABCD.Application {
         }
 
         public async Task<Post> CreatePostAsync(CreatePostCommand command) {
-            var post = new Post(_requestContext.Blog.BlogId, command.Title) {
-                PathSegment = new PathSegment(command.Path) 
-            };
+            var blogId = _requestContext.Blog.BlogId.Value!;
+            var post = new Post(_requestContext.Blog.BlogId, command.Title) { PathSegment = new PathSegment(command.Path) };
 
-            var existingPostWithSamePath = await _postRepository.GetByBlogIdAndPathSegmentAsync(_requestContext.Blog.BlogId.Value!, post.PathSegment!);
-            if(existingPostWithSamePath != null) 
+            // Check for duplicate title (case-insensitive)
+            var existingPostWithSameTitle = await _postRepository.GetByBlogIdAndTitleAsync(blogId, command.Title);
+            if (existingPostWithSameTitle != null)
+                throw new DuplicatePostTitleException($"A post with the title '{command.Title}' already exists in this blog.");            
+
+            var existingPostWithSamePath = await _postRepository.GetByBlogIdAndPathSegmentAsync(blogId, post.PathSegment.Value!);
+            if (existingPostWithSamePath != null) 
                 throw new DuplicatePathSegmentException($"A post with the path segment '{post.PathSegment}' already exists in this blog.");
 
             // Persist
