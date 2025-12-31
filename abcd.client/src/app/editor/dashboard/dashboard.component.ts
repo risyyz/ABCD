@@ -5,6 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { PostService } from '../../services/post.service';
 
 interface Post {
+  postId: number; // or postId: number;
   title: string;
   status: string;
   datePublished?: Date;
@@ -36,6 +37,7 @@ export class DashboardComponent implements OnInit {
   fetchPosts(): void {
     this.postService.getPosts().subscribe(posts => {
       this.posts = posts.map(post => ({
+        postId: post.postId, // or postId: post.postId,
         title: post.title,
         status: post.status,
         datePublished: post.dateLastPublished ? new Date(post.dateLastPublished) : undefined,

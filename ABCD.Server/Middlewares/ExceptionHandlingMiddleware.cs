@@ -10,10 +10,13 @@ namespace ABCD.Server.Middlewares {
 
         private static readonly Dictionary<Type, int> ExceptionStatusCodes = new()
         {
-            { typeof(DuplicatePathSegmentException), StatusCodes.Status400BadRequest },
             { typeof(DomainValidationException), StatusCodes.Status400BadRequest },
-            { typeof(SignInFailedException), StatusCodes.Status401Unauthorized },
+            { typeof(DuplicatePathSegmentException), StatusCodes.Status400BadRequest },
+            { typeof(DuplicatePostTitleException), StatusCodes.Status400BadRequest },
+
             { typeof(RequestContextException), StatusCodes.Status401Unauthorized },
+            { typeof(SignInFailedException), StatusCodes.Status401Unauthorized },            
+
             { typeof(BlogNotFoundException), StatusCodes.Status404NotFound }
         };
 

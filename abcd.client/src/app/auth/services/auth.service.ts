@@ -46,29 +46,11 @@ export class AuthService {
   }
 
   signIn(loginData: LoginRequest): Observable<LoginResponse> {
-    // Temporary mock for demo purposes - remove when backend is ready
-    if (loginData.email === 'demo@test.com' && loginData.password === 'demo123') {
-      const mockResponse: LoginResponse = {
-        success: true,
-        token: 'mock-jwt-token-12345',
-        refreshToken: 'mock-refresh-token-12345'
-      };
-      if (mockResponse.token && mockResponse.refreshToken) {
-        this.storeTokensInMemory(mockResponse.token, mockResponse.refreshToken, loginData.email);
-        this.isAuthenticatedSubject.next(true);
-      }
-      return new Observable(observer => {
-        setTimeout(() => {
-          observer.next(mockResponse);
-          observer.complete();
-        }, 1000); // Simulate network delay
-      });
-    }
-
     // Real API call for production use
     return this.http.post<LoginResponse>('/api/auth/sign-in', loginData).pipe(
       tap(response => {
         if (response.success && response.token && response.refreshToken) {
+          console.log("signIn success " + response.token);
           this.storeTokensInMemory(response.token, response.refreshToken, loginData.email);
           this.isAuthenticatedSubject.next(true);
         }
@@ -95,13 +77,16 @@ export class AuthService {
   }
 
   isAuthenticated(): boolean {
+    console.log("current token: " + this.currentToken + ", is valid: " + this.isTokenValid());
     return this.currentToken !== null && this.isTokenValid();
   }
 
   getToken(): string | null {
     if (this.isTokenValid()) {
+      console.log("token is valid");
       return this.currentToken;
     }
+    console.log("token is not valid");
     return null;
   }
 
@@ -173,6 +158,7 @@ export class AuthService {
 
   private refreshAccessToken(): void {
     if (!this.isRefreshTokenValid() || !this.currentRefreshToken || !this.userEmail) {
+      console.log("refreshAccessToken - signing out");
       // Refresh token is expired or missing, force logout
       this.signOut();
       return;

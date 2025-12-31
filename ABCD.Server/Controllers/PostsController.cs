@@ -1,4 +1,5 @@
 using ABCD.Application;
+using ABCD.Domain;
 using ABCD.Lib;
 using ABCD.Server.Models;
 
@@ -31,7 +32,8 @@ namespace ABCD.Server.Controllers
         public async Task<IActionResult> GetAll()
         {
             var posts = await _postService.GetAllAsync();
-            return Ok(posts);
+            var response = _typeMapper.Map<IEnumerable<Post>, IEnumerable<PostSummaryResponse>>(posts);
+            return Ok(response);
         }
     }
 }
