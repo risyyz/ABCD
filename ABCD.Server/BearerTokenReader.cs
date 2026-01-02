@@ -7,13 +7,14 @@
         }
 
         public virtual string? GetToken() {
-            var authorizationHeader = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].FirstOrDefault();
+            // Read token from HTTP-only cookie
+            var token = _httpContextAccessor.HttpContext?.Request.Cookies["access_token"];
 
-            if (string.IsNullOrWhiteSpace(authorizationHeader) || !authorizationHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase)) {
-                return null; // Return null if the header is missing or invalid
+            if (string.IsNullOrWhiteSpace(token)) {
+                return null; // Return null if the cookie is missing
             }
 
-            return authorizationHeader["Bearer ".Length..].Trim(); // Extract and return the token
+            return token.Trim(); // Return the token from cookie
         }
     }
 }
