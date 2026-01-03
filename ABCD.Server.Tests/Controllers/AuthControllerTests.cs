@@ -26,6 +26,10 @@ namespace ABCD.Server.Tests.Controllers {
             _mapperMock = new Mock<IClassMapper>();
             _tokenReaderMock = new Mock<BearerTokenReader>(Mock.Of<IHttpContextAccessor>());
             _controller = new AuthController(_authServiceMock.Object, _mapperMock.Object);
+
+            _controller.ControllerContext = new ControllerContext {
+                HttpContext = new DefaultHttpContext()
+            };
         }
 
         [Fact]
@@ -92,7 +96,7 @@ namespace ABCD.Server.Tests.Controllers {
         public async Task SignOut_ValidToken_ReturnsOk() {
             // Arrange
             var token = "test-token";
-            _tokenReaderMock.Setup(tr => tr.GetToken()).Returns(token);
+            _tokenReaderMock.Setup(tr => tr.GetAccessToken()).Returns(token);
 
             // Act
             var result = await _controller.SignOut(_tokenReaderMock.Object);
@@ -106,7 +110,7 @@ namespace ABCD.Server.Tests.Controllers {
         [Fact]
         public async Task SignOut_MissingToken_ReturnsUnauthorized() {
             // Arrange
-            _tokenReaderMock.Setup(tr => tr.GetToken()).Returns((string)null);
+            _tokenReaderMock.Setup(tr => tr.GetAccessToken()).Returns((string)null);
 
             // Act
             var result = await _controller.SignOut(_tokenReaderMock.Object);
@@ -128,7 +132,7 @@ namespace ABCD.Server.Tests.Controllers {
             var newRefreshToken = "new-refresh-token";
             var resultToken = new Token { JWT = jwt, RefreshToken = newRefreshToken };
 
-            _tokenReaderMock.Setup(tr => tr.GetToken()).Returns(token);
+            _tokenReaderMock.Setup(tr => tr.GetAccessToken()).Returns(token);
             _authServiceMock.Setup(s => s.RefreshToken(refreshment)).ReturnsAsync(resultToken);
 
             // Act
@@ -144,7 +148,7 @@ namespace ABCD.Server.Tests.Controllers {
         public async Task RefreshToken_MissingToken_ReturnsUnauthorized() {
             // Arrange
             var refreshTokenRequest = new RefreshTokenRequest { Email = "test@example.com", RefreshToken = "refresh-token" };
-            _tokenReaderMock.Setup(tr => tr.GetToken()).Returns((string)null);
+            _tokenReaderMock.Setup(tr => tr.GetAccessToken()).Returns((string)null);
 
             // Act
             var result = await _controller.RefreshToken(_tokenReaderMock.Object, refreshTokenRequest);
@@ -159,12 +163,14 @@ namespace ABCD.Server.Tests.Controllers {
         [Fact]
         public async Task RefreshToken_InvalidRequest_ReturnsBadRequest() {
             // Arrange
-            var token = "test-token";
-            var refreshTokenRequest = new RefreshTokenRequest { Email = "test@example.com", RefreshToken = "refresh-token" };
-            var refreshment = new TokenRefreshment { Email = "test@example.com", JWT = token, RefreshToken = "refresh-token" };
+            var accessToken = "access-token";
+            var refreshToken = "refresh-token";
+            var refreshTokenRequest = new RefreshTokenRequest { Email = "test@example.com", RefreshToken = refreshToken };
+            var refreshment = new TokenRefreshment { Email = "test@example.com", JWT = accessToken, RefreshToken = "refresh-token" };
             var validationFailures = new List<ValidationFailure> { new ValidationFailure("Email", "Invalid email format") };
 
-            _tokenReaderMock.Setup(tr => tr.GetToken()).Returns(token);
+            _tokenReaderMock.Setup(tr => tr.GetAccessToken()).Returns(accessToken);
+            _tokenReaderMock.Setup(tr => tr.GetRefreshToken()).Returns(refreshToken);
             _authServiceMock.Setup(s => s.RefreshToken(refreshment)).ThrowsAsync(new ValidationException(validationFailures));
 
             // Act

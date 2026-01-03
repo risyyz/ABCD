@@ -6,15 +6,14 @@
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public virtual string? GetToken() {
-            // Read token from HTTP-only cookie
+        public virtual string? GetAccessToken() {
             var token = _httpContextAccessor.HttpContext?.Request.Cookies["access_token"];
+            return string.IsNullOrWhiteSpace(token) ? null : token.Trim();
+        }
 
-            if (string.IsNullOrWhiteSpace(token)) {
-                return null; // Return null if the cookie is missing
-            }
-
-            return token.Trim(); // Return the token from cookie
+        public virtual string? GetRefreshToken() {
+            var token = _httpContextAccessor.HttpContext?.Request.Cookies["refresh_token"];
+            return string.IsNullOrWhiteSpace(token) ? null : token.Trim();
         }
     }
 }

@@ -32,7 +32,7 @@ namespace ABCD.Server.Controllers {
                     HttpOnly = true,
                     Secure = true,
                     SameSite = SameSiteMode.Strict,
-                    Expires = DateTimeOffset.UtcNow.AddMinutes(30) // Match token expiry
+                    Expires = DateTimeOffset.UtcNow.AddMinutes(60) // Match token expiry
                 });
                 
                 // Set refresh token as HTTP-only cookie
@@ -54,7 +54,7 @@ namespace ABCD.Server.Controllers {
         [Authorize]
         [HttpPost("sign-out")]
         public async Task<IActionResult> SignOut([FromServices] BearerTokenReader tokenReader) {
-            var token = tokenReader.GetToken();
+            var token = tokenReader.GetAccessToken();
             if (string.IsNullOrEmpty(token)) {
                 return Unauthorized("Authorization token is missing or invalid.");
             }
@@ -80,13 +80,13 @@ namespace ABCD.Server.Controllers {
         [HttpPost("refresh-token")]
         public async Task<IActionResult> RefreshToken([FromServices] BearerTokenReader tokenReader, RefreshTokenRequest refreshTokenRequest) {
             try {
-                var token = tokenReader.GetToken();
+                var token = tokenReader.GetAccessToken();
                 if (string.IsNullOrEmpty(token)) {
                     return Unauthorized("Authorization token is missing or invalid.");
                 }
                 
                 // Read refresh token from cookie
-                var refreshTokenFromCookie = Request.Cookies["refresh_token"];
+                var refreshTokenFromCookie = tokenReader.GetRefreshToken();
                 if (string.IsNullOrEmpty(refreshTokenFromCookie)) {
                     return Unauthorized("Refresh token is missing.");
                 }
