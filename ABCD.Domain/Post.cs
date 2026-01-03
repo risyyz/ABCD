@@ -1,12 +1,6 @@
 namespace ABCD.Domain;
 using ABCD.Domain.Exceptions;
 
-public enum PostStatus
-{
-    Draft,
-    Published
-}
-
 public class Post {
     public BlogId BlogId { get; private set; }
     public PostId? PostId { get; private set; }
@@ -18,34 +12,70 @@ public class Post {
         get => _title;
         set {
             if (string.IsNullOrWhiteSpace(value) || !ContainsWord(value))
-                throw new ValidationException("Title must contain at least one word and cannot be null, empty, or whitespace.", new ArgumentException("Value must contain at least one word and cannot be null, empty, or whitespace.", nameof(value)));
+                throw new DomainValidationException("Title must contain at least one word and cannot be null, empty, or whitespace.", new ArgumentException("Value must contain at least one word and cannot be null, empty, or whitespace.", nameof(value)));
             _title = value;
         }
     }
 
+    private PathSegment? _pathSegment;
+    public PathSegment? PathSegment {
+        get => _pathSegment;
+        set => _pathSegment = value;
+    }
+
     private readonly List<Fragment> _fragments = new();
     public IReadOnlyCollection<Fragment> Fragments => _fragments.AsReadOnly();
+    private Post? _parent;
+    public Post? Parent
+    {
+        get => _parent;
+        set
+        {
+            if (PostId != null)
+            {
+                var ancestor = value;
+                while (ancestor != null)
+                {
+                    if (ancestor.PostId != null && ancestor.BlogId == BlogId && ancestor.PostId == PostId)
+                        throw new DomainValidationException("A post cannot be its own ancestor.", new ArgumentException("Parent cannot create an ancestor cycle.", nameof(value)));
+                    
+                    ancestor = ancestor.Parent;
+                }
+            }
+            _parent = value;
+        }
+    }
 
-    public Post(BlogId blogId, string title) {
+    public Post(BlogId blogId, string title)
+    {
         Initialize(blogId, null, title, PostStatus.Draft, null);
     }
 
-    public Post(BlogId blogId, PostId postId, string title, PostStatus status, DateTime? dateLastPublished) {
+    public Post(BlogId blogId, PostId postId, string title, PostStatus status, DateTime? dateLastPublished = null)
+    {
         if (postId == null)
-            throw new ValidationException("PostId cannot be null.", new ArgumentNullException(nameof(postId)));
-
-        if (status == PostStatus.Published && (!dateLastPublished.HasValue || dateLastPublished.Value == default))
-            throw new ValidationException("DateLastPublished must be set when status is Published.", new ArgumentException("Value must be set when status is Published.", nameof(dateLastPublished)));
-        
+            throw new DomainValidationException("PostId cannot be null.", new ArgumentNullException(nameof(postId)));
+                
         Initialize(blogId, postId, title, status, dateLastPublished);
     }
 
     private void Initialize(BlogId blogId, PostId? postId, string title, PostStatus status, DateTime? dateLastPublished) {
-        BlogId = blogId ?? throw new ValidationException("BlogId cannot be null.", new ArgumentNullException(nameof(blogId)));
+        if (blogId == null)
+            throw new DomainValidationException("BlogId cannot be null.", new ArgumentNullException(nameof(blogId)));
+        
+        if (string.IsNullOrWhiteSpace(title) || !ContainsWord(title))
+            throw new DomainValidationException("Title must contain at least one word and cannot be null, empty, or whitespace.", new ArgumentException("Value must contain at least one word and cannot be null, empty, or whitespace.", nameof(title)));
+        
+        if (!Enum.IsDefined(typeof(PostStatus), status))
+            throw new DomainValidationException("Status is required and must be a valid PostStatus.", new ArgumentException("Invalid PostStatus.", nameof(status)));
+
+        if (status == PostStatus.Published && (dateLastPublished == null || dateLastPublished.Value == default(DateTime)))
+            throw new DomainValidationException("DateLastPublished must be set when status is Published.", new ArgumentException("Value must be set when status is Published.", nameof(status)));
+
+        BlogId = blogId;
         PostId = postId;
         Title = title;
         Status = status;
-        DateLastPublished = dateLastPublished;
     }
 
     public void AddFragment(FragmentType fragmentType, string? content, int? position = null)
@@ -68,14 +98,49 @@ public class Post {
         _fragments.Sort((a, b) => a.Position.CompareTo(b.Position));
     }
 
-    public void Publish() {
-        if (Status == PostStatus.Draft) {
-            Status = PostStatus.Published;
-            DateLastPublished = DateTime.UtcNow;
+    public PublishEligibilityResult EligibleForPublishing() {
+        var result = new PublishEligibilityResult();
+
+        if (Status != PostStatus.Draft)
+            result.AddReason("Post status must be Draft");
+
+        if (PathSegment == null)
+            result.AddReason("PathSegment must be set");
+
+        // Gather all path segments from this post and its ancestors
+        var pathSegments = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        if (PathSegment != null)
+            pathSegments.Add(PathSegment.Value);
+
+        var ancestor = Parent;
+        while (ancestor != null) {
+            if (ancestor.Status != PostStatus.Published)
+                result.AddReason("All ancestor posts must be Published");
+
+            if (ancestor.PathSegment == null)
+                result.AddReason("All ancestor posts must have a PathSegment");
+            else if(!pathSegments.Add(ancestor.PathSegment.Value))
+                result.AddReason($"Duplicate PathSegment value found in ancestor chain: '{ancestor.PathSegment.Value}'.");
+
+            ancestor = ancestor.Parent;
         }
+       
+        return result;
+    }
+
+    public void Publish() {
+        var eligibility = EligibleForPublishing();
+        if (!eligibility.CanPublish) {
+            throw new DomainValidationException($"Post cannot be published because it does not meet all publishing requirements.\n - {string.Join("\n - ", eligibility.Reasons)}");
+        }
+        Status = PostStatus.Published;
+        DateLastPublished = DateTime.UtcNow;
     }
 
     public void UnPublish() {
+        if (Status != PostStatus.Published) {
+            throw new DomainValidationException("Post can only be unpublished if it is currently published.");
+        }
         Status = PostStatus.Draft;
     }
 
@@ -121,5 +186,28 @@ public class Post {
 
     private bool ContainsWord(string input) {
         return input.Split(' ', StringSplitOptions.RemoveEmptyEntries).Any(w => w.Length > 0);
+    }    
+}
+
+public enum PostStatus {
+    Draft,
+    Published
+}
+
+public class PublishEligibilityResult {
+    private readonly List<string> _reasons;
+    public PublishEligibilityResult() {
+        _reasons = new List<string>();
+    }
+
+    public bool CanPublish { get => _reasons.Count == 0; }
+    public IReadOnlyList<string> Reasons { get => _reasons; }
+
+    public void AddReason(string reason) {
+        if (string.IsNullOrWhiteSpace(reason))
+            return;
+
+        if (!_reasons.Contains(reason, StringComparer.OrdinalIgnoreCase))
+            _reasons.Add(reason);
     }
 }

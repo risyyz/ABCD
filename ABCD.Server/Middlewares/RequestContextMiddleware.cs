@@ -1,6 +1,6 @@
-﻿using ABCD.Domain;
+﻿using ABCD.Application;
+using ABCD.Domain;
 using ABCD.Lib;
-using ABCD.Lib.Exceptions;
 
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
@@ -25,9 +25,15 @@ namespace ABCD.Server.Middlewares {
             if (blog == null)
                 throw new RequestContextException($"Unable to resolve blog from domain '{domain}'");
 
+            //resolve user
+
             _cache.Set(domain, blog, TimeSpan.FromMinutes(_cachingSettings.DomainCacheDurationInMinutes));
-            contextAccessor.RequestContext = new RequestContext(blog);
+            contextAccessor.RequestContext = new RequestContext(blog, null);
             await _next(httpContext);
         }
+    }
+
+    public class RequestContextException : Exception {
+        public RequestContextException(string message) : base(message) { }
     }
 }

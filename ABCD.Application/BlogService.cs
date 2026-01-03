@@ -1,13 +1,12 @@
-﻿using ABCD.Domain;
-using ABCD.Lib;
-using ABCD.Lib.Exceptions;
+﻿using ABCD.Application.Exceptions;
+using ABCD.Domain;
 
 namespace ABCD.Application {
     public class BlogService : IBlogService {
-        private readonly RequestContext _context;
+        private readonly RequestContext _requestContext;
         private readonly IBlogRepository _repository;
-        public BlogService(RequestContext context, IBlogRepository repository) {
-            _context = context;
+        public BlogService(RequestContext requestContext, IBlogRepository repository) {
+            _requestContext = requestContext;
             _repository = repository;
         }
 

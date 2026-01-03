@@ -6,8 +6,11 @@ using ABCD.Infra.Data;
 using ABCD.Lib;
 using ABCD.Server;
 using ABCD.Server.Middlewares;
+using ABCD.Server.Models;
 
 using FluentValidation;
+
+using Mapster;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -101,7 +104,6 @@ builder.Services.AddScoped<ICryptoService>(provider => {
     return new CryptoService(configuration["Crypto:PassPhrase"]);
 });
 
-
 var passwordPolicy = builder.Configuration.GetSection("PasswordPolicy").Get<PasswordPolicy>();
 builder.Services.AddScoped<PasswordPolicy>(provider => passwordPolicy);
 builder.Services.AddScoped<IValidator<UserRegistration>, UserRegistrationValidator>();
@@ -114,17 +116,25 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<BearerTokenReader>();
 
 builder.Services.AddScoped<RequestContextAccessor>();
-builder.Services.AddScoped<RequestContext>(ctx => {
-    var contextAccessor = ctx.GetRequiredService<RequestContextAccessor>();
-    return contextAccessor.RequestContext;
-});
-
+builder.Services.AddScoped<RequestContext>(ctx => ctx.GetRequiredService<RequestContextAccessor>().RequestContext);
 builder.Services.AddScoped<IBlogRepository, BlogRepository>();
 builder.Services.AddScoped<IBlogService, BlogService>();
+builder.Services.AddScoped<IPostRepository, PostRepository>();
+builder.Services.AddScoped<IPostService, PostService>();
 
-var mapper = AutoMapperConfig.Initialize();
-builder.Services.AddSingleton(mapper);
-builder.Services.AddSingleton<IClassMapper, ClassMapper>();
+
+var config = TypeAdapterConfig.GlobalSettings;
+
+// Example: Map domain Post to PostResponseModel
+config.NewConfig<Post, PostSummaryResponse>()
+    .Map(dest => dest.Status, src => src.Status.ToString())
+    .Map(dest => dest.PathSegment, src => src.PathSegment != null ? src.PathSegment : null )
+    .Map(dest => dest.PostId, src => src.PostId != null ? src.PostId.Value : 0)
+    .Map(dest => dest.BlogId, src => src.BlogId.Value);
+
+// Register the config and mapper
+builder.Services.AddSingleton(config);
+builder.Services.AddSingleton<ITypeMapper, TypeMapper>();
 
 var app = builder.Build();
 
@@ -140,7 +150,7 @@ app.UseCors("AllowAngularClient"); // Enable CORS for cookie-based auth
 app.UseAuthentication();
 app.UseMiddleware<TokenValidationMiddleware>();
 app.UseAuthorization();
-app.UseMiddleware<RequestContextMiddleware>();
+app.UseMiddleware<RequestContextMiddleware>(); //TODO: do not use this middleware for live blog - only for backend scenarios
 app.MapControllers();
 
 // Apply migrations

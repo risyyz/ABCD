@@ -1,5 +1,4 @@
-﻿using ABCD.Server.Requests;
-using ABCD.Application;
+﻿using ABCD.Application;
 
 using Microsoft.AspNetCore.Mvc;
 

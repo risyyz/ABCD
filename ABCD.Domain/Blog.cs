@@ -10,7 +10,7 @@ public class Blog {
         get => _name;
         set {
             if (string.IsNullOrWhiteSpace(value))
-                throw new ValidationException("Blog name cannot be null or empty.", new ArgumentException("Value cannot be null or empty.", nameof(value)));
+                throw new DomainValidationException("Blog name cannot be null or empty.", new ArgumentException("Value cannot be null or empty.", nameof(value)));
 
             _name = value.Trim();
         }
@@ -26,7 +26,7 @@ public class Blog {
     public IReadOnlyCollection<BlogDomain> Domains => _domains;
     public void AddDomain(BlogDomain blogDomain) {
         if(blogDomain == null)
-            throw new ValidationException("Blog domain cannot be null.", new ArgumentNullException(nameof(blogDomain)));
+            throw new DomainValidationException("Blog domain cannot be null.", new ArgumentNullException(nameof(blogDomain)));
 
         if (!_domains.Contains(blogDomain))
             _domains.Add(blogDomain);
@@ -34,7 +34,7 @@ public class Blog {
 
     public void RemoveDomain(BlogDomain blogDomain) {
         if (blogDomain == null)
-            throw new ValidationException("Blog domain cannot be null.", new ArgumentNullException(nameof(blogDomain)));
+            throw new DomainValidationException("Blog domain cannot be null.", new ArgumentNullException(nameof(blogDomain)));
 
         var toRemove = _domains.FirstOrDefault(d => d.Equals(blogDomain));
         if (toRemove != null)
@@ -42,6 +42,6 @@ public class Blog {
     }
 
     public Blog(BlogId blogId) {
-        BlogId = blogId ?? throw new ValidationException("BlogId cannot be null.", new ArgumentNullException(nameof(blogId)));
+        BlogId = blogId ?? throw new DomainValidationException("BlogId cannot be null.", new ArgumentNullException(nameof(blogId)));
     }
 }
