@@ -26,7 +26,7 @@ namespace ABCD.Application.Tests {
         private readonly Mock<SignInManager<ApplicationUser>> _signInManagerMock;
         private readonly Mock<ITokenService> _tokenServiceMock;
         private readonly Mock<IOptions<JwtSettings>> _jwtSettingsMock;
-        private readonly Mock<IValidator<SignInCredentials>> _userLoginValidatorMock;
+        private readonly Mock<IValidator<SignInCommand>> _userLoginValidatorMock;
         private readonly Mock<IValidator<RefreshTokenCommand>> _tokenRefreshValidatorMock;
         private readonly Mock<IMemoryCache> _cacheMock;
         private readonly AuthService _authService;
@@ -37,7 +37,7 @@ namespace ABCD.Application.Tests {
             _userManagerMock.Object, Mock.Of<IHttpContextAccessor>(), Mock.Of<IUserClaimsPrincipalFactory<ApplicationUser>>(), null, null, null, null);
             _tokenServiceMock = new Mock<ITokenService>();
             _jwtSettingsMock = new Mock<IOptions<JwtSettings>>();
-            _userLoginValidatorMock = new Mock<IValidator<SignInCredentials>>();
+            _userLoginValidatorMock = new Mock<IValidator<SignInCommand>>();
             _tokenRefreshValidatorMock = new Mock<IValidator<RefreshTokenCommand>>();
             _cacheMock = new Mock<IMemoryCache>();
 
@@ -58,7 +58,7 @@ namespace ABCD.Application.Tests {
         [Fact]
         public async Task SignIn_InvalidRequest_ThrowsValidationException() {
             // Arrange
-            var credentials = new SignInCredentials { Email = "invalid-email", Password = "password" };
+            var credentials = new SignInCommand { Email = "invalid-email", Password = "password" };
             var validationResult = new ValidationResult(new List<ValidationFailure> { new ValidationFailure("Email", "Invalid email format") });
 
             _userLoginValidatorMock
@@ -75,7 +75,7 @@ namespace ABCD.Application.Tests {
         [Fact]
         public async Task SignIn_InvalidCredentials_ThrowsLoginFailedException() {
             // Arrange
-            var credentials = new SignInCredentials { Email = "test@example.com", Password = "password" };
+            var credentials = new SignInCommand { Email = "test@example.com", Password = "password" };
 
             _userLoginValidatorMock
                 .Setup(v => v.Validate(It.IsAny<IValidationContext>()))
@@ -97,7 +97,7 @@ namespace ABCD.Application.Tests {
         [Fact]
         public async Task SignIn_ValidCredentials_ReturnsToken() {
             // Arrange
-            var credentials = new SignInCredentials { Email = "test@example.com", Password = "password" };
+            var credentials = new SignInCommand { Email = "test@example.com", Password = "password" };
             var user = new ApplicationUser { Email = credentials.Email, UserName = credentials.Email, NormalizedUserName = credentials.Email };
             var token = new Token { JWT = "test-jwt-token", RefreshToken = "test-refresh-token" };
 

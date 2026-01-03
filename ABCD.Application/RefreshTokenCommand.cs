@@ -7,8 +7,8 @@ namespace ABCD.Application {
         public required string RefreshToken { get; init; }
     }
 
-    public class TokenRefreshmentValidator : AbstractValidator<RefreshTokenCommand> {
-        public TokenRefreshmentValidator() {
+    public class RefreshTokenCommandValidator : AbstractValidator<RefreshTokenCommand> {
+        public RefreshTokenCommandValidator() {
             RuleFor(x => x.Email)
                 .NotEmpty().WithMessage("Email is required")
                 .EmailAddress().WithMessage("Invalid email format");

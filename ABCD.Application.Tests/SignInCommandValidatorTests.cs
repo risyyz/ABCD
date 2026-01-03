@@ -1,9 +1,9 @@
 ﻿namespace ABCD.Application.Tests {
-    public class SignInCredentialsValidatorTests {
-        private readonly SignInCredentialsValidator _validator;
+    public class SignInCommandValidatorTests {
+        private readonly SignInCommandValidator _validator;
 
-        public SignInCredentialsValidatorTests() {
-            _validator = new SignInCredentialsValidator();
+        public SignInCommandValidatorTests() {
+            _validator = new SignInCommandValidator();
         }
 
         [Theory]
@@ -12,7 +12,7 @@
         [InlineData("  ")]
         public void Validate_EmailIsEmpty_ShouldHaveValidationError(string email) {
             // Arrange
-            var credentials = new SignInCredentials {
+            var credentials = new SignInCommand {
                 Email = email,
                 Password = "ValidPassword123"
             };
@@ -28,7 +28,7 @@
         [Fact]
         public void Validate_EmailIsInvalid_ShouldHaveValidationError() {
             // Arrange
-            var credentials = new SignInCredentials {
+            var credentials = new SignInCommand {
                 Email = "invalid-email",
                 Password = "ValidPassword123"
             };
@@ -47,7 +47,7 @@
         [InlineData("  ")]
         public void Validate_PasswordIsEmpty_ShouldHaveValidationError(string password) {
             // Arrange
-            var credentials = new SignInCredentials {
+            var credentials = new SignInCommand {
                 Email = "user@example.com",
                 Password = password
             };
@@ -63,7 +63,7 @@
         [Fact]
         public void Validate_ValidCredentials_ShouldNotHaveValidationErrors() {
             // Arrange
-            var credentials = new SignInCredentials {
+            var credentials = new SignInCommand {
                 Email = "user@example.com",
                 Password = "ValidPassword123"
             };

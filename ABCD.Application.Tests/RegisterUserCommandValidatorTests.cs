@@ -4,11 +4,11 @@ namespace ABCD.Application.Tests {
 
     using Xunit;
 
-    public class UserRegistrationValidatorTests {
+    public class RegisterUserCommandValidatorTests {
         private PasswordPolicy _passwordPolicy;
 
-        private UserRegistrationValidator CreateValidator() {
-            return new UserRegistrationValidator(_passwordPolicy);
+        private RegisterUserCommandValidator CreateValidator() {
+            return new RegisterUserCommandValidator(_passwordPolicy);
         }
 
         [Theory]
@@ -19,7 +19,7 @@ namespace ABCD.Application.Tests {
             // Arrange
             _passwordPolicy = new PasswordPolicy { MinPasswordLength = 15 };
             var validator = CreateValidator();
-            var registration = new UserRegistration {
+            var registration = new RegisterUserCommand {
                 Email = email,
                 Password = "ValidPassword123!",
                 PasswordConfirmation = "ValidPassword123!"
@@ -38,7 +38,7 @@ namespace ABCD.Application.Tests {
             // Arrange
             _passwordPolicy = new PasswordPolicy { MinPasswordLength = 15 };
             var validator = CreateValidator();
-            var registration = new UserRegistration {
+            var registration = new RegisterUserCommand {
                 Email = "invalid-email",
                 Password = "ValidPassword123!",
                 PasswordConfirmation = "ValidPassword123!"
@@ -60,7 +60,7 @@ namespace ABCD.Application.Tests {
             // Arrange
             _passwordPolicy = new PasswordPolicy { MinPasswordLength = 15 };
             var validator = CreateValidator();
-            var registration = new UserRegistration {
+            var registration = new RegisterUserCommand {
                 Email = "user@example.com",
                 Password = password,
                 PasswordConfirmation = password
@@ -79,7 +79,7 @@ namespace ABCD.Application.Tests {
             // Arrange
             _passwordPolicy = new PasswordPolicy { MinPasswordLength = 15 };
             var validator = CreateValidator();
-            var registration = new UserRegistration {
+            var registration = new RegisterUserCommand {
                 Email = "user@example.com",
                 Password = "Short1!",
                 PasswordConfirmation = "Short1!"
@@ -100,7 +100,7 @@ namespace ABCD.Application.Tests {
             // Arrange
             _passwordPolicy = new PasswordPolicy { MinPasswordLength = 15, RequireLowercase = requireLowercase };
             var validator = CreateValidator();
-            var registration = new UserRegistration {
+            var registration = new RegisterUserCommand {
                 Email = "user@example.com",
                 Password = password,
                 PasswordConfirmation = password
@@ -125,7 +125,7 @@ namespace ABCD.Application.Tests {
             // Arrange
             _passwordPolicy = new PasswordPolicy { MinPasswordLength = 15, RequireUppercase = requireUppercase };
             var validator = CreateValidator();
-            var registration = new UserRegistration {
+            var registration = new RegisterUserCommand {
                 Email = "user@example.com",
                 Password = password,
                 PasswordConfirmation = password
@@ -150,7 +150,7 @@ namespace ABCD.Application.Tests {
             // Arrange
             _passwordPolicy = new PasswordPolicy { MinPasswordLength = 15, RequireDigit = requireDigit };
             var validator = CreateValidator();
-            var registration = new UserRegistration {
+            var registration = new RegisterUserCommand {
                 Email = "user@example.com",
                 Password = password,
                 PasswordConfirmation = password
@@ -175,7 +175,7 @@ namespace ABCD.Application.Tests {
             // Arrange
             _passwordPolicy = new PasswordPolicy { MinPasswordLength = 15, RequireSpecialCharacter = requireSpecialCharacter };
             var validator = CreateValidator();
-            var registration = new UserRegistration {
+            var registration = new RegisterUserCommand {
                 Email = "user@example.com",
                 Password = password,
                 PasswordConfirmation = password
@@ -198,7 +198,7 @@ namespace ABCD.Application.Tests {
             // Arrange
             _passwordPolicy = new PasswordPolicy { MinPasswordLength = 15 };
             var validator = CreateValidator();
-            var registration = new UserRegistration {
+            var registration = new RegisterUserCommand {
                 Email = "user@example.com",
                 Password = "ValidPassword123!",
                 PasswordConfirmation = "DifferentPassword123!"
@@ -223,7 +223,7 @@ namespace ABCD.Application.Tests {
                 RequireSpecialCharacter = true
             };
             var validator = CreateValidator();
-            var registration = new UserRegistration {
+            var registration = new RegisterUserCommand {
                 Email = "user@example.com",
                 Password = "ValidPassword123!",
                 PasswordConfirmation = "ValidPassword123!"

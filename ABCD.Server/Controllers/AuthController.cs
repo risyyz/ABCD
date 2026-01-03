@@ -25,7 +25,7 @@ namespace ABCD.Server.Controllers {
         [HttpPost("sign-in")]
         public async Task<IActionResult> SignIn(SignInRequest signInRequest) {
             try {
-                var credentials = _mapper.Map<SignInRequest, SignInCredentials>(signInRequest);
+                var credentials = _mapper.Map<SignInRequest, SignInCommand>(signInRequest);
                 var result = await _authService.SignIn(credentials);
                 UpdateTokenCookies(result.JWT, result.RefreshToken, 60, 60);
                 return Ok(new { success = true });

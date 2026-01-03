@@ -1,9 +1,9 @@
 ﻿namespace ABCD.Application.Tests {
-    public class TokenRefreshmentValidatorTests {
-        private readonly TokenRefreshmentValidator _validator;
+    public class RefreshTokenCommandValidatorTests {
+        private readonly RefreshTokenCommandValidator _validator;
 
-        public TokenRefreshmentValidatorTests() {
-            _validator = new TokenRefreshmentValidator();
+        public RefreshTokenCommandValidatorTests() {
+            _validator = new RefreshTokenCommandValidator();
         }
 
         [Theory]

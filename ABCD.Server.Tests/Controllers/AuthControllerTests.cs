@@ -37,9 +37,9 @@ namespace ABCD.Server.Tests.Controllers {
         public async Task SignIn_MissingRequiredParameters_ReturnsBadRequest() {
             // Arrange
             var request = new SignInRequest { Email = null, Password = null };
-            var credentials = new SignInCredentials { Email = null, Password = null };
+            var credentials = new SignInCommand { Email = null, Password = null };
             string message = "Missing parameters";
-            _mapperMock.Setup(m => m.Map<SignInRequest, SignInCredentials>(request)).Returns(credentials);
+            _mapperMock.Setup(m => m.Map<SignInRequest, SignInCommand>(request)).Returns(credentials);
             _authServiceMock.Setup(s => s.SignIn(credentials)).ThrowsAsync(
                 new ValidationException(new List<ValidationFailure> { new ValidationFailure { ErrorMessage = message } }));
 
@@ -58,9 +58,9 @@ namespace ABCD.Server.Tests.Controllers {
         public async Task SignIn_InvalidCredentials_ReturnsUnauthorized() {
             // Arrange
             var request = new SignInRequest { Email = "test@example.com", Password = "password" };
-            var credentials = new SignInCredentials { Email = "test@example.com", Password = "password" };
+            var credentials = new SignInCommand { Email = "test@example.com", Password = "password" };
             string message = "Invalid login attempt.";
-            _mapperMock.Setup(m => m.Map<SignInRequest, SignInCredentials>(request)).Returns(credentials);
+            _mapperMock.Setup(m => m.Map<SignInRequest, SignInCommand>(request)).Returns(credentials);
             _authServiceMock.Setup(s => s.SignIn(credentials)).ThrowsAsync(new SignInFailedException(message));
 
             // Act
@@ -78,12 +78,12 @@ namespace ABCD.Server.Tests.Controllers {
         public async Task SignIn_ValidCredentials_ReturnsOk() {
             // Arrange
             var signInRequest = new SignInRequest { Email = "test@example.com", Password = "password" };
-            var credentials = new SignInCredentials { Email = "test@example.com", Password = "password" };
+            var credentials = new SignInCommand { Email = "test@example.com", Password = "password" };
             var jwt = "test-token";
             var refreshToken = "test-refresh-token";
             var token = new Token { JWT = jwt, RefreshToken = refreshToken };
 
-            _mapperMock.Setup(m => m.Map<SignInRequest, SignInCredentials>(signInRequest)).Returns(credentials);
+            _mapperMock.Setup(m => m.Map<SignInRequest, SignInCommand>(signInRequest)).Returns(credentials);
             _authServiceMock.Setup(s => s.SignIn(credentials)).ReturnsAsync(token);
 
             // Act

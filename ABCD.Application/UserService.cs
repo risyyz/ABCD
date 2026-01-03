@@ -11,23 +11,23 @@ namespace ABCD.Application {
         //Task<User> GetUser(string id);
         //Task UpdateUser(string id, UpdateUser user);
         //Task DeleteUser(string id);
-        Task<IdentityResult> RegisterUser(UserRegistration userRegistration);
+        Task<IdentityResult> RegisterUser(RegisterUserCommand userRegistration);
     }
 
     public class UserService : IUserService {
 
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IValidator<UserRegistration> _userRegistrationValidator;
+        private readonly IValidator<RegisterUserCommand> _userRegistrationValidator;
 
         public UserService(
             UserManager<ApplicationUser> userManager,
-            IValidator<UserRegistration> userRegistrationValidator
+            IValidator<RegisterUserCommand> userRegistrationValidator
         ) {
             _userManager = userManager;
             _userRegistrationValidator = userRegistrationValidator;
         }
 
-        public async Task<IdentityResult> RegisterUser(UserRegistration userRegistration) {
+        public async Task<IdentityResult> RegisterUser(RegisterUserCommand userRegistration) {
             _userRegistrationValidator.ValidateAndThrow(userRegistration);
             var user = new ApplicationUser { UserName = userRegistration.Email, Email = userRegistration.Email, RefreshToken = "abcd" };
             return await _userManager.CreateAsync(user, userRegistration.Password);            

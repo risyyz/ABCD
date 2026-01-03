@@ -96,7 +96,7 @@ builder.Services.AddCors(options => {
 });
 
 builder.Services.AddControllers();
-builder.Services.AddValidatorsFromAssemblyContaining<UserRegistrationValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<RegisterUserCommandValidator>();
 
 builder.Services.Configure<WeatherForecastOptions>(builder.Configuration.GetSection("WeatherForecast"));
 builder.Services.AddScoped<ICryptoService>(provider => {
@@ -106,8 +106,8 @@ builder.Services.AddScoped<ICryptoService>(provider => {
 
 var passwordPolicy = builder.Configuration.GetSection("PasswordPolicy").Get<PasswordPolicy>();
 builder.Services.AddScoped<PasswordPolicy>(provider => passwordPolicy);
-builder.Services.AddScoped<IValidator<UserRegistration>, UserRegistrationValidator>();
-builder.Services.AddScoped<IValidator<SignInCredentials>, SignInCredentialsValidator>();
+builder.Services.AddScoped<IValidator<RegisterUserCommand>, RegisterUserCommandValidator>();
+builder.Services.AddScoped<IValidator<SignInCommand>, SignInCommandValidator>();
 builder.Services.AddScoped<SecurityTokenHandler, JwtSecurityTokenHandler>();
 
 builder.Services.AddScoped<IUserService, UserService>();

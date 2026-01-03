@@ -49,7 +49,7 @@ namespace ABCD.Server.Controllers {
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterUserRequest registerRequest) {
             try {
-                var userRegistration = _mapper.Map<RegisterUserRequest, UserRegistration>(registerRequest);
+                var userRegistration = _mapper.Map<RegisterUserRequest, RegisterUserCommand>(registerRequest);
                 var result = await _userService.RegisterUser(userRegistration);
                 if (!result.Succeeded) {
                     return BadRequest($"User registration failed: {string.Join(", ", result.Errors.Select(e => e.Description))}");

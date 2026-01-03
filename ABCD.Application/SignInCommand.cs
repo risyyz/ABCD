@@ -1,13 +1,13 @@
 ﻿using FluentValidation;
 
 namespace ABCD.Application {
-    public record SignInCredentials {
+    public record SignInCommand {
         public required string Email { get; init; }
         public required string Password { get; init; }
     }
 
-    public class SignInCredentialsValidator : AbstractValidator<SignInCredentials> {
-        public SignInCredentialsValidator() {
+    public class SignInCommandValidator : AbstractValidator<SignInCommand> {
+        public SignInCommandValidator() {
             RuleFor(x => x.Email)
                 .NotEmpty().WithMessage("Email is required.")
                 .EmailAddress().WithMessage("Invalid email format.");
