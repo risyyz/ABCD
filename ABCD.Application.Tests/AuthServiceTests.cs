@@ -223,7 +223,7 @@ namespace ABCD.Application.Tests {
             Func<Task> act = async () => await _authService.RefreshToken(tokenRefresh);
 
             // Assert
-            await act.Should().ThrowAsync<SecurityTokenException>().WithMessage("Invalid token");
+            await act.Should().ThrowAsync<SecurityTokenException>().WithMessage("Invalid email or token");
         }
 
         [Fact]
@@ -248,7 +248,7 @@ namespace ABCD.Application.Tests {
             Func<Task> act = async () => await _authService.RefreshToken(tokenRefresh);
 
             // Assert
-            await act.Should().ThrowAsync<SecurityTokenException>().WithMessage("Invalid token");
+            await act.Should().ThrowAsync<SecurityTokenException>().WithMessage("Invalid email or token");
         }
 
         [Fact]
@@ -274,7 +274,7 @@ namespace ABCD.Application.Tests {
             Func<Task> act = async () => await _authService.RefreshToken(tokenRefresh);
 
             // Assert
-            await act.Should().ThrowAsync<SecurityTokenException>().WithMessage("Invalid refresh token");
+            await act.Should().ThrowAsync<SecurityTokenException>().WithMessage("Invalid email or token");
         }
 
         [Fact]
@@ -300,7 +300,7 @@ namespace ABCD.Application.Tests {
             Func<Task> act = async () => await _authService.RefreshToken(tokenRefresh);
 
             // Assert
-            await act.Should().ThrowAsync<SecurityTokenException>().WithMessage("Invalid refresh token");
+            await act.Should().ThrowAsync<SecurityTokenException>().WithMessage("Invalid email or token");
         }
 
         [Fact]
