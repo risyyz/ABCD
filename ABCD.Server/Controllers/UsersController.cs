@@ -50,12 +50,15 @@ namespace ABCD.Server.Controllers {
         public async Task<IActionResult> Register(RegisterUserRequest registerRequest) {
             try {
                 var userRegistration = _mapper.Map<RegisterUserRequest, UserRegistration>(registerRequest);
-                await _userService.RegisterUser(userRegistration);
+                var result = await _userService.RegisterUser(userRegistration);
+                if (!result.Succeeded) {
+                    return BadRequest($"User registration failed: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+                }
+
+                return Ok("User registered successfully.");
             } catch (ValidationException ex) {
                 return BadRequest(string.Join(" ", ex.Errors.Select(e => e.ErrorMessage)));
-            }
-
-            return Ok("User registered successfully.");
+            }            
         }
     }
 }

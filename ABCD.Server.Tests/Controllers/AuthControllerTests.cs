@@ -127,7 +127,7 @@ namespace ABCD.Server.Tests.Controllers {
         public async Task RefreshToken_ValidRequest_ReturnsOk() {
             // Arrange
             var token = "test-token";
-            var refreshTokenRequest = new RefreshTokenRequest { Email = "test@example.com", RefreshToken = "refresh-token" };
+            var refreshTokenRequest = new RefreshTokenRequest { Email = "test@example.com" };
             var refreshment = new TokenRefreshment { Email = "test@example.com", JWT = token, RefreshToken = "refresh-token" };
             var jwt = "new-jwt";
             var newRefreshToken = "new-refresh-token";
@@ -148,7 +148,7 @@ namespace ABCD.Server.Tests.Controllers {
         [Fact]
         public async Task RefreshToken_MissingToken_ReturnsUnauthorized() {
             // Arrange
-            var refreshTokenRequest = new RefreshTokenRequest { Email = "test@example.com", RefreshToken = "refresh-token" };
+            var refreshTokenRequest = new RefreshTokenRequest { Email = "test@example.com" };
             _tokenReaderMock.Setup(tr => tr.GetAccessToken()).Returns((string)null);
 
             // Act
@@ -166,7 +166,7 @@ namespace ABCD.Server.Tests.Controllers {
             // Arrange
             var accessToken = "access-token";
             var refreshToken = "refresh-token";
-            var refreshTokenRequest = new RefreshTokenRequest { Email = "test@example.com", RefreshToken = refreshToken };
+            var refreshTokenRequest = new RefreshTokenRequest { Email = "test@example.com" };
             var refreshment = new TokenRefreshment { Email = "test@example.com", JWT = accessToken, RefreshToken = "refresh-token" };
             var validationFailures = new List<ValidationFailure> { new ValidationFailure("Email", "Invalid email format") };
 

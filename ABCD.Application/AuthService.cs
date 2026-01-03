@@ -41,11 +41,11 @@ namespace ABCD.Application {
 
             var principal = _tokenService.GetPrincipalFromToken(tokenRefresh.JWT);
             if (principal == null || principal.Identity?.Name != tokenRefresh.Email)
-                throw new SecurityTokenException("Invalid token");
+                throw new SecurityTokenException("Invalid email or token");
 
             var user = await _userManager.FindByEmailAsync(tokenRefresh.Email);
             if (user == null || user.RefreshToken != tokenRefresh.RefreshToken || user.RefreshTokenExpiryTime <= DateTimeOffset.UtcNow)
-                throw new SecurityTokenException("Invalid refresh token");
+                throw new SecurityTokenException("Invalid email or token");
 
             var newToken = _tokenService.GenerateToken(user);
             user.RefreshToken = newToken.RefreshToken;

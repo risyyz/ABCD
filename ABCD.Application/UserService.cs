@@ -11,7 +11,7 @@ namespace ABCD.Application {
         //Task<User> GetUser(string id);
         //Task UpdateUser(string id, UpdateUser user);
         //Task DeleteUser(string id);
-        Task RegisterUser(UserRegistration userRegistration);
+        Task<IdentityResult> RegisterUser(UserRegistration userRegistration);
     }
 
     public class UserService : IUserService {
@@ -27,10 +27,10 @@ namespace ABCD.Application {
             _userRegistrationValidator = userRegistrationValidator;
         }
 
-        public async Task RegisterUser(UserRegistration userRegistration) {
+        public async Task<IdentityResult> RegisterUser(UserRegistration userRegistration) {
             _userRegistrationValidator.ValidateAndThrow(userRegistration);
             var user = new ApplicationUser { UserName = userRegistration.Email, Email = userRegistration.Email, RefreshToken = "abcd" };
-            await _userManager.CreateAsync(user, userRegistration.Password);
+            return await _userManager.CreateAsync(user, userRegistration.Password);            
         }
 
         public async Task<IEnumerable<ApplicationUser>> GetUsers() {

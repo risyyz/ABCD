@@ -3,12 +3,14 @@ using ABCD.Domain;
 using ABCD.Lib;
 using ABCD.Server.Models;
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ABCD.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class PostsController : ControllerBase
     {        
         private readonly IPostService _postService;
