@@ -1,13 +1,13 @@
 ﻿using FluentValidation;
 
 namespace ABCD.Application {
-    public record TokenRefreshment {
+    public record RefreshTokenCommand {
         public required string Email { get; init; }
         public required string JWT { get; init; }
         public required string RefreshToken { get; init; }
     }
 
-    public class TokenRefreshmentValidator : AbstractValidator<TokenRefreshment> {
+    public class TokenRefreshmentValidator : AbstractValidator<RefreshTokenCommand> {
         public TokenRefreshmentValidator() {
             RuleFor(x => x.Email)
                 .NotEmpty().WithMessage("Email is required")

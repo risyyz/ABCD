@@ -17,7 +17,6 @@ export interface LoginResponse {
 
 export interface RefreshTokenRequest {
   email: string;
-  refreshToken: string;
 }
 
 @Injectable({
@@ -26,6 +25,9 @@ export interface RefreshTokenRequest {
 export class AuthService {
   private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
   public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
+
+  private isAuthResolvedSubject = new BehaviorSubject<boolean>(false);
+  public isAuthResolved$ = this.isAuthResolvedSubject.asObservable();
 
   constructor(private http: HttpClient) {
     // Check authentication status on init by calling backend
@@ -72,10 +74,11 @@ export class AuthService {
     }).subscribe({
       next: (response) => {
         this.isAuthenticatedSubject.next(response.isAuthenticated);
+        this.isAuthResolvedSubject.next(true);
       },
       error: () => {
-        // Not authenticated or error occurred
         this.isAuthenticatedSubject.next(false);
+        this.isAuthResolvedSubject.next(true);
       }
     });
   }

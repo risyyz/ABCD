@@ -27,7 +27,7 @@ namespace ABCD.Application.Tests {
         private readonly Mock<ITokenService> _tokenServiceMock;
         private readonly Mock<IOptions<JwtSettings>> _jwtSettingsMock;
         private readonly Mock<IValidator<SignInCredentials>> _userLoginValidatorMock;
-        private readonly Mock<IValidator<TokenRefreshment>> _tokenRefreshValidatorMock;
+        private readonly Mock<IValidator<RefreshTokenCommand>> _tokenRefreshValidatorMock;
         private readonly Mock<IMemoryCache> _cacheMock;
         private readonly AuthService _authService;
 
@@ -38,7 +38,7 @@ namespace ABCD.Application.Tests {
             _tokenServiceMock = new Mock<ITokenService>();
             _jwtSettingsMock = new Mock<IOptions<JwtSettings>>();
             _userLoginValidatorMock = new Mock<IValidator<SignInCredentials>>();
-            _tokenRefreshValidatorMock = new Mock<IValidator<TokenRefreshment>>();
+            _tokenRefreshValidatorMock = new Mock<IValidator<RefreshTokenCommand>>();
             _cacheMock = new Mock<IMemoryCache>();
 
             var jwtSettings = new JwtSettings {
@@ -195,7 +195,7 @@ namespace ABCD.Application.Tests {
             _tokenRefreshValidatorMock.Setup(v => v.Validate(It.IsAny<IValidationContext>()))
                 .Throws(new ValidationException(validationResult.Errors));
 
-            var tokenRefresh = new TokenRefreshment {
+            var tokenRefresh = new RefreshTokenCommand {
                 Email = null,
                 JWT = null,
                 RefreshToken = null
@@ -211,7 +211,7 @@ namespace ABCD.Application.Tests {
         [Fact]
         public async Task RefreshToken_InvalidToken_ThrowsSecurityTokenException() {
             // Arrange
-            var tokenRefresh = new TokenRefreshment {
+            var tokenRefresh = new RefreshTokenCommand {
                 Email = "user@example.com",
                 JWT = "invalid-jwt",
                 RefreshToken = "valid-refresh-token"
@@ -229,7 +229,7 @@ namespace ABCD.Application.Tests {
         [Fact]
         public async Task RefreshToken_NonMatchingEmail_ThrowsSecurityTokenException() {
             // Arrange
-            var tokenRefresh = new TokenRefreshment {
+            var tokenRefresh = new RefreshTokenCommand {
                 Email = "user@example.com",
                 JWT = "invalid-jwt",
                 RefreshToken = "valid-refresh-token"
@@ -254,7 +254,7 @@ namespace ABCD.Application.Tests {
         [Fact]
         public async Task RefreshToken_NonMatchingRefreshToken_ThrowsSecurityTokenException() {
             // Arrange
-            var tokenRefresh = new TokenRefreshment {
+            var tokenRefresh = new RefreshTokenCommand {
                 Email = "user@example.com",
                 JWT = "valid-jwt",
                 RefreshToken = "invalid-refresh-token"
@@ -280,7 +280,7 @@ namespace ABCD.Application.Tests {
         [Fact]
         public async Task RefreshToken_ExpiredRefreshToken_ThrowsSecurityTokenException() {
             // Arrange
-            var tokenRefresh = new TokenRefreshment {
+            var tokenRefresh = new RefreshTokenCommand {
                 Email = "user@example.com",
                 JWT = "valid-jwt",
                 RefreshToken = "valid-refresh-token"
@@ -306,7 +306,7 @@ namespace ABCD.Application.Tests {
         [Fact]
         public async Task RefreshToken_ValidInput_ReturnsNewToken() {
             // Arrange
-            var tokenRefresh = new TokenRefreshment {
+            var tokenRefresh = new RefreshTokenCommand {
                 Email = "user@example.com",
                 JWT = "valid-jwt",
                 RefreshToken = "valid-refresh-token"

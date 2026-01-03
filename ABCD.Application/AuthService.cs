@@ -11,7 +11,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace ABCD.Application {
     public interface IAuthService {
-        Task<Token> RefreshToken(TokenRefreshment tokenRefresh); 
+        Task<Token> RefreshToken(RefreshTokenCommand tokenRefresh); 
         Task<Token> SignIn(SignInCredentials credentials);
         Task SignOut(string jwt);
     }
@@ -21,12 +21,12 @@ namespace ABCD.Application {
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ITokenService _tokenService;
         private readonly IValidator<SignInCredentials> _credentialsValidator;
-        private readonly IValidator<TokenRefreshment> _tokenRefreshValidator;
+        private readonly IValidator<RefreshTokenCommand> _tokenRefreshValidator;
         private readonly IMemoryCache _invalidatedTokenCache;
         private readonly JwtSettings _jwtSettings;
 
         public AuthService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, ITokenService tokenService,
-             IValidator<SignInCredentials> credentialsValidator, IValidator<TokenRefreshment> tokenRefreshValidator, IMemoryCache cache, IOptions<JwtSettings> jwtSettings) {
+             IValidator<SignInCredentials> credentialsValidator, IValidator<RefreshTokenCommand> tokenRefreshValidator, IMemoryCache cache, IOptions<JwtSettings> jwtSettings) {
             _userManager = userManager;
             _signInManager = signInManager;
             _tokenService = tokenService;
@@ -36,7 +36,7 @@ namespace ABCD.Application {
             _jwtSettings = jwtSettings.Value;
         }
 
-        public async Task<Token> RefreshToken(TokenRefreshment tokenRefresh) {
+        public async Task<Token> RefreshToken(RefreshTokenCommand tokenRefresh) {
             _tokenRefreshValidator.ValidateAndThrow(tokenRefresh);
 
             var principal = _tokenService.GetPrincipalFromToken(tokenRefresh.JWT);

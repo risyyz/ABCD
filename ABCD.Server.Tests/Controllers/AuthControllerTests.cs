@@ -47,6 +47,7 @@ namespace ABCD.Server.Tests.Controllers {
             var result = await _controller.SignIn(request);
 
             // Assert
+            _authServiceMock.Verify(s => s.SignIn(credentials), Times.Once);
             result.Should().BeOfType<BadRequestObjectResult>();
             var badRequestResult = result as BadRequestObjectResult;
             badRequestResult.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
@@ -66,6 +67,7 @@ namespace ABCD.Server.Tests.Controllers {
             var result = await _controller.SignIn(request);
 
             // Assert
+            _authServiceMock.Verify(s => s.SignIn(credentials), Times.Once);
             result.Should().BeOfType<UnauthorizedObjectResult>();
             var unauthorizedResult = result as UnauthorizedObjectResult;
             unauthorizedResult.Should().NotBeNull();
@@ -88,9 +90,10 @@ namespace ABCD.Server.Tests.Controllers {
             var result = await _controller.SignIn(signInRequest);
 
             // Assert
+            _authServiceMock.Verify(s => s.SignIn(credentials), Times.Once);
             var okResult = result as OkObjectResult;
             okResult.Should().NotBeNull();
-            okResult.Value.Should().BeEquivalentTo(new { success = true, token = jwt, refreshToken = refreshToken });
+            okResult.Value.Should().BeEquivalentTo(new { success = true });
         }
 
         [Fact]
@@ -103,9 +106,9 @@ namespace ABCD.Server.Tests.Controllers {
             var result = await _controller.SignOut(_tokenReaderMock.Object);
 
             // Assert
+            _authServiceMock.Verify(s => s.SignOut(token), Times.Once);
             var okResult = result as OkResult;
             okResult.Should().NotBeNull();
-            _authServiceMock.Verify(s => s.SignOut(token), Times.Once);
         }
 
         [Fact]
@@ -117,6 +120,7 @@ namespace ABCD.Server.Tests.Controllers {
             var result = await _controller.SignOut(_tokenReaderMock.Object);
 
             // Assert
+            _authServiceMock.Verify(s => s.SignOut(It.IsAny<string>()), Times.Never);
             result.Should().BeOfType<UnauthorizedObjectResult>();
             var unauthorizedResult = result as UnauthorizedObjectResult;
             unauthorizedResult.Should().NotBeNull();
@@ -126,39 +130,71 @@ namespace ABCD.Server.Tests.Controllers {
         [Fact]
         public async Task RefreshToken_ValidRequest_ReturnsOk() {
             // Arrange
-            var token = "test-token";
+            var accessToken = "test-access-token";
+            var refreshToken = "test-refresh-token";
             var refreshTokenRequest = new RefreshTokenRequest { Email = "test@example.com" };
-            var refreshment = new TokenRefreshment { Email = "test@example.com", JWT = token, RefreshToken = "refresh-token" };
+            var refreshCommand = new RefreshTokenCommand { Email = "test@example.com", JWT = accessToken, RefreshToken = refreshToken };
             var jwt = "new-jwt";
             var newRefreshToken = "new-refresh-token";
             var resultToken = new Token { JWT = jwt, RefreshToken = newRefreshToken };
 
-            _tokenReaderMock.Setup(tr => tr.GetAccessToken()).Returns(token);
-            _authServiceMock.Setup(s => s.RefreshToken(refreshment)).ReturnsAsync(resultToken);
+            _tokenReaderMock.Setup(tr => tr.GetAccessToken()).Returns(accessToken);
+            _tokenReaderMock.Setup(tr => tr.GetRefreshToken()).Returns(refreshToken);
+            _authServiceMock.Setup(s => s.RefreshToken(refreshCommand)).ReturnsAsync(resultToken);
 
             // Act
             var result = await _controller.RefreshToken(_tokenReaderMock.Object, refreshTokenRequest);
 
             // Assert
+            _authServiceMock.Verify(s => s.RefreshToken(refreshCommand), Times.Once);
             var okResult = result as OkObjectResult;
             okResult.Should().NotBeNull();
-            okResult.Value.Should().BeEquivalentTo(new { success = true, token = jwt, refreshToken = newRefreshToken });
+            okResult.Value.Should().BeEquivalentTo(new { success = true });
+            
         }
 
-        [Fact]
-        public async Task RefreshToken_MissingToken_ReturnsUnauthorized() {
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData("   ")]
+        public async Task RefreshToken_EmptyNullWhitespaceAccessToken_ReturnsUnauthorized(string accessToken) {
             // Arrange
+            var refreshToken = "test-refresh-token";
             var refreshTokenRequest = new RefreshTokenRequest { Email = "test@example.com" };
-            _tokenReaderMock.Setup(tr => tr.GetAccessToken()).Returns((string)null);
+            _tokenReaderMock.Setup(tr => tr.GetAccessToken()).Returns(accessToken);
+            _tokenReaderMock.Setup(tr => tr.GetRefreshToken()).Returns(refreshToken);
 
             // Act
             var result = await _controller.RefreshToken(_tokenReaderMock.Object, refreshTokenRequest);
 
             // Assert
+            _authServiceMock.Verify(s => s.RefreshToken(It.IsAny<RefreshTokenCommand>()), Times.Never);
             result.Should().BeOfType<UnauthorizedObjectResult>();
             var unauthorizedResult = result as UnauthorizedObjectResult;
             unauthorizedResult.Should().NotBeNull();
             unauthorizedResult.Value.Should().Be("Authorization token is missing or invalid.");
+        }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData("   ")]
+        public async Task RefreshToken_EmptyNullWhitespaceRefreshToken_ReturnsUnauthorized(string refreshToken) {
+            // Arrange
+            var accessToken = "test-access-token";
+            var refreshTokenRequest = new RefreshTokenRequest { Email = "test@example.com" };
+            _tokenReaderMock.Setup(tr => tr.GetAccessToken()).Returns(accessToken);
+            _tokenReaderMock.Setup(tr => tr.GetRefreshToken()).Returns(refreshToken);
+
+            // Act
+            var result = await _controller.RefreshToken(_tokenReaderMock.Object, refreshTokenRequest);
+
+            // Assert
+            _authServiceMock.Verify(s => s.RefreshToken(It.IsAny<RefreshTokenCommand>()), Times.Never);
+            result.Should().BeOfType<UnauthorizedObjectResult>();
+            var unauthorizedResult = result as UnauthorizedObjectResult;
+            unauthorizedResult.Should().NotBeNull();
+            unauthorizedResult.Value.Should().Be("Refresh token is missing or invalid.");
         }
 
         [Fact]
@@ -167,17 +203,18 @@ namespace ABCD.Server.Tests.Controllers {
             var accessToken = "access-token";
             var refreshToken = "refresh-token";
             var refreshTokenRequest = new RefreshTokenRequest { Email = "test@example.com" };
-            var refreshment = new TokenRefreshment { Email = "test@example.com", JWT = accessToken, RefreshToken = "refresh-token" };
+            var refreshCommand = new RefreshTokenCommand { Email = "test@example.com", JWT = accessToken, RefreshToken = "refresh-token" };
             var validationFailures = new List<ValidationFailure> { new ValidationFailure("Email", "Invalid email format") };
 
             _tokenReaderMock.Setup(tr => tr.GetAccessToken()).Returns(accessToken);
             _tokenReaderMock.Setup(tr => tr.GetRefreshToken()).Returns(refreshToken);
-            _authServiceMock.Setup(s => s.RefreshToken(refreshment)).ThrowsAsync(new ValidationException(validationFailures));
+            _authServiceMock.Setup(s => s.RefreshToken(refreshCommand)).ThrowsAsync(new ValidationException(validationFailures));
 
             // Act
             var result = await _controller.RefreshToken(_tokenReaderMock.Object, refreshTokenRequest);
 
             // Assert
+            _authServiceMock.Verify(s => s.RefreshToken(refreshCommand), Times.Once);
             result.Should().BeOfType<BadRequestObjectResult>();
             var badRequestResult = result as BadRequestObjectResult;
             badRequestResult.Should().NotBeNull();
