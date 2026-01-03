@@ -71,10 +71,30 @@ builder.Services.AddAuthentication(options => {
     options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
 }).AddJwtBearer(options => {
     options.TokenValidationParameters = jwtSettings.GetTokenValidationParameters();
+    
+    // Configure to read JWT token from cookie instead of Authorization header
+    options.Events = new JwtBearerEvents {
+        OnMessageReceived = context => {
+            // Read token from cookie
+            context.Token = context.Request.Cookies["access_token"];
+            return Task.CompletedTask;
+        }
+    };
 });
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddAuthorization();
+
+// Add CORS configuration to allow credentials (for cookie-based auth)
+builder.Services.AddCors(options => {
+    options.AddPolicy("AllowAngularClient", policy => {
+        policy.WithOrigins("https://localhost:4200", "http://localhost:4200")
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials(); // Required for cookies
+    });
+});
+
 builder.Services.AddControllers();
 builder.Services.AddValidatorsFromAssemblyContaining<UserRegistrationValidator>();
 
@@ -126,6 +146,7 @@ if (app.Environment.IsDevelopment()) {
 // Configure the HTTP request pipeline.
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseHttpsRedirection();
+app.UseCors("AllowAngularClient"); // Enable CORS for cookie-based auth
 app.UseAuthentication();
 app.UseMiddleware<TokenValidationMiddleware>();
 app.UseAuthorization();

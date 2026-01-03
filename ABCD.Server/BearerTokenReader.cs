@@ -6,14 +6,14 @@
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public virtual string? GetToken() {
-            var authorizationHeader = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].FirstOrDefault();
+        public virtual string? GetAccessToken() {
+            var token = _httpContextAccessor.HttpContext?.Request.Cookies["access_token"];
+            return string.IsNullOrWhiteSpace(token) ? null : token.Trim();
+        }
 
-            if (string.IsNullOrWhiteSpace(authorizationHeader) || !authorizationHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase)) {
-                return null; // Return null if the header is missing or invalid
-            }
-
-            return authorizationHeader["Bearer ".Length..].Trim(); // Extract and return the token
+        public virtual string? GetRefreshToken() {
+            var token = _httpContextAccessor.HttpContext?.Request.Cookies["refresh_token"];
+            return string.IsNullOrWhiteSpace(token) ? null : token.Trim();
         }
     }
 }
