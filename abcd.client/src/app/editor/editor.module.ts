@@ -5,10 +5,12 @@ import { FormsModule } from '@angular/forms';
 import { EditorRoutingModule } from './editor-routing.module';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { CreatePostComponent } from './create-post/create-post.component';
+import { EditPostComponent } from './edit-post/edit-post.component';
 
 @NgModule({
   declarations: [
-    DashboardComponent
+    DashboardComponent,
+    EditPostComponent
   ],
   imports: [
     CommonModule,

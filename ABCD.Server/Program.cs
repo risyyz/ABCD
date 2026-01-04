@@ -46,8 +46,8 @@ if (builder.Environment.IsDevelopment()) {
 // Bind Settings class to configuration
 var configuration = builder.Configuration;
 builder.Services.Configure<Settings>(options => {
-    options.ConnectionString = configuration.GetConnectionString("DefaultConnection");
-    options.CryptoPassPhrase = configuration["Crypto:PassPhrase"];
+    options.ConnectionString = configuration.GetConnectionString("DefaultConnection")!;
+    options.CryptoPassPhrase = configuration["Crypto:PassPhrase"]!;
 });
 
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection(JwtSettings.SectionName));
@@ -70,7 +70,7 @@ builder.Services.AddAuthentication(options => {
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
 }).AddJwtBearer(options => {
-    options.TokenValidationParameters = jwtSettings.GetTokenValidationParameters();
+    options.TokenValidationParameters = jwtSettings!.GetTokenValidationParameters();
     
     // Configure to read JWT token from cookie instead of Authorization header
     options.Events = new JwtBearerEvents {
@@ -101,11 +101,11 @@ builder.Services.AddValidatorsFromAssemblyContaining<RegisterUserCommandValidato
 builder.Services.Configure<WeatherForecastOptions>(builder.Configuration.GetSection("WeatherForecast"));
 builder.Services.AddScoped<ICryptoService>(provider => {
     var configuration = provider.GetRequiredService<IConfiguration>();
-    return new CryptoService(configuration["Crypto:PassPhrase"]);
+    return new CryptoService(configuration["Crypto:PassPhrase"]!);
 });
 
 var passwordPolicy = builder.Configuration.GetSection("PasswordPolicy").Get<PasswordPolicy>();
-builder.Services.AddScoped<PasswordPolicy>(provider => passwordPolicy);
+builder.Services.AddScoped<PasswordPolicy>(provider => passwordPolicy!);
 builder.Services.AddScoped<IValidator<RegisterUserCommand>, RegisterUserCommandValidator>();
 builder.Services.AddScoped<IValidator<SignInCommand>, SignInCommandValidator>();
 builder.Services.AddScoped<SecurityTokenHandler, JwtSecurityTokenHandler>();

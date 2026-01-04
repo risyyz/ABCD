@@ -1,4 +1,30 @@
-<div>
+<div *ngIf="post">
   <h2>Edit Post</h2>
-  <!-- Edit post form will go here -->
+  <form>
+    <div>
+      <label>Title:</label>
+      <input type="text" [(ngModel)]="post.title" name="title" />
+    </div>
+    <div>
+      <label>Status:</label>
+      <select [(ngModel)]="post.status" name="status">
+        <option value="Draft">Draft</option>
+        <option value="Published">Published</option>
+      </select>
+    </div>
+    <div>
+      <label>Date Last Published:</label>
+      <input
+        type="text"
+        [(ngModel)]="post.dateLastPublished"
+        name="dateLastPublished"
+        readonly
+      />
+    </div>
+    <div>
+      <label>Path Segment:</label>
+      <input type="text" [(ngModel)]="post.pathSegment" name="pathSegment" />
+    </div>
+    <!-- Add save/cancel buttons as needed -->
+  </form>
 </div>

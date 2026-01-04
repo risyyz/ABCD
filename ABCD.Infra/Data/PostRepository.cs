@@ -6,9 +6,9 @@ namespace ABCD.Infra.Data {
         private readonly DataContext _context;
         public PostRepository(DataContext context) => _context = context;
 
-        public async Task<Post?> GetByPostIdAsync(int postId) {
+        public async Task<Post?> GetByPostIdAsync(int blogId, int postId) {
             var record = await _context.Posts
-                .FirstOrDefaultAsync(p => p.PostId == postId);
+                .FirstOrDefaultAsync(p => p.PostId == postId && p.BlogId == blogId);
             if (record == null) return null;
             return MapToDomain(record);
         }

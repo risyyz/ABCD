@@ -40,5 +40,9 @@ namespace ABCD.Application {
         {
             return await _postRepository.GetAllByBlogIdAsync(_requestContext.Blog.BlogId.Value!);
         }
+
+        public async Task<Post?> GetByIdAsync(int postId) {
+            return await _postRepository.GetByPostIdAsync(_requestContext.Blog.BlogId.Value!, postId);
+        }
     }
 }

@@ -37,5 +37,16 @@ namespace ABCD.Server.Controllers
             var response = _typeMapper.Map<IEnumerable<Post>, IEnumerable<PostSummaryResponse>>(posts);
             return Ok(response);
         }
+
+        [HttpGet("{postId:int}")]
+        public async Task<IActionResult> GetPostById([FromRoute] int postId) {
+            var post = await _postService.GetByIdAsync(postId);
+            if(post == null) {
+                return NotFound();
+            }
+
+            var response = _typeMapper.Map<Post, PostSummaryResponse>(post);
+            return Ok(response);
+        }
     }
 }

@@ -31,7 +31,7 @@ namespace ABCD.Server.Controllers {
                 return Ok(new { success = true });
             } catch (ValidationException ex) {
                 return BadRequest(string.Join(" ", ex.Errors.Select(e => e.ErrorMessage)));
-            } catch (SignInFailedException ex) {
+            } catch (SignInFailedException) {
                 return Unauthorized("Invalid login attempt.");
             }
         }
