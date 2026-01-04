@@ -1,7 +1,5 @@
 ﻿using ABCD.Server.Middlewares;
 
-using FluentAssertions;
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
@@ -51,11 +49,11 @@ namespace ABCD.Server.Tests.Middlewares {
             await middleware.InvokeAsync(_context);
 
             // Assert
-            _context.Response.StatusCode.Should().Be(StatusCodes.Status401Unauthorized);
+            Assert.Equal(StatusCodes.Status401Unauthorized, _context.Response.StatusCode);
             _context.Response.Body.Seek(0, SeekOrigin.Begin);
             var reader = new StreamReader(_context.Response.Body);
             var responseText = await reader.ReadToEndAsync();
-            responseText.Should().Be("invalid token");
+            Assert.Equal("invalid token", responseText);
             _nextMock.Verify(m => m(It.IsAny<HttpContext>()), Times.Never);
             _cacheMock.Verify(m => m.TryGetValue(token, out cachedValue), Times.Once);
         }
@@ -86,7 +84,7 @@ namespace ABCD.Server.Tests.Middlewares {
             await middleware.InvokeAsync(_context);
 
             // Assert
-            _context.Response.StatusCode.Should().NotBe(StatusCodes.Status401Unauthorized);
+            Assert.NotEqual(StatusCodes.Status401Unauthorized, _context.Response.StatusCode);
             _nextMock.Verify(m => m(It.IsAny<HttpContext>()), Times.Once);
             _cacheMock.Verify(m => m.TryGetValue(token, out cachedValue), Times.Once);
         }
@@ -112,7 +110,7 @@ namespace ABCD.Server.Tests.Middlewares {
             await middleware.InvokeAsync(_context);
 
             // Assert
-            _context.Response.StatusCode.Should().NotBe(StatusCodes.Status401Unauthorized);
+            Assert.NotEqual(StatusCodes.Status401Unauthorized, _context.Response.StatusCode);
             _nextMock.Verify(m => m(It.IsAny<HttpContext>()), Times.Once);
         }
 
@@ -142,7 +140,7 @@ namespace ABCD.Server.Tests.Middlewares {
             await middleware.InvokeAsync(_context);
 
             // Assert
-            _context.Response.StatusCode.Should().NotBe(StatusCodes.Status401Unauthorized);
+            Assert.NotEqual(StatusCodes.Status401Unauthorized, _context.Response.StatusCode);
             _nextMock.Verify(m => m(It.IsAny<HttpContext>()), Times.Once);
             _cacheMock.Verify(m => m.TryGetValue(It.IsAny<string>(), out cachedValue), Times.Never);
         }

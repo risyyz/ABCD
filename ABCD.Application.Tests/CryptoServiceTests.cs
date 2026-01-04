@@ -1,5 +1,3 @@
-using FluentAssertions;
-
 namespace ABCD.Application.Tests {
     public class CryptoServiceTests {
         private readonly string passphrase = "3q2+7w==...";
@@ -18,8 +16,8 @@ namespace ABCD.Application.Tests {
             string encrypted = cryptoService.Encrypt(input);
 
             // Assert
-            encrypted.Should().NotBeNullOrEmpty();
-            encrypted.Should().NotBe(input);
+            Assert.False(string.IsNullOrEmpty(encrypted));
+            Assert.NotEqual(input, encrypted);
         }
 
         [Fact]
@@ -32,25 +30,19 @@ namespace ABCD.Application.Tests {
             string decrypted = cryptoService.Decrypt(encrypted);
 
             // Assert
-            decrypted.Should().Be(input);
+            Assert.Equal(input, decrypted);
         }
 
         [Fact]
         public void Encrypt_ShouldThrowArgumentNullException_WhenInputIsNull() {
-            // Act
-            Action act = () => cryptoService.Encrypt(null);
-
-            // Assert
-            act.Should().Throw<ArgumentNullException>();
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(() => cryptoService.Encrypt(null));
         }
 
         [Fact]
         public void Decrypt_ShouldThrowArgumentNullException_WhenInputIsNull() {
-            // Act
-            Action act = () => cryptoService.Decrypt(null);
-
-            // Assert
-            act.Should().Throw<ArgumentNullException>();
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(() => cryptoService.Decrypt(null));
         }
 
         [Fact]
@@ -58,11 +50,8 @@ namespace ABCD.Application.Tests {
             // Arrange
             string invalidBase64 = "InvalidBase64String";
 
-            // Act
-            Action act = () => cryptoService.Decrypt(invalidBase64);
-
-            // Assert
-            act.Should().Throw<FormatException>();
+            // Act & Assert
+            Assert.Throws<FormatException>(() => cryptoService.Decrypt(invalidBase64));
         }
     }
 }

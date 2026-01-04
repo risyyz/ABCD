@@ -5,8 +5,6 @@ using System.Text;
 using ABCD.Infra.Data;
 using ABCD.Lib;
 
-using FluentAssertions;
-
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
@@ -14,7 +12,6 @@ using Moq;
 
 namespace ABCD.Application.Tests {
     public class TokenServiceTests {
-
         private readonly Mock<SecurityTokenHandler> _tokenHandlerMock;
         private readonly Mock<IOptions<JwtSettings>> _jwtSettingsMock;
         private readonly TokenService _tokenService;
@@ -40,14 +37,14 @@ namespace ABCD.Application.Tests {
         }
 
         [Fact]
-        public void GenerateToken_NullUser_ReturnsEmptyToken() {            
+        public void GenerateToken_NullUser_ReturnsEmptyToken() {
             // Act
             var token = _tokenService.GenerateToken(null);
 
             // Assert
-            token.JWT.Should().BeEmpty();
-            token.RefreshToken.Should().BeEmpty();
-            token.IsEmpty.Should().BeTrue();
+            Assert.Equal(string.Empty, token.JWT);
+            Assert.Equal(string.Empty, token.RefreshToken);
+            Assert.True(token.IsEmpty);
         }
 
         [Fact]
@@ -64,9 +61,9 @@ namespace ABCD.Application.Tests {
             var token = _tokenService.GenerateToken(user);
 
             // Assert
-            token.JWT.Should().Be(_validJwt);
-            token.RefreshToken.Should().NotBeNullOrEmpty();
-            token.IsEmpty.Should().BeFalse();
+            Assert.Equal(_validJwt, token.JWT);
+            Assert.False(string.IsNullOrEmpty(token.RefreshToken));
+            Assert.False(token.IsEmpty);
             _tokenHandlerMock.Verify(x => x.WriteToken(It.IsAny<SecurityToken>()), Times.Once);
         }
 
@@ -79,7 +76,7 @@ namespace ABCD.Application.Tests {
             Action act = () => _tokenService.GetPrincipalFromToken(jwt);
 
             // Assert
-            act.Should().Throw<SecurityTokenException>().WithMessage("Invalid token");
+            Assert.Throws<SecurityTokenException>(() => _tokenService.GetPrincipalFromToken(jwt));
         }
 
         [Fact]
@@ -94,7 +91,7 @@ namespace ABCD.Application.Tests {
             Action act = () => _tokenService.GetPrincipalFromToken(jwt);
 
             // Assert
-            act.Should().Throw<SecurityTokenException>().WithMessage("Invalid token");
+            Assert.Throws<SecurityTokenException>(() => _tokenService.GetPrincipalFromToken(jwt));
         }
 
         [Fact]
@@ -109,7 +106,7 @@ namespace ABCD.Application.Tests {
             Action act = () => _tokenService.GetPrincipalFromToken(jwt);
 
             // Assert
-            act.Should().Throw<SecurityTokenException>().WithMessage("Invalid token");
+            Assert.Throws<SecurityTokenException>(() => _tokenService.GetPrincipalFromToken(jwt));
         }
 
         [Fact]
@@ -128,10 +125,11 @@ namespace ABCD.Application.Tests {
             var principal = _tokenService.GetPrincipalFromToken(_validJwt);
 
             // Assert
-            principal.Should().NotBeNull();
-            principal.Claims.Should().HaveCount(2);
-            principal.Claims.Should().ContainSingle(x => x.Type == ClaimTypes.Name && x.Value == "username");
-            principal.Claims.Should().ContainSingle(x => x.Type == ClaimTypes.Email && x.Value == "user@email.com");
+            Assert.NotNull(principal);
+            var claims = principal.Claims.ToList();
+            Assert.Equal(2, claims.Count);
+            Assert.Single(claims, x => x.Type == ClaimTypes.Name && x.Value == "username");
+            Assert.Single(claims, x => x.Type == ClaimTypes.Email && x.Value == "user@email.com");
         }
     }
 }

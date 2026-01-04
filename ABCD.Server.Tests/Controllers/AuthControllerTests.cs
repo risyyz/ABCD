@@ -5,8 +5,6 @@ using ABCD.Server.Controllers;
 using ABCD.Server.Models;
 using ABCD.Server.Requests;
 
-using FluentAssertions;
-
 using FluentValidation;
 using FluentValidation.Results;
 
@@ -48,10 +46,10 @@ namespace ABCD.Server.Tests.Controllers {
 
             // Assert
             _authServiceMock.Verify(s => s.SignIn(credentials), Times.Once);
-            result.Should().BeOfType<BadRequestObjectResult>();
+            Assert.IsType<BadRequestObjectResult>(result);
             var badRequestResult = result as BadRequestObjectResult;
-            badRequestResult.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
-            badRequestResult.Value.Should().Be(message);
+            Assert.Equal(StatusCodes.Status400BadRequest, badRequestResult.StatusCode);
+            Assert.Equal(message, badRequestResult.Value);
         }
 
         [Fact]
@@ -68,10 +66,10 @@ namespace ABCD.Server.Tests.Controllers {
 
             // Assert
             _authServiceMock.Verify(s => s.SignIn(credentials), Times.Once);
-            result.Should().BeOfType<UnauthorizedObjectResult>();
+            Assert.IsType<UnauthorizedObjectResult>(result);
             var unauthorizedResult = result as UnauthorizedObjectResult;
-            unauthorizedResult.Should().NotBeNull();
-            unauthorizedResult.Value.Should().Be(message);
+            Assert.NotNull(unauthorizedResult);
+            Assert.Equal(message, unauthorizedResult.Value);
         }
 
         [Fact]
@@ -92,8 +90,8 @@ namespace ABCD.Server.Tests.Controllers {
             // Assert
             _authServiceMock.Verify(s => s.SignIn(credentials), Times.Once);
             var okResult = result as OkObjectResult;
-            okResult.Should().NotBeNull();
-            okResult.Value.Should().BeEquivalentTo(new { success = true });
+            Assert.NotNull(okResult);
+            Assert.Equivalent(new { success = true }, okResult.Value);
         }
 
         [Fact]
@@ -108,7 +106,7 @@ namespace ABCD.Server.Tests.Controllers {
             // Assert
             _authServiceMock.Verify(s => s.SignOut(token), Times.Once);
             var okResult = result as OkResult;
-            okResult.Should().NotBeNull();
+            Assert.NotNull(okResult);
         }
 
         [Fact]
@@ -121,10 +119,10 @@ namespace ABCD.Server.Tests.Controllers {
 
             // Assert
             _authServiceMock.Verify(s => s.SignOut(It.IsAny<string>()), Times.Never);
-            result.Should().BeOfType<UnauthorizedObjectResult>();
+            Assert.IsType<UnauthorizedObjectResult>(result);
             var unauthorizedResult = result as UnauthorizedObjectResult;
-            unauthorizedResult.Should().NotBeNull();
-            unauthorizedResult.Value.Should().Be("Authorization token is missing or invalid.");
+            Assert.NotNull(unauthorizedResult);
+            Assert.Equal("Authorization token is missing or invalid.", unauthorizedResult.Value);
         }
 
         [Fact]
@@ -148,8 +146,8 @@ namespace ABCD.Server.Tests.Controllers {
             // Assert
             _authServiceMock.Verify(s => s.RefreshToken(refreshCommand), Times.Once);
             var okResult = result as OkObjectResult;
-            okResult.Should().NotBeNull();
-            okResult.Value.Should().BeEquivalentTo(new { success = true });
+            Assert.NotNull(okResult);
+            Assert.Equivalent(new { success = true }, okResult.Value);
             
         }
 
@@ -169,10 +167,10 @@ namespace ABCD.Server.Tests.Controllers {
 
             // Assert
             _authServiceMock.Verify(s => s.RefreshToken(It.IsAny<RefreshTokenCommand>()), Times.Never);
-            result.Should().BeOfType<UnauthorizedObjectResult>();
+            Assert.IsType<UnauthorizedObjectResult>(result);
             var unauthorizedResult = result as UnauthorizedObjectResult;
-            unauthorizedResult.Should().NotBeNull();
-            unauthorizedResult.Value.Should().Be("Authorization token is missing or invalid.");
+            Assert.NotNull(unauthorizedResult);
+            Assert.Equal("Authorization token is missing or invalid.", unauthorizedResult.Value);
         }
 
         [Theory]
@@ -191,10 +189,10 @@ namespace ABCD.Server.Tests.Controllers {
 
             // Assert
             _authServiceMock.Verify(s => s.RefreshToken(It.IsAny<RefreshTokenCommand>()), Times.Never);
-            result.Should().BeOfType<UnauthorizedObjectResult>();
+            Assert.IsType<UnauthorizedObjectResult>(result);
             var unauthorizedResult = result as UnauthorizedObjectResult;
-            unauthorizedResult.Should().NotBeNull();
-            unauthorizedResult.Value.Should().Be("Refresh token is missing or invalid.");
+            Assert.NotNull(unauthorizedResult);
+            Assert.Equal("Refresh token is missing or invalid.", unauthorizedResult.Value);
         }
 
         [Fact]
@@ -215,10 +213,10 @@ namespace ABCD.Server.Tests.Controllers {
 
             // Assert
             _authServiceMock.Verify(s => s.RefreshToken(refreshCommand), Times.Once);
-            result.Should().BeOfType<BadRequestObjectResult>();
+            Assert.IsType<BadRequestObjectResult>(result);
             var badRequestResult = result as BadRequestObjectResult;
-            badRequestResult.Should().NotBeNull();
-            badRequestResult.Value.Should().Be("Invalid email format");
+            Assert.NotNull(badRequestResult);
+            Assert.Equal("Invalid email format", badRequestResult.Value);
         }
     }
 }

@@ -1,23 +1,17 @@
 using System.Security.Claims;
 using System.Text;
-
 using ABCD.Application.Exceptions;
 using ABCD.Infra.Data;
 using ABCD.Lib;
-
-using FluentAssertions;
-
 using FluentValidation;
 using FluentValidation.Results;
-
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-
 using Moq;
-
+using Xunit;
 using ValidationFailure = FluentValidation.Results.ValidationFailure;
 
 namespace ABCD.Application.Tests {
@@ -69,7 +63,8 @@ namespace ABCD.Application.Tests {
             Func<Task> act = async () => await _authService.SignIn(credentials);
 
             // Assert
-            await act.Should().ThrowAsync<ValidationException>().WithMessage("*Invalid email format*");            
+            var ex = await Assert.ThrowsAsync<ValidationException>(act);
+            Assert.Contains("Invalid email format", ex.Message);
         }
 
         [Fact]
@@ -88,7 +83,8 @@ namespace ABCD.Application.Tests {
             Func<Task> act = async () => await _authService.SignIn(credentials);
 
             // Assert
-            await act.Should().ThrowAsync<SignInFailedException>().WithMessage("*Invalid login attempt*");
+            var ex = await Assert.ThrowsAsync<SignInFailedException>(act);
+            Assert.Contains("Invalid login attempt", ex.Message);
             _userManagerMock.Verify(m => m.FindByEmailAsync(credentials.Email), Times.Never);
             _userManagerMock.Verify(m => m.UpdateAsync(It.IsAny<ApplicationUser>()), Times.Never);
             _tokenServiceMock.Verify(m => m.GenerateToken(It.IsAny<ApplicationUser>()), Times.Never);
@@ -114,8 +110,8 @@ namespace ABCD.Application.Tests {
             var result = await _authService.SignIn(credentials);
 
             // Assert
-            result.JWT.Should().Be(token.JWT);
-            result.RefreshToken.Should().Be(token.RefreshToken);
+            Assert.Equal(token.JWT, result.JWT);
+            Assert.Equal(token.RefreshToken, result.RefreshToken);
             _userManagerMock.Verify(m => m.FindByEmailAsync(credentials.Email), Times.Once);
             _userManagerMock.Verify(m => m.UpdateAsync(It.IsAny<ApplicationUser>()), Times.Once);
             _tokenServiceMock.Verify(m => m.GenerateToken(It.IsAny<ApplicationUser>()), Times.Once);
@@ -205,7 +201,8 @@ namespace ABCD.Application.Tests {
             Func<Task> act = async () => await _authService.RefreshToken(tokenRefresh);
 
             // Assert
-            await act.Should().ThrowAsync<ValidationException>().WithMessage("*Invalid email format*"); ;
+            var ex = await Assert.ThrowsAsync<ValidationException>(act);
+            Assert.Contains("Invalid email format", ex.Message);
         }
 
         [Fact]
@@ -223,7 +220,8 @@ namespace ABCD.Application.Tests {
             Func<Task> act = async () => await _authService.RefreshToken(tokenRefresh);
 
             // Assert
-            await act.Should().ThrowAsync<SecurityTokenException>().WithMessage("Invalid email or token");
+            var ex = await Assert.ThrowsAsync<SecurityTokenException>(act);
+            Assert.Equal("Invalid email or token", ex.Message);
         }
 
         [Fact]
@@ -248,7 +246,8 @@ namespace ABCD.Application.Tests {
             Func<Task> act = async () => await _authService.RefreshToken(tokenRefresh);
 
             // Assert
-            await act.Should().ThrowAsync<SecurityTokenException>().WithMessage("Invalid email or token");
+            var ex = await Assert.ThrowsAsync<SecurityTokenException>(act);
+            Assert.Equal("Invalid email or token", ex.Message);
         }
 
         [Fact]
@@ -274,7 +273,8 @@ namespace ABCD.Application.Tests {
             Func<Task> act = async () => await _authService.RefreshToken(tokenRefresh);
 
             // Assert
-            await act.Should().ThrowAsync<SecurityTokenException>().WithMessage("Invalid email or token");
+            var ex = await Assert.ThrowsAsync<SecurityTokenException>(act);
+            Assert.Equal("Invalid email or token", ex.Message);
         }
 
         [Fact]
@@ -300,7 +300,8 @@ namespace ABCD.Application.Tests {
             Func<Task> act = async () => await _authService.RefreshToken(tokenRefresh);
 
             // Assert
-            await act.Should().ThrowAsync<SecurityTokenException>().WithMessage("Invalid email or token");
+            var ex = await Assert.ThrowsAsync<SecurityTokenException>(act);
+            Assert.Equal("Invalid email or token", ex.Message);
         }
 
         [Fact]
@@ -334,7 +335,8 @@ namespace ABCD.Application.Tests {
             var result = await _authService.RefreshToken(tokenRefresh);
 
             // Assert
-            result.Should().BeEquivalentTo(newToken);
+            Assert.Equal(newToken.JWT, result.JWT);
+            Assert.Equal(newToken.RefreshToken, result.RefreshToken);
             _userManagerMock.Verify(x => x.UpdateAsync(It.IsAny<ApplicationUser>()), Times.Once);
             _cacheMock.Verify(m => m.CreateEntry(tokenRefresh.JWT), Times.Once);
         }
