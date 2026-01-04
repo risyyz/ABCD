@@ -76,7 +76,7 @@ builder.Services.AddAuthentication(options => {
     options.Events = new JwtBearerEvents {
         OnMessageReceived = context => {
             // Read token from cookie
-            context.Token = context.Request.Cookies["access_token"];
+            context.Token = context.Request.Cookies[AppConstants.ACCESS_TOKEN];
             return Task.CompletedTask;
         }
     };

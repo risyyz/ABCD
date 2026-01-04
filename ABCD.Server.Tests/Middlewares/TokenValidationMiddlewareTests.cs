@@ -1,4 +1,5 @@
-﻿using ABCD.Server.Middlewares;
+﻿using ABCD.Application;
+using ABCD.Server.Middlewares;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -28,7 +29,7 @@ namespace ABCD.Server.Tests.Middlewares {
         public async Task InvokeAsync_TokenInCache_ReturnsUnauthorized() {
             // Arrange
             var token = "test-token";
-            _context.Request.Headers["Cookie"] = $"access_token={token}";
+            _context.Request.Headers["Cookie"] = $"{AppConstants.ACCESS_TOKEN}={token}";
 
             object cachedValue = true;
             _cacheMock.Setup(m => m.TryGetValue(token, out cachedValue)).Returns(true);
@@ -62,7 +63,7 @@ namespace ABCD.Server.Tests.Middlewares {
         public async Task InvokeAsync_TokenNotInCache_CallsNextMiddleware() {
             // Arrange
             var token = "test-token";
-            _context.Request.Headers["Cookie"] = $"access_token={token}";
+            _context.Request.Headers["Cookie"] = $"{AppConstants.ACCESS_TOKEN}={token}";
 
             object cachedValue;
             _cacheMock.Setup(m => m.TryGetValue(token, out cachedValue)).Returns(false);
@@ -119,7 +120,7 @@ namespace ABCD.Server.Tests.Middlewares {
         [InlineData(" ")]
         public async Task InvokeAsync_TokenEmptyWhitespace_CallsNextMiddleware(string accessToken) {
             // Arrange
-            _context.Request.Headers["Cookie"] = $"access_token={accessToken}";
+            _context.Request.Headers["Cookie"] = $"{AppConstants.ACCESS_TOKEN}={accessToken}";
 
             object cachedValue = true;
             _cacheMock.Setup(m => m.TryGetValue(It.IsAny<string>(), out cachedValue)).Returns(true);

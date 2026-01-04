@@ -47,12 +47,12 @@ namespace ABCD.Server.Controllers {
             await _authService.SignOut(token);
 
             // Clear authentication cookies
-            Response.Cookies.Delete("access_token", new CookieOptions {
+            Response.Cookies.Delete(AppConstants.ACCESS_TOKEN, new CookieOptions {
                 HttpOnly = true,
                 Secure = true,
                 SameSite = SameSiteMode.Strict
             });
-            Response.Cookies.Delete("refresh_token", new CookieOptions {
+            Response.Cookies.Delete(AppConstants.REFRESH_TOKEN, new CookieOptions {
                 HttpOnly = true,
                 Secure = true,
                 SameSite = SameSiteMode.Strict
@@ -100,14 +100,14 @@ namespace ABCD.Server.Controllers {
         }
 
         private void UpdateTokenCookies(string jwt, string refreshToken, int jwtExpiryMinutes, int refreshTokenExpiryMinutes) {
-            Response.Cookies.Append("access_token", jwt, new CookieOptions {
+            Response.Cookies.Append(AppConstants.ACCESS_TOKEN, jwt, new CookieOptions {
                 HttpOnly = true,
                 Secure = true,
                 SameSite = SameSiteMode.Strict,
                 Expires = DateTimeOffset.UtcNow.AddMinutes(jwtExpiryMinutes)
             });
 
-            Response.Cookies.Append("refresh_token", refreshToken, new CookieOptions {
+            Response.Cookies.Append(AppConstants.REFRESH_TOKEN, refreshToken, new CookieOptions {
                 HttpOnly = true,
                 Secure = true,
                 SameSite = SameSiteMode.Strict,

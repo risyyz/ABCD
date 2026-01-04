@@ -164,7 +164,7 @@ namespace ABCD.Application.Tests {
             }));
             var user = new ApplicationUser {
                 Email = "user@example.com",
-                RefreshToken = "refresh_token",
+                RefreshToken = AppConstants.REFRESH_TOKEN,
                 RefreshTokenExpiryTime = DateTimeOffset.UtcNow.AddMinutes(60)
             };
 
