@@ -41,7 +41,6 @@ namespace ABCD.Infra.Data {
                 entity.HasKey(e => e.PostId);
                 entity.Property(e => e.PostId).ValueGeneratedOnAdd();
                 entity.Property(e => e.Title).IsRequired().HasMaxLength(250);
-                entity.Property(e => e.Content);
                 entity.Property(e => e.BlogId).IsRequired();
                 entity.Property(e => e.Status)
                       .HasConversion<string>()
