@@ -1,4 +1,3 @@
-
 @import 'bulma/bulma';
 
 :root {
@@ -61,4 +60,44 @@ body {
 
 .field:not(:last-child) {
   margin-bottom: 1rem; // Increase spacing between all Bulma fields globally
+}
+
+.input {
+  border: none;
+  border-bottom: 2px solid #dbdbdb;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.input:focus {
+  border-bottom-color: #3273dc; /* Bulma primary color */
+  outline: none;
+  box-shadow: none;
+}
+
+.has-floating-label {
+  position: relative;
+}
+.input.with-floating-label,
+.textarea.with-floating-label {
+  background: none;
+}
+.input.with-floating-label + .is-floating-label,
+.textarea.with-floating-label + .is-floating-label {
+  position: absolute;
+  left: 1rem;
+  top: 1rem;
+  pointer-events: none;
+  transition: 0.2s;
+  color: #888;
+}
+.input.with-floating-label:focus + .is-floating-label,
+.input.with-floating-label:not(:placeholder-shown) + .is-floating-label,
+.textarea.with-floating-label:focus + .is-floating-label,
+.textarea.with-floating-label:not(:placeholder-shown) + .is-floating-label {
+  top: 0.3rem;
+  left: 0.8rem;
+  font-size: 0.75rem;
+  background: #fff;
+  padding: 0 0.25rem;
 }

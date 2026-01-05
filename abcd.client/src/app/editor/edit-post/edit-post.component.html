@@ -1,30 +1,43 @@
-<div *ngIf="post">
-  <h2>Edit Post</h2>
-  <form>
-    <div>
-      <label>Title:</label>
-      <input type="text" [(ngModel)]="post.title" name="title" />
+<div *ngIf="post" class="container">
+  <div class="is-flex is-align-items-center is-justify-content-space-between">
+    <h2 class="title">Edit Post</h2>
+    <button type="button" class="button is-primary" style="margin-left:auto;" *ngIf="post.status === 'Draft'">Publish</button>
+    <button type="button" class="button is-warning" style="margin-left:auto;" *ngIf="post.status === 'Published'">Convert to Draft</button>
+  </div>  
+  <main class="section">
+    <div class="columns is-centered">
+      <div class="column is-10">
+        <div class="box">
+          <div class="content">
+            <div class="is-flex is-justify-content-flex-end" style="margin-bottom: 1rem;">
+              <span class="has-text-right has-text-grey" *ngIf="post.dateLastPublished">
+                Last published on {{ post.dateLastPublished }}
+              </span>
+            </div>
+            <form>
+              <div class="field">
+                <div class="control has-floating-label">
+                  <input class="input is-medium with-floating-label" placeholder=" " id="title" type="text" [(ngModel)]="post.title" name="title" required maxlength="250" />
+                  <label class="label is-floating-label" for="title">Title</label>
+                </div>
+              </div>
+              <div class="field">
+                <div class="control has-floating-label">
+                  <textarea class="textarea is-medium with-floating-label" placeholder=" " id="synopsis" [(ngModel)]="post.synopsis" name="synopsis" rows="3"></textarea>
+                  <label class="label is-floating-label" for="synopsis">Synopsis</label>
+                </div>
+              </div>
+              <div class="field">
+                <div class="control has-floating-label">
+                  <input class="input is-medium with-floating-label" placeholder=" " id="pathSegment" type="text" [(ngModel)]="post.pathSegment" name="pathSegment" required maxlength="250" />
+                  <label class="label is-floating-label" for="pathSegment">Path Segment</label>
+                </div>
+              </div>
+              <!-- Add save/cancel buttons as needed -->
+            </form>
+          </div>
+        </div>
+      </div>
     </div>
-    <div>
-      <label>Status:</label>
-      <select [(ngModel)]="post.status" name="status">
-        <option value="Draft">Draft</option>
-        <option value="Published">Published</option>
-      </select>
-    </div>
-    <div>
-      <label>Date Last Published:</label>
-      <input
-        type="text"
-        [(ngModel)]="post.dateLastPublished"
-        name="dateLastPublished"
-        readonly
-      />
-    </div>
-    <div>
-      <label>Path Segment:</label>
-      <input type="text" [(ngModel)]="post.pathSegment" name="pathSegment" />
-    </div>
-    <!-- Add save/cancel buttons as needed -->
-  </form>
+  </main>
 </div>

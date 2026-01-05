@@ -3,5 +3,6 @@ export interface Post {
   title: string;
   status: 'Draft' | 'Published';
   dateLastPublished?: string;
-  pathSegment?: string ;
+  pathSegment?: string;
+  synopsis?: string;
 }
