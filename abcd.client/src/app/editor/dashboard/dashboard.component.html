@@ -6,7 +6,7 @@
     <div class="navbar-menu">
       <div class="navbar-end">
         <div class="navbar-item">
-          <button class="button" (click)="logout()">
+          <button class="button is-dark-grey" (click)="logout()">
             <span class="icon">
               <i class="fas fa-sign-out-alt"></i>
             </span>
@@ -25,7 +25,7 @@
             <div class="level mb-2">
               <div class="level-left">
                 <div class="level-item">
-                  <button class="button" title="Create new post" (click)="openCreatePost()">
+                  <button class="button no-border" title="Create new post" (click)="openCreatePost()">
                     <span class="icon">
                       <i class="fa-solid fa-folder-plus"></i>
                     </span>
@@ -36,13 +36,13 @@
                 <div class="level-item">
                   <div class="field has-addons">
                     <div class="control">
-                      <input class="input has-text-white"
+                      <input class="input"
                              type="text"
                              placeholder="Search posts by title..."
                              [(ngModel)]="searchTerm"/>
                     </div>
                     <div class="control">
-                      <button class="button" title="Search">
+                      <button class="button no-border" title="Search">
                         <span class="icon">
                           <i class="fa-solid fa-magnifying-glass"></i>
                         </span>

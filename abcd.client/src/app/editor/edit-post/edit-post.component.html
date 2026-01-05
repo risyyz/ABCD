@@ -1,8 +1,8 @@
 <div *ngIf="post" class="container">
   <div class="is-flex is-align-items-center is-justify-content-space-between">
     <h2 class="title">Edit Post</h2>
-    <button type="button" class="button is-primary" style="margin-left:auto;" *ngIf="post.status === 'Draft'">Publish</button>
-    <button type="button" class="button is-warning" style="margin-left:auto;" *ngIf="post.status === 'Published'">Convert to Draft</button>
+    <button type="button" class="button is-dark-grey" style="margin-left:auto;" *ngIf="post.status === 'Draft'">Publish</button>
+    <button type="button" class="button is-dark-grey" style="margin-left:auto;" *ngIf="post.status === 'Published'">Convert to Draft</button>
   </div>  
   <main class="section">
     <div class="columns is-centered">
