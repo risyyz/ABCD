@@ -14,27 +14,27 @@
                 Last published on {{ post.dateLastPublished }}
               </span>
             </div>
-            <form>
+            <app-editable>
               <div class="field">
                 <div class="control has-floating-label">
-                  <input class="input is-medium with-floating-label" placeholder=" " id="title" type="text" [(ngModel)]="post.title" name="title" required maxlength="250" />
+                  <input class="input is-medium with-floating-label" placeholder=" " id="title" type="text" [(ngModel)]="post.title" name="title" required maxlength="250" #editableControl />
                   <label class="label is-floating-label" for="title">Title</label>
                 </div>
               </div>
               <div class="field">
                 <div class="control has-floating-label">
-                  <textarea class="textarea is-medium with-floating-label" placeholder=" " id="synopsis" [(ngModel)]="post.synopsis" name="synopsis" rows="3"></textarea>
+                  <textarea class="textarea is-medium with-floating-label" placeholder=" " id="synopsis" [(ngModel)]="post.synopsis" name="synopsis" rows="3" #editableControl></textarea>
                   <label class="label is-floating-label" for="synopsis">Synopsis</label>
                 </div>
               </div>
               <div class="field">
                 <div class="control has-floating-label">
-                  <input class="input is-medium with-floating-label" placeholder=" " id="pathSegment" type="text" [(ngModel)]="post.pathSegment" name="pathSegment" required maxlength="250" />
+                  <input class="input is-medium with-floating-label" placeholder=" " id="pathSegment" type="text" [(ngModel)]="post.pathSegment" name="pathSegment" required maxlength="250" #editableControl />
                   <label class="label is-floating-label" for="pathSegment">Path Segment</label>
                 </div>
               </div>
-              <!-- Add save/cancel buttons as needed -->
-            </form>
+            </app-editable>
+            <!-- Add save/cancel buttons as needed -->
           </div>
         </div>
       </div>

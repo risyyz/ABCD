@@ -6,11 +6,13 @@ import { EditorRoutingModule } from './editor-routing.module';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { CreatePostComponent } from './create-post/create-post.component';
 import { EditPostComponent } from './edit-post/edit-post.component';
+import { EditableComponent } from './editable/editable.component';
 
 @NgModule({
   declarations: [
     DashboardComponent,
-    EditPostComponent
+    EditPostComponent,
+    EditableComponent
   ],
   imports: [
     CommonModule,

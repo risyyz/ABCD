@@ -1,0 +1,24 @@
+<div class="editable-wrapper-parent">
+  <div class="editable-actions" *ngIf="!isEditing">
+    <button type="button" class="button" (click)="onEdit()" title="Edit">
+      <span class="icon">
+        <i class="fas fa-edit"></i>
+      </span>
+    </button>
+  </div>
+  <div class="editable-actions" *ngIf="isEditing">
+    <button type="button" class="button is-dark-grey" (click)="onSave()" title="Save">
+      <span class="icon">
+        <i class="fas fa-save"></i>
+      </span>
+    </button>
+    <button type="button" class="button" (click)="onCancel()" title="Cancel">
+      <span class="icon">
+        <i class="fas fa-times"></i>
+      </span>
+    </button>
+  </div>
+  <div class="editable-wrapper" [class.inactive]="!isEditing">
+    <ng-content></ng-content>
+  </div>
+</div>
