@@ -1,0 +1,9 @@
+<app-editable>
+  <div class="NgxEditor__Wrapper">
+    <ngx-editor-menu [editor]="editor" [toolbar]="toolbar"> </ngx-editor-menu>
+    <ngx-editor [editor]="editor"                
+                [ngModel]="html"
+                [disabled]="false"
+                [placeholder]="'Type here...'"></ngx-editor>
+  </div>
+</app-editable>

@@ -7,18 +7,22 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { CreatePostComponent } from './create-post/create-post.component';
 import { EditPostComponent } from './edit-post/edit-post.component';
 import { EditableComponent } from './editable/editable.component';
+import { RichTextFragmentComponent } from './rich-text-fragment/rich-text-fragment.component';
+import { NgxEditorModule } from 'ngx-editor';
 
 @NgModule({
   declarations: [
     DashboardComponent,
     EditPostComponent,
+    RichTextFragmentComponent,
     EditableComponent
   ],
   imports: [
     CommonModule,
     FormsModule,
     EditorRoutingModule,
-    CreatePostComponent
+    CreatePostComponent,
+    NgxEditorModule
   ]
 })
 export class EditorModule { }

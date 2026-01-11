@@ -22,6 +22,7 @@
     "@angular/router": "^19.2.8",
     "bulma": "^1.0.4",
     "jest-editor-support": "*",
+    "ngx-editor": "^19.0.0-beta.1",
     "run-script-os": "*",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",

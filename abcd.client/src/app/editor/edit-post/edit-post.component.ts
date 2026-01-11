@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Post } from '../models/post.model'; 
 import { PostService } from '../../services/post.service'; 
 import { FormsModule } from '@angular/forms';
+import {RichTextFragmentComponent } from '../rich-text-fragment/rich-text-fragment.component'
 
 @Component({
   selector: 'app-edit-post',

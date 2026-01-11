@@ -1,4 +1,4 @@
-import { Component, ContentChildren, QueryList, AfterContentInit, Output, EventEmitter, HostBinding, ElementRef } from '@angular/core';
+import { Component, ContentChildren, QueryList, AfterContentInit, Output, EventEmitter, ElementRef } from '@angular/core';
 
 @Component({
   selector: 'app-editable',
@@ -56,6 +56,4 @@ export class EditableComponent implements AfterContentInit {
     this.setDisabled(true);
     this.save.emit();
   }
-
-  @HostBinding('class.editing') get editing() { return this.isEditing; }
 }

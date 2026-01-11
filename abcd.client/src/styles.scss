@@ -13,7 +13,7 @@
   --checkbox-checked-color: #222; // dark grey
   --button-bg-color: #222; // dark grey
   --button-text-color: #fff; // white
-  --link-color: #122387; // dark grey
+  --link-color: #222; // dark grey
 }
 
 .control.has-floating-label {
@@ -129,6 +129,7 @@ a,
 .button.is-link,
 .has-text-link {
   color: var(--link-color) !important;
+  text-decoration:underline;
 }
 
 a:hover,
