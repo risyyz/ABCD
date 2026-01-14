@@ -15,6 +15,14 @@ namespace ABCD.Server.Models
         public DateTime? DateLastPublished { get; init; }
     }
 
+    public record FragmentResponse
+    {
+        public string FragmentType { get; init; } = string.Empty;
+        public string Content { get; init; } = string.Empty;
+        public int Position { get; init; }
+        public bool? Active { get; init; }
+    }
+
     public record PostDetailResponse {
         public int PostId { get; init; }
         public int BlogId { get; init; }
@@ -25,7 +33,7 @@ namespace ABCD.Server.Models
         public DateTime? DateLastPublished { get; init; }
         public DateTime DateCreated { get; init; }
         public DateTime DateModified { get; init; }
-        // add fragments or other related data as needed
+        public List<FragmentResponse> Fragments { get; init; } = new();
     }
 
     public record PostListResponseModel

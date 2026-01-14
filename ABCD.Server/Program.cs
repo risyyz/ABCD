@@ -132,6 +132,18 @@ config.NewConfig<Post, PostSummaryResponse>()
     .Map(dest => dest.PostId, src => src.PostId != null ? src.PostId.Value : 0)
     .Map(dest => dest.BlogId, src => src.BlogId.Value);
 
+config.NewConfig<Fragment, FragmentResponse>()
+    .Map(dest => dest.FragmentType, src => src.FragmentType.ToString())
+    .Map(dest => dest.Content, src => src.Content != null ? src.Content : null)
+    .Map(dest => dest.Position, src => src.Position);
+
+config.NewConfig<Post, PostDetailResponse>()
+    .Map(dest => dest.PostId, src => src.PostId != null ? src.PostId.Value : 0)
+    .Map(dest => dest.BlogId, src => src.BlogId.Value)
+    .Map(dest => dest.Status, src => src.Status.ToString())
+    .Map(dest => dest.PathSegment, src => src.PathSegment != null ? src.PathSegment.Value : null)
+    .Map(dest => dest.Fragments, src => src.Fragments.Adapt<List<FragmentResponse>>());
+
 // Register the config and mapper
 builder.Services.AddSingleton(config);
 builder.Services.AddSingleton<ITypeMapper, TypeMapper>();

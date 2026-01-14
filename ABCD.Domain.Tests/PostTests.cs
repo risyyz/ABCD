@@ -124,9 +124,9 @@ namespace ABCD.Domain.Tests
             var blogId = new BlogId(1);
             var postId = new PostId(1);
             var post = new Post(blogId, postId, "Title", PostStatus.Draft);
-            post.AddFragment(FragmentType.Text, "First");
-            post.AddFragment(FragmentType.Text, "Second");
-            post.AddFragment(FragmentType.Text, "Third");
+            post.AddFragment(FragmentType.RichText, "First");
+            post.AddFragment(FragmentType.RichText, "Second");
+            post.AddFragment(FragmentType.RichText, "Third");
 
             Assert.Equal(3, post.Fragments.Count);
             Assert.Equal(new[] {1, 2, 3}, post.Fragments.Select(f => f.Position));
@@ -139,11 +139,11 @@ namespace ABCD.Domain.Tests
             var blogId = new BlogId(2);
             var postId = new PostId(2);
             var post = new Post(blogId, postId, "Title", PostStatus.Draft);
-            post.AddFragment(FragmentType.Text, "First"); // pos 1
-            post.AddFragment(FragmentType.Text, "Second"); // pos 2
-            post.AddFragment(FragmentType.Text, "Third"); // pos 3
+            post.AddFragment(FragmentType.RichText, "First"); // pos 1
+            post.AddFragment(FragmentType.RichText, "Second"); // pos 2
+            post.AddFragment(FragmentType.RichText, "Third"); // pos 3
 
-            post.AddFragment(FragmentType.Text, "Inserted", 2); // Insert at pos 2
+            post.AddFragment(FragmentType.RichText, "Inserted", 2); // Insert at pos 2
 
             Assert.Equal(4, post.Fragments.Count);
             var positions = post.Fragments.Select(f => f.Position).ToArray();
@@ -164,11 +164,11 @@ namespace ABCD.Domain.Tests
             var blogId = new BlogId(3);
             var postId = new PostId(3);
             var post = new Post(blogId, postId, "Title", PostStatus.Draft);
-            post.AddFragment(FragmentType.Text, "First");
-            post.AddFragment(FragmentType.Text, "Second");
-            post.AddFragment(FragmentType.Text, "Third");
+            post.AddFragment(FragmentType.RichText, "First");
+            post.AddFragment(FragmentType.RichText, "Second");
+            post.AddFragment(FragmentType.RichText, "Third");
 
-            var ex = Assert.Throws<FragmentPositionException>(() => post.AddFragment(FragmentType.Text, "Invalid", invalidPosition));
+            var ex = Assert.Throws<FragmentPositionException>(() => post.AddFragment(FragmentType.RichText, "Invalid", invalidPosition));
             Assert.Contains("Position must be between", ex.Message);
         }
 
@@ -180,14 +180,14 @@ namespace ABCD.Domain.Tests
             var post = new Post(blogId, postId, "Title", PostStatus.Draft);
 
             // Valid: position 1
-            post.AddFragment(FragmentType.Text, "First", 1);
+            post.AddFragment(FragmentType.RichText, "First", 1);
             Assert.Single(post.Fragments);
             Assert.Equal(1, post.Fragments.First().Position);
             Assert.Equal("First", post.Fragments.First().Content);
 
             // Invalid: position 2
             var post2 = new Post(blogId, postId, "Title", PostStatus.Draft);
-            var ex = Assert.Throws<FragmentPositionException>(() => post2.AddFragment(FragmentType.Text, "Invalid", 2));
+            var ex = Assert.Throws<FragmentPositionException>(() => post2.AddFragment(FragmentType.RichText, "Invalid", 2));
             Assert.Contains("Position must be between", ex.Message);
         }
 
@@ -200,9 +200,9 @@ namespace ABCD.Domain.Tests
             var blogId = new BlogId(200);
             var postId = new PostId(200);
             var post = new Post(blogId, postId, "Title", PostStatus.Draft);
-            post.AddFragment(FragmentType.Text, "First");
-            post.AddFragment(FragmentType.Text, "Second");
-            post.AddFragment(FragmentType.Text, "Third");
+            post.AddFragment(FragmentType.RichText, "First");
+            post.AddFragment(FragmentType.RichText, "Second");
+            post.AddFragment(FragmentType.RichText, "Third");
             var ex = Assert.Throws<FragmentPositionException>(() => post.MoveFragmentUp(invalidPosition));
             Assert.Contains("Position must be between", ex.Message);
         }
@@ -216,9 +216,9 @@ namespace ABCD.Domain.Tests
             var blogId = new BlogId(201);
             var postId = new PostId(201);
             var post = new Post(blogId, postId, "Title", PostStatus.Draft);
-            post.AddFragment(FragmentType.Text, "First");
-            post.AddFragment(FragmentType.Text, "Second");
-            post.AddFragment(FragmentType.Text, "Third");
+            post.AddFragment(FragmentType.RichText, "First");
+            post.AddFragment(FragmentType.RichText, "Second");
+            post.AddFragment(FragmentType.RichText, "Third");
             var ex = Assert.Throws<FragmentPositionException>(() => post.MoveFragmentDown(invalidPosition));
             Assert.Contains("Position must be between", ex.Message);
         }
@@ -249,7 +249,7 @@ namespace ABCD.Domain.Tests
             var blogId = new BlogId(204);
             var postId = new PostId(204);
             var post = new Post(blogId, postId, "Title", PostStatus.Draft);
-            post.AddFragment(FragmentType.Text, "First");
+            post.AddFragment(FragmentType.RichText, "First");
             var ex = Assert.Throws<FragmentPositionException>(() => post.MoveFragmentUp(1));
             Assert.Equal("Cannot move fragment when 1 fragment exists.", ex.Message);
         }
@@ -260,7 +260,7 @@ namespace ABCD.Domain.Tests
             var blogId = new BlogId(205);
             var postId = new PostId(205);
             var post = new Post(blogId, postId, "Title", PostStatus.Draft);
-            post.AddFragment(FragmentType.Text, "First");
+            post.AddFragment(FragmentType.RichText, "First");
             var ex = Assert.Throws<FragmentPositionException>(() => post.MoveFragmentDown(1));
             Assert.Equal("Cannot move fragment when 1 fragment exists.", ex.Message);
         }
@@ -271,8 +271,8 @@ namespace ABCD.Domain.Tests
             var blogId = new BlogId(102);
             var postId = new PostId(102);
             var post = new Post(blogId, postId, "Title", PostStatus.Draft);
-            post.AddFragment(FragmentType.Text, "First");
-            post.AddFragment(FragmentType.Text, "Second");
+            post.AddFragment(FragmentType.RichText, "First");
+            post.AddFragment(FragmentType.RichText, "Second");
             var ex = Assert.Throws<FragmentPositionException>(() => post.MoveFragmentUp(1));
             Assert.Equal("Fragment at position 1 is already at the top.", ex.Message);
         }
@@ -283,8 +283,8 @@ namespace ABCD.Domain.Tests
             var blogId = new BlogId(103);
             var postId = new PostId(103);
             var post = new Post(blogId, postId, "Title", PostStatus.Draft);
-            post.AddFragment(FragmentType.Text, "First");
-            post.AddFragment(FragmentType.Text, "Second");
+            post.AddFragment(FragmentType.RichText, "First");
+            post.AddFragment(FragmentType.RichText, "Second");
             var ex = Assert.Throws<FragmentPositionException>(() => post.MoveFragmentDown(2));
             Assert.Equal("Fragment at position 2 is already at the bottom.", ex.Message);
         }
@@ -295,9 +295,9 @@ namespace ABCD.Domain.Tests
             var blogId = new BlogId(104);
             var postId = new PostId(104);
             var post = new Post(blogId, postId, "Title", PostStatus.Draft);
-            post.AddFragment(FragmentType.Text, "First"); // pos 1
-            post.AddFragment(FragmentType.Text, "Second"); // pos 2
-            post.AddFragment(FragmentType.Text, "Third"); // pos 3
+            post.AddFragment(FragmentType.RichText, "First"); // pos 1
+            post.AddFragment(FragmentType.RichText, "Second"); // pos 2
+            post.AddFragment(FragmentType.RichText, "Third"); // pos 3
 
             post.MoveFragmentUp(2); // Move "Second" up
 
@@ -315,9 +315,9 @@ namespace ABCD.Domain.Tests
             var blogId = new BlogId(105);
             var postId = new PostId(105);
             var post = new Post(blogId, postId, "Title", PostStatus.Draft);
-            post.AddFragment(FragmentType.Text, "First"); // pos 1
-            post.AddFragment(FragmentType.Text, "Second"); // pos 2
-            post.AddFragment(FragmentType.Text, "Third"); // pos 3
+            post.AddFragment(FragmentType.RichText, "First"); // pos 1
+            post.AddFragment(FragmentType.RichText, "Second"); // pos 2
+            post.AddFragment(FragmentType.RichText, "Third"); // pos 3
 
             post.MoveFragmentDown(2); // Move "Second" down
 

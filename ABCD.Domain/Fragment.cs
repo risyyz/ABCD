@@ -6,9 +6,9 @@ public enum FragmentType
 {
     Code,
     Heading,
-    Html,
+    Table,
     Image,  
-    Text,
+    RichText,
 }
 
 public class Fragment 

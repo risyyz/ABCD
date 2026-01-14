@@ -9,13 +9,19 @@ import { EditPostComponent } from './edit-post/edit-post.component';
 import { EditableComponent } from './editable/editable.component';
 import { RichTextFragmentComponent } from './rich-text-fragment/rich-text-fragment.component';
 import { NgxEditorModule } from 'ngx-editor';
+import { ImageFragmentComponent } from './image-fragment/image-fragment.component';
+import { TableFragmentComponent } from './table-fragment/table-fragment.component';
+import { CodeFragmentComponent } from './code-fragment/code-fragment.component';
 
 @NgModule({
   declarations: [
+    CodeFragmentComponent,
     DashboardComponent,
+    EditableComponent,
     EditPostComponent,
-    RichTextFragmentComponent,
-    EditableComponent
+    ImageFragmentComponent,
+    RichTextFragmentComponent,    
+    TableFragmentComponent,    
   ],
   imports: [
     CommonModule,

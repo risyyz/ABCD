@@ -45,7 +45,7 @@ namespace ABCD.Server.Controllers
                 return NotFound();
             }
 
-            var response = _typeMapper.Map<Post, PostSummaryResponse>(post);
+            var response = _typeMapper.Map<Post, PostDetailResponse>(post);
             return Ok(response);
         }
     }

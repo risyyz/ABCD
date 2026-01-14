@@ -8,6 +8,7 @@ namespace ABCD.Infra.Data {
 
         public async Task<Post?> GetByPostIdAsync(int blogId, int postId) {
             var record = await _context.Posts
+                .Include(p => p.Fragments) // Assuming navigation property Fragments exists
                 .FirstOrDefaultAsync(p => p.PostId == postId && p.BlogId == blogId);
             if (record == null) return null;
             return MapToDomain(record);
@@ -52,7 +53,16 @@ namespace ABCD.Infra.Data {
         // Map EF record to domain model
         private Post MapToDomain(PostRecord record) {
             // TODO: Map all required fields and relationships
-            return new Post(new BlogId(record.BlogId), new PostId(record.PostId), record.Title, (PostStatus)record.Status);
+            var post = new Post(new BlogId(record.BlogId), new PostId(record.PostId), record.Title, (PostStatus)record.Status);
+
+            // Map fragments if available
+            if (record.Fragments != null) {
+                foreach (var fragmentRecord in record.Fragments) {
+                    // Assuming Fragment is a domain model and you have a method to map from record to domain
+                    post.AddFragment(fragmentRecord.FragmentType, fragmentRecord.Content, fragmentRecord.Position);
+                }
+            }
+            return post;
         }
 
         // Map domain model to EF record

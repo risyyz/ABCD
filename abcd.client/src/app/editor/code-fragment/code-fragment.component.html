@@ -1,0 +1,19 @@
+<app-editable>
+  <div class="code-fragment-wrapper">
+    <div class="field">
+      <label class="label">Language</label>
+      <div class="control">
+        <select class="input" [(ngModel)]="language" #editableControl>
+          <option *ngFor="let lang of languages" [value]="lang.value">{{ lang.label }}</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label class="label">Code</label>
+      <div class="control">
+        <ngx-editor-menu [editor]="editor" [toolbar]="toolbar"> </ngx-editor-menu>
+        <ngx-editor [editor]="editor" [(ngModel)]="fragment" #editableControl></ngx-editor>
+      </div>
+    </div>
+  </div>
+</app-editable>

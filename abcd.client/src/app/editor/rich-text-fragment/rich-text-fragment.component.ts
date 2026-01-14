@@ -1,6 +1,7 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { NgxEditorComponent, NgxEditorMenuComponent, Editor, Toolbar } from 'ngx-editor';
 import { FormsModule } from '@angular/forms';
+import { Fragment } from '../models/fragment.model';
 
 @Component({
   selector: 'app-rich-text-fragment',
@@ -9,7 +10,7 @@ import { FormsModule } from '@angular/forms';
   standalone:false
 })
 export class RichTextFragmentComponent implements OnInit, OnDestroy {
-  html = '';
+  @Input() fragment!: Fragment;
   editor!: Editor;
   toolbar: Toolbar = [
     [{ heading: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'] }],
