@@ -1,22 +1,20 @@
-<app-editable>
-  <div class="image-fragment-wrapper">
-    <div class="field">
-      <label class="label">Upload Image</label>
-      <div class="control">
-        <input type="file" (change)="onFileChange($event)" accept="image/*" #editableControl />
-      </div>
-    </div>
-    <div class="field">
-      <label class="label">Image Caption</label>
-      <div class="control">
-        <input type="text" class="input" [(ngModel)]="caption" placeholder="Enter caption..." #editableControl />
-      </div>
-    </div>
-    <div class="field" *ngIf="imageSrc">
-      <label class="label">Preview</label>
-      <div class="control">
-        <img [src]="imageSrc" [alt]="caption" class="image-preview" />
-      </div>
+<div class="image-fragment-wrapper">
+  <div class="field">
+    <label class="label">Upload Image</label>
+    <div class="control">
+      <input type="file" (change)="onFileChange($event)" accept="image/*" #editableControl />
     </div>
   </div>
-</app-editable>
+  <div class="field">
+    <label class="label">Image Caption</label>
+    <div class="control">
+      <input type="text" class="input" [(ngModel)]="caption" placeholder="Enter caption..." #editableControl />
+    </div>
+  </div>
+  <div class="field" *ngIf="imageSrc">
+    <label class="label">Preview</label>
+    <div class="control">
+      <img [src]="imageSrc" [alt]="caption" class="image-preview" />
+    </div>
+  </div>
+</div>

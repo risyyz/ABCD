@@ -25,6 +25,46 @@ export class EditPostComponent implements OnInit {
     });
   }
 
+  onFragmentMoveUp(position: Number) {
+    if (!this.post) return;
+
+    this.highlightFragment(position);
+    const fragments = this.post.fragments;
+    const index = fragments.findIndex(f => f.position === position);
+    if (index > 0) {
+      // Swap with the previous fragment
+      [fragments[index - 1].position, fragments[index].position] = [fragments[index].position, fragments[index - 1].position];
+      // Re-sort the array by position
+      fragments.sort((a, b) => a.position - b.position);
+    }
+  }
+
+  onFragmentMoveDown(position: Number) {
+    if (!this.post) return;
+
+    this.highlightFragment(position);
+
+    const fragments = this.post.fragments;
+    const index = fragments.findIndex(f => f.position === position);
+    if (index !== -1 && index < fragments.length - 1) {
+      // Swap with the next fragment
+      [fragments[index + 1].position, fragments[index].position] = [fragments[index].position, fragments[index + 1].position];
+      // Re-sort the array by position
+      fragments.sort((a, b) => a.position - b.position);
+    }
+  }
+
+  highlightFragment(position: Number) {
+    if (!this.post) return;
+
+    console.log("highlighting" + position);
+    const fragment = this.post.fragments.find(f => f.position === position);
+    if (fragment) {
+      fragment.highlight = true;
+      setTimeout(() => fragment.highlight = false, 5000);
+    }
+  }
+
   //save(): void {
   //  if (this.post) {
   //    this.postService.updatePost(this.post).subscribe(() => {

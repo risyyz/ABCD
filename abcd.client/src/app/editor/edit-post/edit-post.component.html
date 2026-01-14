@@ -36,10 +36,15 @@
             </app-editable>
 
             <ng-container *ngFor="let fragment of post.fragments">
-              <app-image-fragment *ngIf="fragment.fragmentType === 'Image'" [fragment]="fragment"></app-image-fragment>
-              <app-code-fragment *ngIf="fragment.fragmentType === 'Code'" [fragment]="fragment"></app-code-fragment>
-              <app-rich-text-fragment *ngIf="fragment.fragmentType === 'RichText'" [fragment]="fragment"></app-rich-text-fragment>
-              <app-table-fragment *ngIf="fragment.fragmentType === 'Table'" [fragment]="fragment"></app-table-fragment>
+              <app-editable [position]="fragment.position" [fragmentCount]="post.fragments.length" [highlight]="fragment.highlight"
+                    (moveUp)="onFragmentMoveUp($event)"
+                    (moveDown)="onFragmentMoveDown($event)">
+                <app-code-fragment *ngIf="fragment.fragmentType === 'Code'" [fragment]="fragment"></app-code-fragment>
+                <app-image-fragment *ngIf="fragment.fragmentType === 'Image'" [fragment]="fragment"></app-image-fragment>
+                <app-code-fragment *ngIf="fragment.fragmentType === 'Code'" [fragment]="fragment"></app-code-fragment>
+                <app-rich-text-fragment *ngIf="fragment.fragmentType === 'RichText'" [fragment]="fragment"></app-rich-text-fragment>
+                <app-table-fragment *ngIf="fragment.fragmentType === 'Table'" [fragment]="fragment"></app-table-fragment>
+              </app-editable>
             </ng-container>
 
           </div>

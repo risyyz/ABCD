@@ -4,4 +4,5 @@ export interface Fragment {
   content: string;
   position: number;
   active?: boolean;
+  highlight: boolean;
 }

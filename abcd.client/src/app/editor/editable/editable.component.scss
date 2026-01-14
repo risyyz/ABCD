@@ -15,7 +15,7 @@
 
 .editable-wrapper.inactive {
   opacity: 0.5;
-  transition: opacity 0.2s;
+  transition: opacity 0.3s;
 }
 
 .editable-actions {
@@ -27,4 +27,22 @@
   justify-content: flex-end;
   z-index: 2;
   opacity:1;
+}
+
+.highlighted {
+  animation: showHighlight 5s;
+}
+
+@keyframes showHighlight {
+  0% {
+    background-color: #ff0000;
+  }
+
+  60% {
+    background-color: #ff0000;
+  }
+
+  100% {
+    background-color: transparent;
+  }
 }
