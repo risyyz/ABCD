@@ -14,7 +14,7 @@
                 Last published on {{ post.dateLastPublished }}
               </span>
             </div>
-            <app-editable>
+            <app-editable-generic>
               <div class="field">
                 <div class="control has-floating-label">
                   <input class="input is-medium with-floating-label" placeholder=" " id="title" type="text" [(ngModel)]="post.title" name="title" required maxlength="250" #editableControl />
@@ -33,20 +33,18 @@
                   <label class="label is-floating-label" for="pathSegment">Path Segment</label>
                 </div>
               </div>
-            </app-editable>
-
-            <ng-container *ngFor="let fragment of post.fragments">
-              <app-editable [position]="fragment.position" [fragmentCount]="post.fragments.length" [highlight]="fragment.highlight"
-                    (moveUp)="onFragmentMoveUp($event)"
-                    (moveDown)="onFragmentMoveDown($event)">
-                <app-code-fragment *ngIf="fragment.fragmentType === 'Code'" [fragment]="fragment"></app-code-fragment>
-                <app-image-fragment *ngIf="fragment.fragmentType === 'Image'" [fragment]="fragment"></app-image-fragment>
-                <app-code-fragment *ngIf="fragment.fragmentType === 'Code'" [fragment]="fragment"></app-code-fragment>
-                <app-rich-text-fragment *ngIf="fragment.fragmentType === 'RichText'" [fragment]="fragment"></app-rich-text-fragment>
-                <app-table-fragment *ngIf="fragment.fragmentType === 'Table'" [fragment]="fragment"></app-table-fragment>
-              </app-editable>
-            </ng-container>
-
+            </app-editable-generic>
+              <ng-container *ngFor="let fragment of post.fragments">
+                <app-editable-fragment [position]="fragment.position" [fragmentCount]="post.fragments.length" [highlight]="fragment.highlight"
+                                      (moveUp)="onFragmentMoveUp($event)"
+                                      (moveDown)="onFragmentMoveDown($event)">
+                  <app-code-fragment *ngIf="fragment.fragmentType === 'Code'" [fragment]="fragment"></app-code-fragment>
+                  <app-image-fragment *ngIf="fragment.fragmentType === 'Image'" [fragment]="fragment"></app-image-fragment>
+                  <app-code-fragment *ngIf="fragment.fragmentType === 'Code'" [fragment]="fragment"></app-code-fragment>
+                  <app-rich-text-fragment *ngIf="fragment.fragmentType === 'RichText'" [fragment]="fragment"></app-rich-text-fragment>
+                  <app-table-fragment *ngIf="fragment.fragmentType === 'Table'" [fragment]="fragment"></app-table-fragment>
+                </app-editable-fragment>
+              </ng-container>
           </div>
         </div>
       </div>

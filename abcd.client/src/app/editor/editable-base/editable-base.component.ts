@@ -1,22 +1,11 @@
-import { Component, ContentChildren, QueryList, AfterContentInit, Input, Output, EventEmitter, ElementRef } from '@angular/core';
+import { Input, Output, EventEmitter, ContentChildren, QueryList, ElementRef, AfterContentInit, Directive } from '@angular/core';
 
-@Component({
-  selector: 'app-editable',
-  standalone: false,
-  templateUrl: './editable.component.html',
-  styleUrls: ['./editable.component.scss']
-})
-export class EditableComponent implements AfterContentInit {
+@Directive()
+export abstract class EditableBaseComponent implements AfterContentInit {
   isEditing = false;
-
-  @Input() position!: number;
-  @Input() fragmentCount!: number;
-  @Input() highlight: boolean = false;
 
   @Output() save = new EventEmitter<void>();
   @Output() cancel = new EventEmitter<void>();
-  @Output() moveUp = new EventEmitter<Number>();
-  @Output() moveDown = new EventEmitter<Number>();
 
   @ContentChildren('editableControl', { descendants: true, read: ElementRef }) controls!: QueryList<ElementRef>;
   private originalValues: any[] = [];
@@ -62,15 +51,5 @@ export class EditableComponent implements AfterContentInit {
     this.isEditing = false;
     this.setDisabled(true);
     this.save.emit();
-  }
-
-  onMoveUp() {
-    console.log("moving up" + this.position);
-    this.moveUp.emit(this.position);
-  }
-
-  onMoveDown() {
-    console.log("moving down" + this.position);
-    this.moveDown.emit(this.position);
   }
 }
