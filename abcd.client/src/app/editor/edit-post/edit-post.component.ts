@@ -1,13 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Post } from '../models/post.model'; 
-import { PostService } from '../../services/post.service'; 
+import { PostService } from '../../services/post.service';
+import { Fragment } from '../models/fragment.model';
 
 @Component({
   selector: 'app-edit-post',
   standalone: false,
   templateUrl: './edit-post.component.html'
 })
+
 export class EditPostComponent implements OnInit {
   post: Post | null = null;
 
@@ -63,11 +65,9 @@ export class EditPostComponent implements OnInit {
     }
   }
 
-  //save(): void {
-  //  if (this.post) {
-  //    this.postService.updatePost(this.post).subscribe(() => {
-  //      // handle success, e.g., navigate away or show a message
-  //    });
-  //  }
-  //}
+  onFragmentSaved(fragment: Fragment) {
+    // Handle the saved fragment (e.g., update post, send to server, etc.)
+    console.log('Fragment saved:', fragment);
+    // Example: update the fragment in post.fragments if needed
+  }
 }

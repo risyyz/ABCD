@@ -2,6 +2,7 @@ import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { NgxEditorComponent, NgxEditorMenuComponent, Editor, Toolbar } from 'ngx-editor';
 import { FormsModule } from '@angular/forms';
 import { Fragment } from '../models/fragment.model';
+import { IFragmentComponent } from '../models/fragment-component.interface';
 
 @Component({
   selector: 'app-rich-text-fragment',
@@ -9,7 +10,7 @@ import { Fragment } from '../models/fragment.model';
   styleUrls: ['./rich-text-fragment.component.scss'],
   standalone:false
 })
-export class RichTextFragmentComponent implements OnInit, OnDestroy {
+export class RichTextFragmentComponent implements OnInit, OnDestroy, IFragmentComponent {
   @Input() fragment!: Fragment;
   editor!: Editor;
   toolbar: Toolbar = [
@@ -27,6 +28,10 @@ export class RichTextFragmentComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.editor = new Editor();
+  }
+  getLatestFragment(): Fragment {
+    console.log('returning latest richtext fragment');
+    return this.fragment;
   }
 
   ngOnDestroy(): void {

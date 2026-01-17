@@ -1,6 +1,7 @@
 import { Component, Input, OnDestroy } from '@angular/core';
 import { Editor, Toolbar } from 'ngx-editor';
-import { Fragment } from '../models/fragment.model'; // Adjust the path as needed
+import { Fragment } from '../models/fragment.model';
+import { IFragmentComponent } from '../models/fragment-component.interface';
 
 @Component({
   selector: 'app-code-fragment',
@@ -8,7 +9,7 @@ import { Fragment } from '../models/fragment.model'; // Adjust the path as neede
   styleUrls: ['./code-fragment.component.scss'],
   standalone: false
 })
-export class CodeFragmentComponent implements OnDestroy {
+export class CodeFragmentComponent implements OnDestroy, IFragmentComponent {
   @Input() fragment!: Fragment;
   language: string = 'javascript';
   editor: Editor;
@@ -28,5 +29,9 @@ export class CodeFragmentComponent implements OnDestroy {
 
   ngOnDestroy(): void {
     this.editor.destroy();
+  }
+  getLatestFragment(): Fragment {
+    console.log('returning latest code fragment');
+    return this.fragment;
   }
 }

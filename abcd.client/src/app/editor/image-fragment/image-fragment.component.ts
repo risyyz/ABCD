@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { Fragment } from '../models/fragment.model';
+import { IFragmentComponent } from '../models/fragment-component.interface';
 
 @Component({
   selector: 'app-image-fragment',
@@ -7,10 +8,15 @@ import { Fragment } from '../models/fragment.model';
   styleUrls: ['./image-fragment.component.scss'],
   standalone: false
 })
-export class ImageFragmentComponent {
+export class ImageFragmentComponent implements IFragmentComponent {
   @Input() fragment!: Fragment;
   imageSrc: string | ArrayBuffer | null = null;
   caption: string = '';
+
+  getLatestFragment(): Fragment {
+    console.log('returning latest image fragment');
+    return this.fragment;
+  }
 
   onFileChange(event: Event): void {
     const input = event.target as HTMLInputElement;
