@@ -11,12 +11,7 @@ import { IFragmentComponent } from '../models/fragment-component.interface';
 export class ImageFragmentComponent implements IFragmentComponent {
   @Input() fragment!: Fragment;
   imageSrc: string | ArrayBuffer | null = null;
-  caption: string = '';
-
-  getLatestFragment(): Fragment {
-    console.log('returning latest image fragment');
-    return this.fragment;
-  }
+  caption: string = '';  
 
   onFileChange(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -27,5 +22,18 @@ export class ImageFragmentComponent implements IFragmentComponent {
       };
       reader.readAsDataURL(input.files[0]);
     }
+  }
+
+  setEditMode(isEditing: boolean) {
+    console.log('ImageFragmentComponent setEditMode: ' + isEditing);
+  }
+
+  revert() {
+    console.log('reverting image fragment to original');
+  }
+
+  getCurrentFragment(): Fragment {
+    console.log('returning latest image fragment');
+    return this.fragment;
   }
 }

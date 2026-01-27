@@ -78,8 +78,7 @@ public class Post {
         Status = status;
     }
 
-    public void AddFragment(FragmentType fragmentType, string? content, int? position = null)
-    {
+    public void AddFragment(FragmentType fragmentType, string? content, int? position = null) {
         int fragmentCount = _fragments.Count;
         int insertPosition = position ?? (fragmentCount == 0 ? Fragment.MinPosition : fragmentCount + Fragment.MinPosition);
         if (insertPosition < Fragment.MinPosition || insertPosition > fragmentCount + Fragment.MinPosition)
@@ -144,44 +143,46 @@ public class Post {
         Status = PostStatus.Draft;
     }
 
-    public void MoveFragmentUp(int currentFragmentPosition)
-    {
-        ValidateFragmentMovement(currentFragmentPosition);
-        if (currentFragmentPosition == Fragment.MinPosition)
-            throw new FragmentPositionException($"Fragment at position {currentFragmentPosition} is already at the top.");
+    public void ChangeFragmentPosition(int currentPosition, int newPosition) {
+        ValidatePositionChange(currentPosition, newPosition);
+        var fragment = _fragments.FirstOrDefault(f => f.Position == currentPosition);
+        if (newPosition < currentPosition) {
+            MoveFragmentUp(fragment!);
+        } else {
+            MoveFragmentDown(fragment!);
+        }
+    }
 
-        var fragment = _fragments.FirstOrDefault(f => f.Position == currentFragmentPosition);
-        if (fragment == null)
-            throw new FragmentPositionException($"No fragment found at position {currentFragmentPosition}.");
+    private void ValidatePositionChange(int currentPosition, int newPosition) {
+        if (currentPosition == newPosition)
+            throw new FragmentPositionException("New position must be different from the current position.");
 
-        var prevFragment = _fragments.First(f => f.Position == currentFragmentPosition - 1);
+        if (_fragments.Count <= 1)
+            throw new FragmentPositionException($"Cannot move fragment when {_fragments.Count} fragment exists.");
+
+        if (Math.Abs(currentPosition - newPosition) != 1)
+            throw new FragmentPositionException("Fragment can move by only one position at a time.");
+
+        if (currentPosition < Fragment.MinPosition || currentPosition > _fragments.Count)
+            throw new FragmentPositionException($"Current position must be between {Fragment.MinPosition} and {_fragments.Count}.");
+
+        if (newPosition < Fragment.MinPosition || newPosition > _fragments.Count)
+            throw new FragmentPositionException($"New position must be between {Fragment.MinPosition} and {_fragments.Count}.");
+    }
+
+    private void MoveFragmentUp(Fragment fragment) {
+        
+        var prevFragment = _fragments.First(f => f.Position == fragment.Position - 1);
         prevFragment.MoveDown(_fragments.Count);
         fragment.MoveUp();
         _fragments.Sort((a, b) => a.Position.CompareTo(b.Position));
     }
 
-    public void MoveFragmentDown(int currentFragmentPosition)
-    {
-        ValidateFragmentMovement(currentFragmentPosition);
-        if (currentFragmentPosition == _fragments.Count)
-            throw new FragmentPositionException($"Fragment at position {currentFragmentPosition} is already at the bottom.");
-
-        var fragment = _fragments.FirstOrDefault(f => f.Position == currentFragmentPosition);
-        if (fragment == null)
-            throw new FragmentPositionException($"No fragment found at position {currentFragmentPosition}.");
-
-        var nextFragment = _fragments.First(f => f.Position == currentFragmentPosition + 1);
+    private void MoveFragmentDown(Fragment fragment) {
+        var nextFragment = _fragments.First(f => f.Position == fragment.Position + 1);
         nextFragment.MoveUp();
         fragment.MoveDown(_fragments.Count);
         _fragments.Sort((a, b) => a.Position.CompareTo(b.Position));
-    }
-
-    private void ValidateFragmentMovement(int currentFragmentPosition) {
-        if (_fragments.Count <= 1)
-            throw new FragmentPositionException($"Cannot move fragment when {_fragments.Count} fragment exists.");
-
-        if (currentFragmentPosition < Fragment.MinPosition || currentFragmentPosition > _fragments.Count)
-            throw new FragmentPositionException($"Position must be between {Fragment.MinPosition} and {_fragments.Count}.");
     }
 
     private bool ContainsWord(string input) {

@@ -4,7 +4,9 @@ using ABCD.Lib;
 using ABCD.Server.Models;
 
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace ABCD.Server.Controllers
 {
@@ -47,6 +49,29 @@ namespace ABCD.Server.Controllers
 
             var response = _typeMapper.Map<Post, PostDetailResponse>(post);
             return Ok(response);
+        }
+
+        [HttpPut("{postId:int}/fragments/{currentPosition:int}/position")]
+        public async Task<IActionResult> UpdateFragmentPosition(
+            [FromRoute] int postId,
+            [FromRoute] int currentPosition,
+            [FromBody][Required] FragmentChangePositionRequest request)
+        {
+            // Validate input
+            if (request == null || request.NewPosition <= 0)
+                return BadRequest("Invalid new position.");
+
+            var result = await _postService.UpdateFragmentPositionAsync(new ChangeFragmentPositionCommand(postId, currentPosition, request.NewPosition));
+            //if (!result)
+            //    return NotFound("Fragment not found or could not update position.");
+
+            return NoContent();
+        }
+
+        public class UpdateFragmentPositionRequest
+        {
+            [Required]
+            public int NewPosition { get; set; }
         }
     }
 }

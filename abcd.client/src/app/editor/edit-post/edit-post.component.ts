@@ -25,32 +25,32 @@ export class EditPostComponent implements OnInit {
     });
   }
 
-  onFragmentMoveUp(position: Number) {
+  onFragmentMoveUp(position: number) {
     if (!this.post) return;
-
-    this.highlightFragment(position);
     const fragments = this.post.fragments;
     const index = fragments.findIndex(f => f.position === position);
     if (index > 0) {
-      // Swap with the previous fragment
-      [fragments[index - 1].position, fragments[index].position] = [fragments[index].position, fragments[index - 1].position];
-      // Re-sort the array by position
-      fragments.sort((a, b) => a.position - b.position);
+      const newPosition = fragments[index - 1].position;
+      this.postService.updateFragmentPosition(this.post.postId, position, newPosition)
+        .subscribe(() => {
+          // Swap positions in the UI after successful API call
+          [fragments[index - 1].position, fragments[index].position] = [fragments[index].position, fragments[index - 1].position];
+          fragments.sort((a, b) => a.position - b.position);
+        });
     }
   }
 
-  onFragmentMoveDown(position: Number) {
+  onFragmentMoveDown(position: number) {
     if (!this.post) return;
-
-    this.highlightFragment(position);
-
     const fragments = this.post.fragments;
     const index = fragments.findIndex(f => f.position === position);
     if (index !== -1 && index < fragments.length - 1) {
-      // Swap with the next fragment
-      [fragments[index + 1].position, fragments[index].position] = [fragments[index].position, fragments[index + 1].position];
-      // Re-sort the array by position
-      fragments.sort((a, b) => a.position - b.position);
+      const newPosition = fragments[index + 1].position;
+      this.postService.updateFragmentPosition(this.post.postId, position, newPosition)
+        .subscribe(() => {
+          [fragments[index + 1].position, fragments[index].position] = [fragments[index].position, fragments[index + 1].position];
+          fragments.sort((a, b) => a.position - b.position);
+        });
     }
   }
 
@@ -65,7 +65,7 @@ export class EditPostComponent implements OnInit {
     }
   }
 
-  onFragmentSaved(fragment: Fragment) {
+  onFragmentSave(fragment: Fragment) {
     // Handle the saved fragment (e.g., update post, send to server, etc.)
     console.log('Fragment saved:', fragment);
     // Example: update the fragment in post.fragments if needed

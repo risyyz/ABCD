@@ -15,5 +15,9 @@ export class PostService {
     return this.http.get<Post>(`/api/posts/${postId}`);
   }
 
+  updateFragmentPosition(postId: number, position: number, newPosition: number) {
+    return this.http.put(`/api/posts/${postId}/fragments/${position}/position`, { newPosition });
+  }
+
   // You can add more methods for create, update, delete as needed
 }

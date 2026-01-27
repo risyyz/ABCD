@@ -11,7 +11,7 @@
     <label class="label">Code</label>
     <div class="control">
       <ngx-editor-menu [editor]="editor" [toolbar]="toolbar"> </ngx-editor-menu>
-      <ngx-editor [editor]="editor" [(ngModel)]="fragment" #editableControl></ngx-editor>
+      <ngx-editor [editor]="editor" [(ngModel)]="fragment.content" #editableControl></ngx-editor>
     </div>
   </div>
 </div>

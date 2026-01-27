@@ -1,5 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { EditableBaseComponent } from '../editable-base/editable-base.component';
+import { Component, Output, EventEmitter } from '@angular/core';
 
 @Component({
   selector: 'app-editable-generic',
@@ -7,8 +6,25 @@ import { EditableBaseComponent } from '../editable-base/editable-base.component'
   templateUrl: './editable-generic.component.html',
   styleUrls: ['./editable-generic.component.scss']
 })
-export class EditableGenericComponent extends EditableBaseComponent {
-  @Input() position!: number;
-  @Input() fragmentCount!: number;
-  @Input() highlight: boolean = false;
+export class EditableGenericComponent {
+  isEditing: boolean = false;
+
+  @Output() edit = new EventEmitter<void>();
+  @Output() save = new EventEmitter<void>();
+  @Output() cancel = new EventEmitter<void>();
+
+  onEdit() {
+    this.isEditing = true;
+    this.edit.emit();
+  }
+
+  onCancel() {
+    this.isEditing = false;    
+    this.cancel.emit();
+  }
+
+  onSave() {
+    this.isEditing = false;    
+    this.save.emit();
+  }
 }

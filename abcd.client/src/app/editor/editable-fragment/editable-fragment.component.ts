@@ -1,6 +1,5 @@
 import { Component, Input, Output, EventEmitter, ContentChild, AfterContentInit, Type } from '@angular/core';
 import { Fragment } from '../models/fragment.model';
-import { EditableBaseComponent } from '../editable-base/editable-base.component';
 import { IFragmentComponent } from '../models/fragment-component.interface';
 import { CodeFragmentComponent } from '../code-fragment/code-fragment.component';
 import { RichTextFragmentComponent } from '../rich-text-fragment/rich-text-fragment.component';
@@ -13,7 +12,7 @@ import { TableFragmentComponent } from '../table-fragment/table-fragment.compone
   templateUrl: './editable-fragment.component.html',
   styleUrls: ['./editable-fragment.component.scss']
 })
-export class EditableFragmentComponent extends EditableBaseComponent implements AfterContentInit {
+export class EditableFragmentComponent implements AfterContentInit {
   @ContentChild(CodeFragmentComponent) codeFragmentComp?: IFragmentComponent;
   @ContentChild(RichTextFragmentComponent) richTextFragmentComp?: IFragmentComponent;
   @ContentChild(ImageFragmentComponent) imageFragmentComp?: IFragmentComponent;
@@ -23,32 +22,53 @@ export class EditableFragmentComponent extends EditableBaseComponent implements 
   @Input() fragmentCount!: number;
   @Input() highlight: boolean = false;
 
-  @Output() moveUp = new EventEmitter<Number>();
-  @Output() moveDown = new EventEmitter<Number>();
-  @Output() fragmentSaved = new EventEmitter<Fragment>();
+  @Output() fragmentEdit = new EventEmitter<void>();
+  @Output() fragmentSave = new EventEmitter<Fragment>();
+  @Output() fragmentCancel = new EventEmitter<void>();
+  @Output() fragmentMoveUp = new EventEmitter<number>();
+  @Output() fragmentMoveDown = new EventEmitter<number>();
 
+  isEditing: boolean = false;
+
+  ngAfterContentInit() {
+    //this.fragmentComponent?.init();
+  }
+
+  onEdit() {
+    this.isEditing = true;
+    this.fragmentComponent?.setEditMode(true);
+    this.fragmentEdit.emit();
+  }
+
+  onCancel() {
+    this.isEditing = false;
+    this.fragmentComponent?.revert();
+    this.fragmentCancel.emit();
+  }
+
+  onSave() {
+    this.isEditing = false;
+    this.fragmentComponent?.setEditMode(false);
+    this.fragmentSave.emit(this.fragmentComponent?.getCurrentFragment());
+  }
 
   onMoveUp() {
     console.log("moving up" + this.position);
-    this.moveUp.emit(this.position);
+    this.fragmentMoveUp.emit(this.position);
   }
 
   onMoveDown() {
     console.log("moving down" + this.position);
-    this.moveDown.emit(this.position);
+    this.fragmentMoveDown.emit(this.position);
   }
 
-  getLatestFragment() {
+
+  get fragmentComponent(): IFragmentComponent | undefined {
     return (
-      this.codeFragmentComp?.getLatestFragment?.() ||
-      this.richTextFragmentComp?.getLatestFragment?.() ||
-      this.imageFragmentComp?.getLatestFragment?.() ||
-      this.tableFragmentComp?.getLatestFragment?.()
+      this.codeFragmentComp ||
+      this.richTextFragmentComp ||
+      this.imageFragmentComp ||
+      this.tableFragmentComp
     );
-  }
-
-  override onSave() {
-    super.onSave(); // Call base logic (sets editing state, disables controls, emits save event)
-    this.fragmentSaved.emit(this.getLatestFragment());
   }
 }

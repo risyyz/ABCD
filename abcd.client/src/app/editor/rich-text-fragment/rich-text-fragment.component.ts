@@ -29,12 +29,21 @@ export class RichTextFragmentComponent implements OnInit, OnDestroy, IFragmentCo
   ngOnInit(): void {
     this.editor = new Editor();
   }
-  getLatestFragment(): Fragment {
-    console.log('returning latest richtext fragment');
-    return this.fragment;
-  }
-
+  
   ngOnDestroy(): void {
     this.editor.destroy();
+  }
+
+  setEditMode(isEditing: boolean) {
+    console.log('RichTextFragmentComponent setEditMode: ' + isEditing);
+  }
+
+  revert() {
+    console.log('reverting rich text fragment to original');
+  }
+
+  getCurrentFragment(): Fragment {
+    console.log('returning latest rich text fragment');
+    return this.fragment;
   }
 }

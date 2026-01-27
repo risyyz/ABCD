@@ -13,7 +13,16 @@ export class TableFragmentComponent implements IFragmentComponent {
   // Add table logic and properties here as needed
   columns: any = 5;
   rows: any = 6
-  getLatestFragment(): Fragment {
+
+  setEditMode(isEditing: boolean) {
+    console.log('TableFragmentComponent setEditMode: ' + isEditing);
+  }
+
+  revert() {
+    console.log('reverting table fragment to original');
+  }
+
+  getCurrentFragment(): Fragment {
     console.log('returning latest table fragment');
     return this.fragment;
   }

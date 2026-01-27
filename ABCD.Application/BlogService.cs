@@ -13,7 +13,7 @@ namespace ABCD.Application {
         public async Task<Blog> GetBlogByIdAsync(int blogId) {
             var blog = await _repository.GetByIdAsync(blogId);
             if (blog == null)
-                throw new BlogNotFoundException($"Blog with Id {blogId} does not exist.");
+                throw new BlogNotFoundException($"Blog {blogId} does not exist.");
 
             return blog;
         }

@@ -44,5 +44,18 @@ namespace ABCD.Application {
         public async Task<Post?> GetByIdAsync(int postId) {
             return await _postRepository.GetByPostIdAsync(_requestContext.Blog.BlogId.Value!, postId);
         }
+
+        public async Task<Post> UpdateFragmentPositionAsync(ChangeFragmentPositionCommand command) {
+            var post =  await _postRepository.GetByPostIdAsync(_requestContext.Blog.BlogId.Value!, command.PostId);
+            if (post == null) throw new PostNotFoundException($"Post {command.PostId} does not exist.");
+
+            var fragment = post.Fragments.FirstOrDefault(f => f.Position == command.CurrentPosition);
+            if (fragment == null) throw new BlogNotFoundException($"Post {command.PostId} does not contain any fragment at position {command.CurrentPosition}.");
+
+            post.ChangeFragmentPosition(command.CurrentPosition, command.NewPosition);
+
+            //await _postRepository.
+            return post;
+        }
     }
 }
