@@ -51,15 +51,15 @@ public class Post {
         Initialize(blogId, null, title, PostStatus.Draft, null);
     }
 
-    public Post(BlogId blogId, PostId postId, string title, PostStatus status, DateTime? dateLastPublished = null)
+    public Post(BlogId blogId, PostId postId, string title, PostStatus status, DateTime? dateLastPublished = null, IEnumerable<Fragment>? fragments = null)
     {
         if (postId == null)
             throw new DomainValidationException("PostId cannot be null.", new ArgumentNullException(nameof(postId)));
                 
-        Initialize(blogId, postId, title, status, dateLastPublished);
+        Initialize(blogId, postId, title, status, dateLastPublished, fragments);        
     }
 
-    private void Initialize(BlogId blogId, PostId? postId, string title, PostStatus status, DateTime? dateLastPublished) {
+    private void Initialize(BlogId blogId, PostId? postId, string title, PostStatus status, DateTime? dateLastPublished, IEnumerable<Fragment>? fragments = null) {
         if (blogId == null)
             throw new DomainValidationException("BlogId cannot be null.", new ArgumentNullException(nameof(blogId)));
         
@@ -72,10 +72,32 @@ public class Post {
         if (status == PostStatus.Published && (dateLastPublished == null || dateLastPublished.Value == default(DateTime)))
             throw new DomainValidationException("DateLastPublished must be set when status is Published.", new ArgumentException("Value must be set when status is Published.", nameof(status)));
 
+        if(fragments?.Any(f => f.FragmentId == null) == true)
+            throw new DomainValidationException("All fragments must have an id.");
+
+        if(fragments?.Any(f => postId != null && f.PostId != postId) == true)
+            throw new DomainValidationException("Fragments within a post cannot have different ids.");
+        
+        EnsureConsecutiveFragmentPositions(fragments);        
+
         BlogId = blogId;
         PostId = postId;
         Title = title;
         Status = status;
+    }
+
+    private void EnsureConsecutiveFragmentPositions(IEnumerable<Fragment>? fragments) {
+        if(fragments?.Any() != true)
+            return;
+
+        var sortedFragments = fragments.OrderBy(f => f.Position).ToList();
+        for(int i = 0; i < sortedFragments.Count; i++) {
+            int expectedPosition = Fragment.MinPosition + i;
+            if(sortedFragments[i].Position != expectedPosition) {
+                throw new DomainValidationException($"Fragment positions must be consecutive starting from {Fragment.MinPosition}. Fragment '{sortedFragments[i].FragmentId}' has invalid position {sortedFragments[i].Position}.");
+            }
+            _fragments.Add(sortedFragments[i]);
+        }
     }
 
     public void AddFragment(FragmentType fragmentType, string? content, int? position = null) {
@@ -99,6 +121,9 @@ public class Post {
 
     public PublishEligibilityResult EligibleForPublishing() {
         var result = new PublishEligibilityResult();
+
+        if (PostId == null)
+            result.AddReason("Post does not have a valid id");
 
         if (Status != PostStatus.Draft)
             result.AddReason("Post status must be Draft");

@@ -61,9 +61,11 @@ namespace ABCD.Infra.Data {
 
             modelBuilder.Entity<FragmentRecord>(entity => {
                 entity.ToTable("Fragments");
-                entity.HasKey(e => new { e.PostId, e.Position });
+                entity.HasKey(e => e.FragmentId);
+                entity.Property(e => e.FragmentId).ValueGeneratedOnAdd();
                 entity.Property(e => e.PostId).IsRequired();
                 entity.Property(e => e.Position).IsRequired();
+                entity.HasIndex(e => new { e.PostId, e.Position }).IsUnique();
                 entity.Property(e => e.Content).IsRequired();
                 entity.Property(e => e.Excluded).IsRequired(false);
                 entity.Property(e => e.FragmentType)

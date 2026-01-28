@@ -14,7 +14,7 @@ public enum FragmentType
 public class Fragment 
 {
     public static readonly int MinPosition = 1;
-
+    public FragmentId? FragmentId { get; }
     public PostId PostId { get; }
     public FragmentType FragmentType { get; }
     public int Position { get; private set; }
@@ -29,6 +29,10 @@ public class Fragment
 
         FragmentType = type;        
         Position = position;
+    }
+
+    public Fragment(FragmentId fragmentId, PostId postId, FragmentType type, int position) : this(postId, type, position) {
+        FragmentId = fragmentId ?? throw new DomainValidationException("FragmentId cannot be null.", new ArgumentNullException(nameof(fragmentId)));        
     }
 
     public void MoveUp()

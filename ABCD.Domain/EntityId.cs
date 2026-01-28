@@ -28,4 +28,11 @@ namespace ABCD.Domain {
                 throw new DomainValidationException("PostId must be greater than 0.", new ArgumentOutOfRangeException(nameof(value)));
         }
     }
+
+    public sealed class FragmentId : EntityId<int> {
+        public FragmentId(int value) : base(value) {
+            if (value <= 0)
+                throw new DomainValidationException("FragmentId must be greater than 0.", new ArgumentOutOfRangeException(nameof(value)));
+        }
+    }
 }

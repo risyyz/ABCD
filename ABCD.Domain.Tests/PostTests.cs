@@ -25,53 +25,6 @@ namespace ABCD.Domain.Tests
             Assert.Equal("blogId", ((ArgumentNullException)ex.InnerException!).ParamName);
         }
 
-        [Theory]
-        [InlineData(null)]
-        [InlineData("")]
-        [InlineData("   ")]
-        public void Title_ShouldThrow_WhenNullOrEmptyOrWhitespaceAndWordMissing(string invalidTitle)
-        {
-            var blogId = new BlogId(2);
-            var post = new Post(blogId, "Valid Title");
-            var ex = Assert.Throws<DomainValidationException>(() => post.Title = invalidTitle!);
-            Assert.Equal("Title must contain at least one word and cannot be null, empty, or whitespace.", ex.Message);
-            Assert.IsType<ArgumentException>(ex.InnerException);
-            Assert.Equal("value", ((ArgumentException)ex.InnerException!).ParamName);
-        }        
-
-        [Fact]
-        public void Publish_ShouldSetStatusAndDate_WhenDraft()
-        {
-            var blogId = new BlogId(4);
-            var post = new Post(blogId, "Valid Title") { PathSegment = new PathSegment("valid-segment") };
-            post.Publish();
-            Assert.Equal(PostStatus.Published, post.Status);
-            Assert.NotNull(post.DateLastPublished);
-        }
-
-        [Fact]
-        public void Publish_ShouldThrow_WhenAlreadyPublished()
-        {
-            var blogId = new BlogId(5);
-            var post = new Post(blogId, "Valid Title") { PathSegment = new PathSegment("valid-segment") };
-            post.Publish();
-            var ex = Assert.Throws<DomainValidationException>(() => post.Publish());
-            Assert.Contains("Post cannot be published because it does not meet all publishing requirements.", ex.Message);
-            Assert.Contains("Post status must be Draft", ex.Message);
-        }
-
-        [Fact]
-        public void SetAsDraft_ShouldSetStatusToDraft()
-        {
-            var blogId = new BlogId(6);
-            var post = new Post(blogId, "Valid Title") { PathSegment = new PathSegment("valid-segment") }; ;
-            post.Publish();
-            var publishedDate = post.DateLastPublished;
-            post.UnPublish();
-            Assert.Equal(PostStatus.Draft, post.Status);
-            Assert.Equal(publishedDate, post.DateLastPublished);
-        }
-
         [Fact]
         public void Constructor_WithPostId_ShouldSetProperties_WhenDraft()
         {
@@ -116,6 +69,131 @@ namespace ABCD.Domain.Tests
             Assert.Equal("DateLastPublished must be set when status is Published.", ex.Message);
             Assert.IsType<ArgumentException>(ex.InnerException);
             Assert.Equal("status", ((ArgumentException)ex.InnerException!).ParamName);
+        }
+
+        [Fact]
+        public void Constructor_Passes_WhenFragmentIsNull()
+        {
+            var blogId = new BlogId(11);
+            var postId = new PostId(13);
+            var post = new Post(blogId, postId, "Valid Title", PostStatus.Draft, null, null);
+            Assert.Empty(post.Fragments);
+        }
+
+        [Fact]
+        public void Constructor_Passes_WhenFragmentIsEmpty() {
+            var blogId = new BlogId(11);
+            var postId = new PostId(13);
+            var post = new Post(blogId, postId, "Valid Title", PostStatus.Draft, null, new List<Fragment>());
+            Assert.Empty(post.Fragments);
+        }
+
+        [Fact]
+        public void Constructor_ShouldThrow_WhenFragmentIdNull() {
+            var blogId = new BlogId(11);
+            var postId = new PostId(13);
+            var fragment = new Fragment(new PostId(14), FragmentType.RichText, 1) { Content = "Test" };
+            var ex = Assert.Throws<DomainValidationException>(() => new Post(blogId, postId, "Valid Title", PostStatus.Draft, null, new List<Fragment> { fragment }));
+            Assert.Equal("All fragments must have an id.", ex.Message);
+        }
+
+        [Fact]
+        public void Constructor_ShouldThrow_WhenFragmentPostIdMismatch() {
+            var blogId = new BlogId(11);
+            var postId = new PostId(13);
+            var fragment = new Fragment(new FragmentId(3), new PostId(14), FragmentType.RichText, 1) { Content = "Test" };
+            var ex = Assert.Throws<DomainValidationException>(() => new Post(blogId, postId, "Valid Title", PostStatus.Draft, null, new List<Fragment> { fragment }));
+            Assert.Equal("Fragments within a post cannot have different ids.", ex.Message);
+        }
+
+        [Fact]
+        public void Constructor_ShouldThrow_WhenFragmentPositionDoesNotStartAt1() {
+            var blogId = new BlogId(11);
+            var postId = new PostId(13);
+            var fragment = new Fragment(new FragmentId(1), postId, FragmentType.RichText, 2) { Content = "Test" };
+            var ex = Assert.Throws<DomainValidationException>(() => new Post(blogId, postId, "Valid Title", PostStatus.Draft, null, new List<Fragment> { fragment }));
+            Assert.Equal("Fragment positions must be consecutive starting from 1. Fragment '1' has invalid position 2.", ex.Message);
+        }
+
+        [Fact]
+        public void Constructor_ShouldThrow_WhenFragmentPosition1IsDuplicate() {
+            var blogId = new BlogId(11);
+            var postId = new PostId(13);
+            var fragment1 = new Fragment(new FragmentId(1), postId, FragmentType.RichText, 1) { Content = "Test1" };
+            var fragment2 = new Fragment(new FragmentId(2), postId, FragmentType.RichText, 1) { Content = "Test2" };
+            var ex = Assert.Throws<DomainValidationException>(() => new Post(blogId, postId, "Valid Title", PostStatus.Draft, null, new List<Fragment> { fragment1, fragment2 }));
+            Assert.Equal("Fragment positions must be consecutive starting from 1. Fragment '2' has invalid position 1.", ex.Message);
+        }
+
+        [Fact]
+        public void Constructor_ShouldThrow_WhenFragmentPositionsAreNotConsecutive() {
+            var blogId = new BlogId(11);
+            var postId = new PostId(13);
+            var fragment1 = new Fragment(new FragmentId(1), postId, FragmentType.RichText, 1) { Content = "Test1" };
+            var fragment2 = new Fragment(new FragmentId(2), postId, FragmentType.RichText, 2) { Content = "Test2" };
+            var fragment3 = new Fragment(new FragmentId(3), postId, FragmentType.RichText, 2) { Content = "Test2" };
+            var fragment4 = new Fragment(new FragmentId(4), postId, FragmentType.RichText, 3) { Content = "Test2" };
+            var ex = Assert.Throws<DomainValidationException>(() => new Post(blogId, postId, "Valid Title", PostStatus.Draft, null, new List<Fragment> { fragment1, fragment2, fragment3, fragment4 }));
+            Assert.Equal("Fragment positions must be consecutive starting from 1. Fragment '3' has invalid position 2.", ex.Message);
+        }
+
+        [Fact]
+        public void FragmentPositionsAreConsecutiveAfterConstruction() {
+            var blogId = new BlogId(11);
+            var postId = new PostId(13);
+            var fragment1 = new Fragment(new FragmentId(1), postId, FragmentType.RichText, 1) { Content = "Test1" };
+            var fragment2 = new Fragment(new FragmentId(2), postId, FragmentType.RichText, 2) { Content = "Test2" };
+            var fragment3 = new Fragment(new FragmentId(3), postId, FragmentType.RichText, 3) { Content = "Test2" };
+            var fragment4 = new Fragment(new FragmentId(4), postId, FragmentType.RichText, 4) { Content = "Test2" };
+
+            var unsortedFragments = new List<Fragment> { fragment4, fragment2, fragment1, fragment3 };
+            var post = new Post(blogId, postId, "Valid Title", PostStatus.Draft, null, unsortedFragments);
+            foreach(var fragment in post.Fragments) {
+                Assert.Equal(fragment.Position, post.Fragments.ToList().IndexOf(fragment) + 1);
+            }
+        }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData("   ")]
+        public void Title_ShouldThrow_WhenNullOrEmptyOrWhitespaceAndWordMissing(string invalidTitle) {
+            var blogId = new BlogId(2);
+            var post = new Post(blogId, "Valid Title");
+            var ex = Assert.Throws<DomainValidationException>(() => post.Title = invalidTitle!);
+            Assert.Equal("Title must contain at least one word and cannot be null, empty, or whitespace.", ex.Message);
+            Assert.IsType<ArgumentException>(ex.InnerException);
+            Assert.Equal("value", ((ArgumentException)ex.InnerException!).ParamName);
+        }
+
+        [Fact]
+        public void Publish_ShouldSetStatusAndDate_WhenDraft() {
+            var blogId = new BlogId(4);
+            var post = new Post(blogId, new PostId(7), "Valid Title", PostStatus.Draft) { PathSegment = new PathSegment("valid-segment") };
+            post.Publish();
+            Assert.Equal(PostStatus.Published, post.Status);
+            Assert.NotNull(post.DateLastPublished);
+        }
+
+        [Fact]
+        public void Publish_ShouldThrow_WhenAlreadyPublished() {
+            var blogId = new BlogId(5);
+            var post = new Post(blogId, new PostId(7), "Valid Title", PostStatus.Draft) { PathSegment = new PathSegment("valid-segment") };
+            post.Publish();
+            var ex = Assert.Throws<DomainValidationException>(() => post.Publish());
+            Assert.Contains("Post cannot be published because it does not meet all publishing requirements.", ex.Message);
+            Assert.Contains("Post status must be Draft", ex.Message);
+        }
+
+        [Fact]
+        public void SetAsDraft_ShouldSetStatusToDraft() {
+            var blogId = new BlogId(6);
+            var post = new Post(blogId, new PostId(7), "Valid Title", PostStatus.Draft) { PathSegment = new PathSegment("valid-segment") }; ;
+            post.Publish();
+            var publishedDate = post.DateLastPublished;
+            post.UnPublish();
+            Assert.Equal(PostStatus.Draft, post.Status);
+            Assert.Equal(publishedDate, post.DateLastPublished);
         }
 
         [Fact]
@@ -333,6 +411,16 @@ namespace ABCD.Domain.Tests
             var result = child.EligibleForPublishing();
             Assert.False(result.CanPublish);
             Assert.Contains("Duplicate PathSegment value found in ancestor chain: 'duplicate-segment'.", result.Reasons, StringComparer.OrdinalIgnoreCase);
+        }
+
+        [Fact]
+        public void PublishEligibilityResult_ReturnsMissingPostId_WhenPostIdNotSet() {
+            var blogId = new BlogId(1);
+            var post = new Post(blogId, "Child") { PathSegment = new PathSegment("post-segment") };
+            post.PathSegment = new PathSegment("duplicate-segment");
+            var result = post.EligibleForPublishing();
+            Assert.False(result.CanPublish);
+            Assert.Contains("Post does not have a valid id", result.Reasons, StringComparer.OrdinalIgnoreCase);
         }
 
         [Fact]
