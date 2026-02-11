@@ -1,3 +1,4 @@
+
 using ABCD.Domain;
 using Microsoft.EntityFrameworkCore;
 
@@ -53,16 +54,24 @@ namespace ABCD.Infra.Data {
         // Map EF record to domain model
         private Post MapToDomain(PostRecord record) {
             // TODO: Map all required fields and relationships
-            var post = new Post(new BlogId(record.BlogId), new PostId(record.PostId), record.Title, (PostStatus)record.Status);
-
-            // Map fragments if available
+            var fragments = new List<Fragment>();
             if (record.Fragments != null) {
                 foreach (var fragmentRecord in record.Fragments) {
                     // Assuming Fragment is a domain model and you have a method to map from record to domain
-                    post.AddFragment(fragmentRecord.FragmentType, fragmentRecord.Content, fragmentRecord.Position);
+                    fragments.Add(MapToDomain(fragmentRecord));
                 }
             }
+            var post = new Post(new BlogId(record.BlogId), new PostId(record.PostId), record.Title, (PostStatus)record.Status, null, fragments);            
             return post;
+        }
+
+        private Fragment MapToDomain(FragmentRecord fragmentRecord) {
+            return new Fragment(
+                new FragmentId(fragmentRecord.FragmentId),
+                new PostId(fragmentRecord.PostId),
+                (FragmentType)fragmentRecord.FragmentType,
+                fragmentRecord.Position
+            );
         }
 
         // Map domain model to EF record

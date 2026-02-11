@@ -11,9 +11,9 @@ namespace ABCD.Application {
         public PostService(RequestContext requestContext, IPostRepository postRepository, IBlogRepository blogRepository) {
             _requestContext = requestContext ?? throw new ArgumentNullException(nameof(requestContext));
             if(_requestContext.Blog == null)
-                throw new InvalidArgumentException("RequestContext must have a Blog set.", nameof(requestContext));
+                throw new ArgumentException("RequestContext must have a Blog set.", nameof(requestContext));
             else if(_requestContext.Blog.BlogId == null)
-                throw new InvalidArgumentException("RequestContext.Blog must have a valid BlogId", nameof(requestContext));
+                throw new ArgumentException("RequestContext.Blog must have a valid BlogId", nameof(requestContext));
 
             _postRepository = postRepository ?? throw new ArgumentNullException(nameof(postRepository));
             _blogRepository = blogRepository ?? throw new ArgumentNullException(nameof(blogRepository));

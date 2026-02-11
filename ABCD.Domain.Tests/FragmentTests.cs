@@ -27,7 +27,7 @@ namespace ABCD.Domain.Tests
         [Fact]
         public void Constructor_ShouldThrow_WhenPostIdIsNull()
         {
-            var ex = Assert.Throws<InvalidArgumentException>(() => new Fragment(null!, FragmentType.RichText, 1));
+            var ex = Assert.Throws<ArgumentNullException>(() => new Fragment(null!, FragmentType.RichText, 1));
             Assert.Equal("PostId cannot be null. (Parameter 'postId')", ex.Message);
             Assert.Equal("postId", ex.ParamName);
         }
@@ -38,7 +38,7 @@ namespace ABCD.Domain.Tests
         public void Constructor_ShouldThrow_WhenPositionIsLessThanMin(int position)
         {
             var postId = new PostId(3);
-            var ex = Assert.Throws<InvalidArgumentException>(() => new Fragment(postId, FragmentType.RichText, position));
+            var ex = Assert.Throws<ArgumentOutOfRangeException>(() => new Fragment(postId, FragmentType.RichText, position));
             Assert.Contains("Position must be at least", ex.Message);
             Assert.Equal("position", ex.ParamName);
         }

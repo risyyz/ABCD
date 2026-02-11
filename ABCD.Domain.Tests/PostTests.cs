@@ -19,7 +19,7 @@ namespace ABCD.Domain.Tests
         [Fact]
         public void Constructor_ShouldThrow_WhenBlogIdIsNull()
         {
-            var ex = Assert.Throws<InvalidArgumentException>(() => new Post(null!, "Valid Title"));
+            var ex = Assert.Throws<ArgumentNullException>(() => new Post(null!, "Valid Title"));
             Assert.Equal("BlogId cannot be null. (Parameter 'blogId')", ex.Message);
             Assert.Equal("blogId", ex.ParamName);
         }
@@ -43,7 +43,7 @@ namespace ABCD.Domain.Tests
             var blogId = new BlogId(8);
             var postId = new PostId(11);
             // The constructor should throw because Published requires DateLastPublished
-            var ex = Assert.Throws<InvalidArgumentException>(() => new Post(blogId, postId, "Valid Title", PostStatus.Published));
+            var ex = Assert.Throws<ArgumentException>(() => new Post(blogId, postId, "Valid Title", PostStatus.Published));
             Assert.Equal("DateLastPublished must be set when status is Published. (Parameter 'dateLastPublished')", ex.Message);
             Assert.Equal("dateLastPublished", ex.ParamName);
         }
@@ -52,7 +52,7 @@ namespace ABCD.Domain.Tests
         public void Constructor_WithPostId_ShouldThrow_WhenPostIdIsNull()
         {
             var blogId = new BlogId(9);
-            var ex = Assert.Throws<InvalidArgumentException>(() => new Post(blogId, null!, "Valid Title", PostStatus.Draft));
+            var ex = Assert.Throws<ArgumentNullException>(() => new Post(blogId, null!, "Valid Title", PostStatus.Draft));
             Assert.Equal("PostId cannot be null. (Parameter 'postId')", ex.Message);
             Assert.Equal("postId", ex.ParamName);
         }
@@ -146,7 +146,7 @@ namespace ABCD.Domain.Tests
         public void Title_ShouldThrow_WhenNullOrEmptyOrWhitespaceAndWordMissing(string invalidTitle) {
             var blogId = new BlogId(2);
             var post = new Post(blogId, "Valid Title");
-            var ex = Assert.Throws<InvalidArgumentException>(() => post.Title = invalidTitle!);
+            var ex = Assert.Throws<ArgumentException>(() => post.Title = invalidTitle!);
             Assert.Equal("Title must contain at least one word and cannot be null, empty, or whitespace. (Parameter 'value')", ex.Message);
             Assert.Equal("value", ex.ParamName);
         }
@@ -278,7 +278,7 @@ namespace ABCD.Domain.Tests
         {
             var blogId = new BlogId(1);
             var post = new Post(blogId, new PostId(2), "Title", PostStatus.Draft);
-            var ex = Assert.Throws<InvalidArgumentException>(() => post.Parent = post);
+            var ex = Assert.Throws<ArgumentException>(() => post.Parent = post);
             Assert.Equal("A post cannot be its own ancestor. (Parameter 'value')", ex.Message);
         }
 
@@ -291,7 +291,7 @@ namespace ABCD.Domain.Tests
             var child = new Post(blogId, new PostId(3), "Child", PostStatus.Draft);
             parent.Parent = grandparent;
             child.Parent = parent;
-            var ex = Assert.Throws<InvalidArgumentException>(() => grandparent.Parent = child);
+            var ex = Assert.Throws<ArgumentException>(() => grandparent.Parent = child);
             Assert.Equal("A post cannot be its own ancestor. (Parameter 'value')", ex.Message);
         }
 
@@ -508,7 +508,7 @@ namespace ABCD.Domain.Tests
             var postId = new PostId(1004);
             var post = new Post(blogId, postId, "Title", PostStatus.Draft);
 
-            var ex = Assert.Throws<InvalidArgumentException>(() => post.ChangeFragmentPosition(1, 2));
+            var ex = Assert.Throws<ArgumentException>(() => post.ChangeFragmentPosition(1, 2));
             Assert.Equal("Post 1004 does not contain any fragment with id 1. (Parameter 'fragmentId')", ex.Message);
         }
 

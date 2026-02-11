@@ -9,7 +9,7 @@ public sealed class PathSegment : IEquatable<PathSegment>
     public PathSegment(string value)
     {
         if (!IsValid(value))
-            throw new InvalidArgumentException($"Invalid PathSegment: '{value}'. It must be 3-50 chars, only alphanumeric or dash, cannot start or end with dash.", nameof(value));
+            throw new ArgumentException($"Invalid PathSegment: '{value}'. It must be 3-50 chars, only alphanumeric or dash, cannot start or end with dash.", nameof(value));
         Value = value.ToLowerInvariant();
     }
 

@@ -23,7 +23,7 @@ public class BlogDomainTests
     [InlineData("   ")]
     public void Constructor_ShouldThrow_OnNullOrWhitespace(string? input)
     {
-        var ex = Assert.Throws<InvalidArgumentException>(() => new BlogDomain(input!));
+        var ex = Assert.Throws<ArgumentException>(() => new BlogDomain(input!));
         Assert.Equal("Domain name cannot be null, empty or whitespace. (Parameter 'domainName')", ex.Message);
         Assert.Equal("domainName", ex.ParamName);
     }
@@ -33,7 +33,7 @@ public class BlogDomainTests
     [InlineData(".com")]
     public void Constructor_ShouldThrow_OnInvalidDomainFormat(string input)
     {
-        var ex = Assert.Throws<InvalidArgumentException>(() => new BlogDomain(input));
+        var ex = Assert.Throws<ArgumentException>(() => new BlogDomain(input));
         Assert.Contains($"'{input}' is not a valid domain name.", ex.Message);
         Assert.Equal("domainName", ex.ParamName);
     }

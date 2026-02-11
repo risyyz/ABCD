@@ -11,7 +11,7 @@ public class BlogTests
     public void Name_ShouldThrow_WhenNullOrEmptyOrWhitespace(string invalidName)
     {
         var blog = new Blog(new BlogId(1)) { Name = "one two three" };
-        var ex = Assert.Throws<InvalidArgumentException>(() => blog.Name = invalidName!);
+        var ex = Assert.Throws<ArgumentException>(() => blog.Name = invalidName!);
         Assert.Equal("Blog name cannot be null or empty. (Parameter 'value')", ex.Message);
         Assert.Equal("value", ex.ParamName);
     }
@@ -30,7 +30,7 @@ public class BlogTests
     public void AddDomain_ShouldThrow_WhenNull()
     {
         var blog = new Blog(new BlogId(6)) { Name = "A B C" };
-        var ex = Assert.Throws<InvalidArgumentException>(() => blog.AddDomain(null!));
+        var ex = Assert.Throws<ArgumentNullException>(() => blog.AddDomain(null!));
         Assert.Equal("Blog domain cannot be null. (Parameter 'blogDomain')", ex.Message);
     }
 
@@ -72,7 +72,7 @@ public class BlogTests
     public void RemoveDomain_ShouldThrow_WhenNull()
     {
         var blog = new Blog(new BlogId(9)) { Name = "A B C" };
-        var ex = Assert.Throws<InvalidArgumentException>(() => blog.RemoveDomain(null!));
+        var ex = Assert.Throws<ArgumentNullException>(() => blog.RemoveDomain(null!));
         Assert.Equal("Blog domain cannot be null. (Parameter 'blogDomain')", ex.Message);
     }
 
@@ -120,7 +120,7 @@ public class BlogTests
     [Fact]
     public void Constructor_ShouldThrow_WhenBlogIdIsNull()
     {
-        var ex = Assert.Throws<InvalidArgumentException>(() => { var _ = new Blog(null!) { Name = "Valid Name" }; });
+        var ex = Assert.Throws<ArgumentNullException>(() => { var _ = new Blog(null!) { Name = "Valid Name" }; });
         Assert.Equal("BlogId cannot be null. (Parameter 'blogId')", ex.Message);
         Assert.Equal("blogId", ex.ParamName);
     }

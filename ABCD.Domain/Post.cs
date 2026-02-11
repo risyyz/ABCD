@@ -13,7 +13,7 @@ public class Post {
         get => _title;
         set {
             if (string.IsNullOrWhiteSpace(value) || !ContainsWord(value))
-                throw new InvalidArgumentException("Title must contain at least one word and cannot be null, empty, or whitespace.", nameof(value));
+                throw new ArgumentException("Title must contain at least one word and cannot be null, empty, or whitespace.", nameof(value));
             _title = value;
         }
     }
@@ -40,7 +40,7 @@ public class Post {
                 while (ancestor != null)
                 {
                     if (ancestor.PostId != null && ancestor.BlogId == BlogId && ancestor.PostId == PostId)
-                        throw new InvalidArgumentException("A post cannot be its own ancestor.",nameof(value));
+                        throw new ArgumentException("A post cannot be its own ancestor.", nameof(value));
                     
                     ancestor = ancestor.Parent;
                 }
@@ -57,7 +57,7 @@ public class Post {
     public Post(BlogId blogId, PostId postId, string title, PostStatus status, DateTime? dateLastPublished = null, IEnumerable<Fragment>? fragments = null)
     {
         if (postId == null)
-            throw new InvalidArgumentException("PostId cannot be null.", nameof(postId));
+            throw new ArgumentNullException(nameof(postId), "PostId cannot be null.");
 
         InitializeFragments(fragments, postId);
         InitializeCoreAttributes(blogId, postId, title, status, dateLastPublished);        
@@ -65,16 +65,16 @@ public class Post {
 
     private void InitializeCoreAttributes(BlogId blogId, PostId? postId, string title, PostStatus status, DateTime? dateLastPublished) {
         if (blogId == null)
-            throw new InvalidArgumentException("BlogId cannot be null.", nameof(blogId));
+            throw new ArgumentNullException(nameof(blogId), "BlogId cannot be null.");
         
         if (string.IsNullOrWhiteSpace(title) || !ContainsWord(title))
-            throw new InvalidArgumentException("Title must contain at least one word and cannot be null, empty, or whitespace.", nameof(title));
-        
+            throw new ArgumentException("Title must contain at least one word and cannot be null, empty, or whitespace.", nameof(title));
+
         if (!Enum.IsDefined(typeof(PostStatus), status))
-            throw new InvalidArgumentException("Status is required and must be a valid PostStatus.", nameof(status));
+            throw new ArgumentException("Status is required and must be a valid PostStatus.", nameof(status));
 
         if (status == PostStatus.Published && (dateLastPublished == null || dateLastPublished.Value == default(DateTime)))
-            throw new InvalidArgumentException("DateLastPublished must be set when status is Published.", nameof(dateLastPublished));
+            throw new ArgumentException("DateLastPublished must be set when status is Published.", nameof(dateLastPublished));
 
         BlogId = blogId;
         PostId = postId;
@@ -89,7 +89,7 @@ public class Post {
         if (fragments?.Any(f => f.FragmentId == null) == true)
             throw new InvalidFragmentException("All fragments must have an id.");
 
-        if (fragments?.Any(f => postId != null && f.PostId != postId) == true)
+        if (fragments?.Any(f => postId != null && !postId.Equals(f.PostId)) == true)
             throw new InvalidFragmentException("Fragment's postid must match the post's id.");
 
         var sortedFragments = fragments!.OrderBy(f => f.Position).ToList();
@@ -179,7 +179,7 @@ public class Post {
     public void ChangeFragmentPosition(int fragmentId, int newPosition) {
         var fragment = _fragments.FirstOrDefault(f => f.FragmentId!.Value == fragmentId);
         if (fragment == null) 
-            throw new InvalidArgumentException($"Post {PostId.Value} does not contain any fragment with id {fragmentId}.", nameof(fragmentId));
+            throw new ArgumentException($"Post {PostId.Value} does not contain any fragment with id {fragmentId}.", nameof(fragmentId));
 
         ValidatePositionChange(fragment.Position, newPosition);
         if (newPosition < fragment.Position) {

@@ -8,11 +8,11 @@ namespace ABCD.Domain {
 
         public BlogDomain(string domainName) {
             if (string.IsNullOrWhiteSpace(domainName))
-                throw new InvalidArgumentException("Domain name cannot be null, empty or whitespace.", nameof(domainName));
+                throw new ArgumentException("Domain name cannot be null, empty or whitespace.", nameof(domainName));
 
             const string domainPattern = @"^(localhost|[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,})$";
             if (!Regex.IsMatch(domainName.Trim(), domainPattern, RegexOptions.IgnoreCase))
-                throw new InvalidArgumentException($"'{domainName}' is not a valid domain name.", nameof(domainName));
+                throw new ArgumentException($"'{domainName}' is not a valid domain name.", nameof(domainName));
 
             DomainName = domainName.Trim().ToLowerInvariant();
         }

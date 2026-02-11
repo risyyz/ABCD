@@ -10,7 +10,7 @@ public class Blog {
         get => _name;
         set {
             if (string.IsNullOrWhiteSpace(value))
-                throw new InvalidArgumentException("Blog name cannot be null or empty.", nameof(value));
+                throw new ArgumentException("Blog name cannot be null or empty.", nameof(value));
 
             _name = value.Trim();
         }
@@ -26,7 +26,7 @@ public class Blog {
     public IReadOnlyCollection<BlogDomain> Domains => _domains;
     public void AddDomain(BlogDomain blogDomain) {
         if(blogDomain == null)
-            throw new InvalidArgumentException("Blog domain cannot be null.", nameof(blogDomain));
+            throw new ArgumentNullException(nameof(blogDomain), "Blog domain cannot be null.");
 
         if (!_domains.Contains(blogDomain))
             _domains.Add(blogDomain);
@@ -34,7 +34,7 @@ public class Blog {
 
     public void RemoveDomain(BlogDomain blogDomain) {
         if (blogDomain == null)
-            throw new InvalidArgumentException("Blog domain cannot be null.", nameof(blogDomain));
+            throw new ArgumentNullException(nameof(blogDomain), "Blog domain cannot be null.");
 
         var toRemove = _domains.FirstOrDefault(d => d.Equals(blogDomain));
         if (toRemove != null)
@@ -42,6 +42,6 @@ public class Blog {
     }
 
     public Blog(BlogId blogId) {
-        BlogId = blogId ?? throw new InvalidArgumentException("BlogId cannot be null.", nameof(blogId));
+        BlogId = blogId ?? throw new ArgumentNullException(nameof(blogId), "BlogId cannot be null.");
     }
 }

@@ -23,16 +23,16 @@ public class Fragment
 
     public Fragment(PostId postId, FragmentType type, int position)
     {
-        PostId = postId ?? throw new InvalidArgumentException("PostId cannot be null.", nameof(postId));
+        PostId = postId ?? throw new ArgumentNullException(nameof(postId), "PostId cannot be null.");
         if (position < MinPosition)
-            throw new InvalidArgumentException($"Position must be at least {MinPosition}.", nameof(position));
+            throw new ArgumentOutOfRangeException(nameof(position), $"Position must be at least {MinPosition}.");
 
         FragmentType = type;        
         Position = position;
     }
 
     public Fragment(FragmentId fragmentId, PostId postId, FragmentType type, int position) : this(postId, type, position) {
-        FragmentId = fragmentId ?? throw new InvalidArgumentException("FragmentId cannot be null.", nameof(fragmentId));
+        FragmentId = fragmentId ?? throw new ArgumentNullException(nameof(fragmentId), "FragmentId cannot be null.");
     }
 
     public void MoveUp()
