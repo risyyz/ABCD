@@ -1,5 +1,6 @@
-namespace ABCD.Domain;
 using ABCD.Domain.Exceptions;
+
+namespace ABCD.Domain;
 
 public sealed class PathSegment : IEquatable<PathSegment>
 {
@@ -8,7 +9,7 @@ public sealed class PathSegment : IEquatable<PathSegment>
     public PathSegment(string value)
     {
         if (!IsValid(value))
-            throw new DomainValidationException($"Invalid PathSegment: '{value}'. It must be 3-50 chars, only alphanumeric or dash, cannot start or end with dash.", new ArgumentException("Invalid PathSegment.", nameof(value)));
+            throw new InvalidArgumentException($"Invalid PathSegment: '{value}'. It must be 3-50 chars, only alphanumeric or dash, cannot start or end with dash.", nameof(value));
         Value = value.ToLowerInvariant();
     }
 

@@ -1,5 +1,6 @@
 using ABCD.Application.Exceptions;
 using ABCD.Domain;
+using ABCD.Domain.Exceptions;
 
 namespace ABCD.Application {
     public class PostService : IPostService {
@@ -10,9 +11,9 @@ namespace ABCD.Application {
         public PostService(RequestContext requestContext, IPostRepository postRepository, IBlogRepository blogRepository) {
             _requestContext = requestContext ?? throw new ArgumentNullException(nameof(requestContext));
             if(_requestContext.Blog == null)
-                throw new ArgumentException("RequestContext must have a Blog set.", nameof(requestContext));
+                throw new InvalidArgumentException("RequestContext must have a Blog set.", nameof(requestContext));
             else if(_requestContext.Blog.BlogId == null)
-                throw new ArgumentException("RequestContext.Blog must have a valid BlogId", nameof(requestContext));
+                throw new InvalidArgumentException("RequestContext.Blog must have a valid BlogId", nameof(requestContext));
 
             _postRepository = postRepository ?? throw new ArgumentNullException(nameof(postRepository));
             _blogRepository = blogRepository ?? throw new ArgumentNullException(nameof(blogRepository));
@@ -49,10 +50,7 @@ namespace ABCD.Application {
             var post =  await _postRepository.GetByPostIdAsync(_requestContext.Blog.BlogId.Value!, command.PostId);
             if (post == null) throw new PostNotFoundException($"Post {command.PostId} does not exist.");
 
-            var fragment = post.Fragments.FirstOrDefault(f => f.Position == command.CurrentPosition);
-            if (fragment == null) throw new BlogNotFoundException($"Post {command.PostId} does not contain any fragment at position {command.CurrentPosition}.");
-
-            post.ChangeFragmentPosition(command.CurrentPosition, command.NewPosition);
+            post.ChangeFragmentPosition(command.FragmentId, command.NewPosition);
 
             //await _postRepository.
             return post;

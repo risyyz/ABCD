@@ -1,6 +1,6 @@
-namespace ABCD.Domain;
-
 using ABCD.Domain.Exceptions;
+
+namespace ABCD.Domain;
 
 public enum FragmentType
 {
@@ -23,22 +23,22 @@ public class Fragment
 
     public Fragment(PostId postId, FragmentType type, int position)
     {
-        PostId = postId ?? throw new DomainValidationException("PostId cannot be null.", new ArgumentNullException(nameof(postId)));
+        PostId = postId ?? throw new InvalidArgumentException("PostId cannot be null.", nameof(postId));
         if (position < MinPosition)
-            throw new FragmentPositionException($"Position must be at least {MinPosition}.");
+            throw new InvalidArgumentException($"Position must be at least {MinPosition}.", nameof(position));
 
         FragmentType = type;        
         Position = position;
     }
 
     public Fragment(FragmentId fragmentId, PostId postId, FragmentType type, int position) : this(postId, type, position) {
-        FragmentId = fragmentId ?? throw new DomainValidationException("FragmentId cannot be null.", new ArgumentNullException(nameof(fragmentId)));        
+        FragmentId = fragmentId ?? throw new InvalidArgumentException("FragmentId cannot be null.", nameof(fragmentId));
     }
 
     public void MoveUp()
     {
         if (Position == MinPosition)
-            throw new FragmentPositionException($"Cannot move up. Position is already at minimum value {MinPosition}.");
+            throw new IllegalOperationException($"Cannot move up. Position is already at minimum value {MinPosition}.");
 
         Position--;
     }
@@ -46,7 +46,7 @@ public class Fragment
     public void MoveDown(int maxPosition)
     {
         if (Position >= maxPosition)
-            throw new FragmentPositionException($"Cannot move down. Position is already at maximum value {maxPosition}.");
+            throw new IllegalOperationException($"Cannot move down. Position is already at maximum value {maxPosition}.");
         
         Position++;
     }

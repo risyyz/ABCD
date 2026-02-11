@@ -1,4 +1,6 @@
 ﻿using ABCD.Domain;
+using ABCD.Domain.Exceptions;
+
 using Microsoft.EntityFrameworkCore;
 
 namespace ABCD.Infra.Data {
@@ -27,7 +29,7 @@ namespace ABCD.Infra.Data {
             var record = await _context.Blogs
                 .Include(b => b.Domains)
                 .FirstOrDefaultAsync(b => b.BlogId == blog.BlogId.Value);
-            if (record == null) throw new InvalidOperationException($"Blog {blog.BlogId.Value} not found");
+            if (record == null) throw new IllegalOperationException($"Blog {blog.BlogId.Value} not found");
             // Update fields
             record.Name = blog.Name;
             record.Description = blog.Description;

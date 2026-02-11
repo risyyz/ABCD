@@ -10,7 +10,9 @@ namespace ABCD.Server.Middlewares {
 
         private static readonly Dictionary<Type, int> ExceptionStatusCodes = new()
         {
-            { typeof(DomainValidationException), StatusCodes.Status400BadRequest },
+            { typeof(InvalidArgumentException), StatusCodes.Status400BadRequest },
+            { typeof(IllegalOperationException), StatusCodes.Status400BadRequest },
+            { typeof(InvalidFragmentException), StatusCodes.Status400BadRequest },
             { typeof(DuplicatePathSegmentException), StatusCodes.Status400BadRequest },
             { typeof(DuplicatePostTitleException), StatusCodes.Status400BadRequest },
 

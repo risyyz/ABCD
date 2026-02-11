@@ -1,17 +1,17 @@
+using System.ComponentModel.DataAnnotations;
+
 using ABCD.Application;
 using ABCD.Domain;
 using ABCD.Lib;
 using ABCD.Server.Models;
 
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
 
 namespace ABCD.Server.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     [Authorize]
     public class PostsController : ControllerBase
     {        
@@ -51,21 +51,70 @@ namespace ABCD.Server.Controllers
             return Ok(response);
         }
 
-        [HttpPut("{postId:int}/fragments/{currentPosition:int}/position")]
+        [HttpPut("{postId:int}/fragments/{fragmentId:int}/position")]
         public async Task<IActionResult> UpdateFragmentPosition(
             [FromRoute] int postId,
-            [FromRoute] int currentPosition,
+            [FromRoute] int fragmentId,
             [FromBody][Required] FragmentChangePositionRequest request)
         {
             // Validate input
             if (request == null || request.NewPosition <= 0)
                 return BadRequest("Invalid new position.");
 
-            var result = await _postService.UpdateFragmentPositionAsync(new ChangeFragmentPositionCommand(postId, currentPosition, request.NewPosition));
+            var result = await _postService.UpdateFragmentPositionAsync(new ChangeFragmentPositionCommand(postId, fragmentId, request.NewPosition));
             //if (!result)
             //    return NotFound("Fragment not found or could not update position.");
 
             return NoContent();
+        }
+
+        // 1. Create post
+        [HttpPost("create")]
+        public IActionResult CreatePost([FromBody] object request)
+        {
+            throw new NotImplementedException();
+        }
+
+        // 2. Update post
+        [HttpPut("update/{postId:int}")]
+        public IActionResult UpdatePost(int postId, [FromBody] object request)
+        {
+            throw new NotImplementedException();
+        }
+
+        // 3. Delete post
+        [HttpDelete("delete/{postId:int}")]
+        public IActionResult DeletePost(int postId)
+        {
+            throw new NotImplementedException();
+        }
+
+        // 4. Add fragment
+        [HttpPost("{postId:int}/fragments/add")]
+        public IActionResult AddFragment(int postId, [FromBody] object request)
+        {
+            throw new NotImplementedException();
+        }
+
+        // 5. Update fragment
+        [HttpPut("{postId:int}/fragments/update/{fragmentId:int}")]
+        public IActionResult UpdateFragment(int postId, int fragmentId, [FromBody] object request)
+        {
+            throw new NotImplementedException();
+        }
+
+        // 6. Change fragment position
+        [HttpPatch("{postId:int}/fragments/{fragmentId:int}/position")]
+        public IActionResult ChangeFragmentPosition(int postId, int fragmentId, [FromBody] object request)
+        {
+            throw new NotImplementedException();
+        }
+
+        // 7. Delete fragment
+        [HttpDelete("{postId:int}/fragments/delete/{fragmentId:int}")]
+        public IActionResult DeleteFragment(int postId, int fragmentId)
+        {
+            throw new NotImplementedException();
         }
 
         public class UpdateFragmentPositionRequest

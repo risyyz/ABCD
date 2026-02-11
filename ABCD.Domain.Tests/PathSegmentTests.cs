@@ -1,6 +1,3 @@
-using System;
-using Xunit;
-using ABCD.Domain;
 using ABCD.Domain.Exceptions;
 
 namespace ABCD.Domain.Tests
@@ -57,8 +54,9 @@ namespace ABCD.Domain.Tests
         [InlineData("abc`def")]
         public void Constructor_InvalidValue_ShouldThrow(string input)
         {
-            var ex = Assert.Throws<DomainValidationException>(() => new PathSegment(input!));
-            Assert.Contains("Invalid PathSegment", ex.Message);
+            var ex = Assert.Throws<InvalidArgumentException>(() => new PathSegment(input!));
+            Assert.Contains($"Invalid PathSegment: '{input}'. It must be 3-50 chars, only alphanumeric or dash, cannot start or end with dash.", ex.Message);
+            Assert.Equal("value", ex.ParamName);
         }
 
         [Theory]
@@ -101,8 +99,9 @@ namespace ABCD.Domain.Tests
         [InlineData("abc-")]
         public void Constructor_ShouldThrow_WhenStartsOrEndsWithDash(string input)
         {
-            var ex = Assert.Throws<DomainValidationException>(() => new PathSegment(input));
-            Assert.Contains("Invalid PathSegment", ex.Message);
+            var ex = Assert.Throws<InvalidArgumentException>(() => new PathSegment(input));
+            Assert.Contains($"Invalid PathSegment: '{input}'. It must be 3-50 chars, only alphanumeric or dash, cannot start or end with dash.", ex.Message);
+            Assert.Equal("value", ex.ParamName);
         }
 
         [Theory]
@@ -111,8 +110,9 @@ namespace ABCD.Domain.Tests
         [InlineData("ab")]
         public void Constructor_ShouldThrow_WhenLessThanThreeChars(string input)
         {
-            var ex = Assert.Throws<DomainValidationException>(() => new PathSegment(input));
-            Assert.Contains("Invalid PathSegment", ex.Message);
+            var ex = Assert.Throws<InvalidArgumentException>(() => new PathSegment(input));
+            Assert.Contains($"Invalid PathSegment: '{input}'. It must be 3-50 chars, only alphanumeric or dash, cannot start or end with dash.", ex.Message);
+            Assert.Equal("value", ex.ParamName);
         }
 
         [Theory]
@@ -144,8 +144,9 @@ namespace ABCD.Domain.Tests
         [InlineData("abc`def")]
         public void Constructor_ShouldThrow_WhenContainsNonAlphaNumericOrDash(string input)
         {
-            var ex = Assert.Throws<DomainValidationException>(() => new PathSegment(input));
-            Assert.Contains("Invalid PathSegment", ex.Message);
+            var ex = Assert.Throws<InvalidArgumentException>(() => new PathSegment(input));
+            Assert.Contains($"Invalid PathSegment: '{input}'. It must be 3-50 chars, only alphanumeric or dash, cannot start or end with dash.", ex.Message);
+            Assert.Equal("value", ex.ParamName);
         }
 
         [Theory]
@@ -155,8 +156,9 @@ namespace ABCD.Domain.Tests
         [InlineData("abc--")]
         public void Constructor_ShouldThrow_WhenConsecutiveDashes(string input)
         {
-            var ex = Assert.Throws<DomainValidationException>(() => new PathSegment(input));
-            Assert.Contains("Invalid PathSegment", ex.Message);
+            var ex = Assert.Throws<InvalidArgumentException>(() => new PathSegment(input));
+            Assert.Contains($"Invalid PathSegment: '{input}'. It must be 3-50 chars, only alphanumeric or dash, cannot start or end with dash.", ex.Message);
+            Assert.Equal("value", ex.ParamName);
         }
     }
 }

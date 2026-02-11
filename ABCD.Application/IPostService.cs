@@ -10,5 +10,5 @@ namespace ABCD.Application {
 
     public record CreatePostCommand(string Title, string Path);
 
-    public record ChangeFragmentPositionCommand(int PostId, int CurrentPosition, int NewPosition);
+    public record ChangeFragmentPositionCommand(int PostId, int FragmentId, int NewPosition);
 }

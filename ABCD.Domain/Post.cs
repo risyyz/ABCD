@@ -1,5 +1,6 @@
-namespace ABCD.Domain;
 using ABCD.Domain.Exceptions;
+
+namespace ABCD.Domain;
 
 public class Post {
     public BlogId BlogId { get; private set; }
@@ -12,11 +13,13 @@ public class Post {
         get => _title;
         set {
             if (string.IsNullOrWhiteSpace(value) || !ContainsWord(value))
-                throw new DomainValidationException("Title must contain at least one word and cannot be null, empty, or whitespace.", new ArgumentException("Value must contain at least one word and cannot be null, empty, or whitespace.", nameof(value)));
+                throw new InvalidArgumentException("Title must contain at least one word and cannot be null, empty, or whitespace.", nameof(value));
             _title = value;
         }
     }
 
+    //TODO: if post is published, should not allow to change path segment to avoid broken links
+    //Do not allow changing path segment if child is published
     private PathSegment? _pathSegment;
     public PathSegment? PathSegment {
         get => _pathSegment;
@@ -37,7 +40,7 @@ public class Post {
                 while (ancestor != null)
                 {
                     if (ancestor.PostId != null && ancestor.BlogId == BlogId && ancestor.PostId == PostId)
-                        throw new DomainValidationException("A post cannot be its own ancestor.", new ArgumentException("Parent cannot create an ancestor cycle.", nameof(value)));
+                        throw new InvalidArgumentException("A post cannot be its own ancestor.",nameof(value));
                     
                     ancestor = ancestor.Parent;
                 }
@@ -48,37 +51,30 @@ public class Post {
 
     public Post(BlogId blogId, string title)
     {
-        Initialize(blogId, null, title, PostStatus.Draft, null);
+        InitializeCoreAttributes(blogId, null, title, PostStatus.Draft, null);
     }
 
     public Post(BlogId blogId, PostId postId, string title, PostStatus status, DateTime? dateLastPublished = null, IEnumerable<Fragment>? fragments = null)
     {
         if (postId == null)
-            throw new DomainValidationException("PostId cannot be null.", new ArgumentNullException(nameof(postId)));
-                
-        Initialize(blogId, postId, title, status, dateLastPublished, fragments);        
+            throw new InvalidArgumentException("PostId cannot be null.", nameof(postId));
+
+        InitializeFragments(fragments, postId);
+        InitializeCoreAttributes(blogId, postId, title, status, dateLastPublished);        
     }
 
-    private void Initialize(BlogId blogId, PostId? postId, string title, PostStatus status, DateTime? dateLastPublished, IEnumerable<Fragment>? fragments = null) {
+    private void InitializeCoreAttributes(BlogId blogId, PostId? postId, string title, PostStatus status, DateTime? dateLastPublished) {
         if (blogId == null)
-            throw new DomainValidationException("BlogId cannot be null.", new ArgumentNullException(nameof(blogId)));
+            throw new InvalidArgumentException("BlogId cannot be null.", nameof(blogId));
         
         if (string.IsNullOrWhiteSpace(title) || !ContainsWord(title))
-            throw new DomainValidationException("Title must contain at least one word and cannot be null, empty, or whitespace.", new ArgumentException("Value must contain at least one word and cannot be null, empty, or whitespace.", nameof(title)));
+            throw new InvalidArgumentException("Title must contain at least one word and cannot be null, empty, or whitespace.", nameof(title));
         
         if (!Enum.IsDefined(typeof(PostStatus), status))
-            throw new DomainValidationException("Status is required and must be a valid PostStatus.", new ArgumentException("Invalid PostStatus.", nameof(status)));
+            throw new InvalidArgumentException("Status is required and must be a valid PostStatus.", nameof(status));
 
         if (status == PostStatus.Published && (dateLastPublished == null || dateLastPublished.Value == default(DateTime)))
-            throw new DomainValidationException("DateLastPublished must be set when status is Published.", new ArgumentException("Value must be set when status is Published.", nameof(status)));
-
-        if(fragments?.Any(f => f.FragmentId == null) == true)
-            throw new DomainValidationException("All fragments must have an id.");
-
-        if(fragments?.Any(f => postId != null && f.PostId != postId) == true)
-            throw new DomainValidationException("Fragments within a post cannot have different ids.");
-        
-        EnsureConsecutiveFragmentPositions(fragments);        
+            throw new InvalidArgumentException("DateLastPublished must be set when status is Published.", nameof(dateLastPublished));
 
         BlogId = blogId;
         PostId = postId;
@@ -86,15 +82,21 @@ public class Post {
         Status = status;
     }
 
-    private void EnsureConsecutiveFragmentPositions(IEnumerable<Fragment>? fragments) {
+    private void InitializeFragments(IEnumerable<Fragment>? fragments, PostId postId) {
         if(fragments?.Any() != true)
             return;
 
-        var sortedFragments = fragments.OrderBy(f => f.Position).ToList();
+        if (fragments?.Any(f => f.FragmentId == null) == true)
+            throw new InvalidFragmentException("All fragments must have an id.");
+
+        if (fragments?.Any(f => postId != null && f.PostId != postId) == true)
+            throw new InvalidFragmentException("Fragment's postid must match the post's id.");
+
+        var sortedFragments = fragments!.OrderBy(f => f.Position).ToList();
         for(int i = 0; i < sortedFragments.Count; i++) {
             int expectedPosition = Fragment.MinPosition + i;
             if(sortedFragments[i].Position != expectedPosition) {
-                throw new DomainValidationException($"Fragment positions must be consecutive starting from {Fragment.MinPosition}. Fragment '{sortedFragments[i].FragmentId}' has invalid position {sortedFragments[i].Position}.");
+                throw new InvalidFragmentException($"Fragment positions must be consecutive starting from {Fragment.MinPosition}. Fragment '{sortedFragments[i].FragmentId}' has invalid position {sortedFragments[i].Position}.");
             }
             _fragments.Add(sortedFragments[i]);
         }
@@ -104,7 +106,7 @@ public class Post {
         int fragmentCount = _fragments.Count;
         int insertPosition = position ?? (fragmentCount == 0 ? Fragment.MinPosition : fragmentCount + Fragment.MinPosition);
         if (insertPosition < Fragment.MinPosition || insertPosition > fragmentCount + Fragment.MinPosition)
-            throw new FragmentPositionException($"Position must be between {Fragment.MinPosition} and {fragmentCount + Fragment.MinPosition}.");
+            throw new IllegalOperationException($"Position must be between {Fragment.MinPosition} and {fragmentCount + Fragment.MinPosition}.");
 
         var fragment = new Fragment(this.PostId!, fragmentType, insertPosition) { Content = content };
 
@@ -155,7 +157,7 @@ public class Post {
     public void Publish() {
         var eligibility = EligibleForPublishing();
         if (!eligibility.CanPublish) {
-            throw new DomainValidationException($"Post cannot be published because it does not meet all publishing requirements.\n - {string.Join("\n - ", eligibility.Reasons)}");
+            throw new IllegalOperationException($"Post cannot be published because it does not meet all publishing requirements.\n - {string.Join("\n - ", eligibility.Reasons)}");
         }
         Status = PostStatus.Published;
         DateLastPublished = DateTime.UtcNow;
@@ -163,15 +165,24 @@ public class Post {
 
     public void UnPublish() {
         if (Status != PostStatus.Published) {
-            throw new DomainValidationException("Post can only be unpublished if it is currently published.");
+            throw new IllegalOperationException("Post can only be unpublished if it is currently published.");
         }
         Status = PostStatus.Draft;
     }
 
-    public void ChangeFragmentPosition(int currentPosition, int newPosition) {
-        ValidatePositionChange(currentPosition, newPosition);
-        var fragment = _fragments.FirstOrDefault(f => f.Position == currentPosition);
-        if (newPosition < currentPosition) {
+    /// <summary>
+    /// RETURN FragmentPositionChangeResult and hand it over to repositorylayer to update the database
+    /// add version to both of post and fragment
+    /// </summary>
+    /// <param name="fragmentId"></param>
+    /// <param name="newPosition"></param>
+    public void ChangeFragmentPosition(int fragmentId, int newPosition) {
+        var fragment = _fragments.FirstOrDefault(f => f.FragmentId!.Value == fragmentId);
+        if (fragment == null) 
+            throw new InvalidArgumentException($"Post {PostId.Value} does not contain any fragment with id {fragmentId}.", nameof(fragmentId));
+
+        ValidatePositionChange(fragment.Position, newPosition);
+        if (newPosition < fragment.Position) {
             MoveFragmentUp(fragment!);
         } else {
             MoveFragmentDown(fragment!);
@@ -180,19 +191,19 @@ public class Post {
 
     private void ValidatePositionChange(int currentPosition, int newPosition) {
         if (currentPosition == newPosition)
-            throw new FragmentPositionException("New position must be different from the current position.");
+            throw new IllegalOperationException("New position must be different from the current position.");
 
         if (_fragments.Count <= 1)
-            throw new FragmentPositionException($"Cannot move fragment when {_fragments.Count} fragment exists.");
+            throw new IllegalOperationException($"Cannot move fragment when {_fragments.Count} fragment exists.");
 
         if (Math.Abs(currentPosition - newPosition) != 1)
-            throw new FragmentPositionException("Fragment can move by only one position at a time.");
+            throw new IllegalOperationException("Fragment can move by only one position at a time.");
 
         if (currentPosition < Fragment.MinPosition || currentPosition > _fragments.Count)
-            throw new FragmentPositionException($"Current position must be between {Fragment.MinPosition} and {_fragments.Count}.");
+            throw new IllegalOperationException($"Current position must be between {Fragment.MinPosition} and {_fragments.Count}.");
 
         if (newPosition < Fragment.MinPosition || newPosition > _fragments.Count)
-            throw new FragmentPositionException($"New position must be between {Fragment.MinPosition} and {_fragments.Count}.");
+            throw new IllegalOperationException($"Invalid fragment position {newPosition}.");
     }
 
     private void MoveFragmentUp(Fragment fragment) {

@@ -27,10 +27,9 @@ namespace ABCD.Domain.Tests
         [Fact]
         public void Constructor_ShouldThrow_WhenPostIdIsNull()
         {
-            var ex = Assert.Throws<DomainValidationException>(() => new Fragment(null!, FragmentType.RichText, 1));
-            Assert.Equal("PostId cannot be null.", ex.Message);
-            Assert.IsType<ArgumentNullException>(ex.InnerException);
-            Assert.Equal("postId", ((ArgumentNullException)ex.InnerException!).ParamName);
+            var ex = Assert.Throws<InvalidArgumentException>(() => new Fragment(null!, FragmentType.RichText, 1));
+            Assert.Equal("PostId cannot be null. (Parameter 'postId')", ex.Message);
+            Assert.Equal("postId", ex.ParamName);
         }
 
         [Theory]
@@ -39,8 +38,9 @@ namespace ABCD.Domain.Tests
         public void Constructor_ShouldThrow_WhenPositionIsLessThanMin(int position)
         {
             var postId = new PostId(3);
-            var ex = Assert.Throws<FragmentPositionException>(() => new Fragment(postId, FragmentType.RichText, position));
+            var ex = Assert.Throws<InvalidArgumentException>(() => new Fragment(postId, FragmentType.RichText, position));
             Assert.Contains("Position must be at least", ex.Message);
+            Assert.Equal("position", ex.ParamName);
         }
 
         [Fact]
@@ -57,7 +57,7 @@ namespace ABCD.Domain.Tests
         {
             var postId = new PostId(5);
             var fragment = new Fragment(postId, FragmentType.RichText, 1);
-            var ex = Assert.Throws<FragmentPositionException>(() => fragment.MoveUp());
+            var ex = Assert.Throws<IllegalOperationException>(() => fragment.MoveUp());
             Assert.Contains("Cannot move up. Position is already at minimum value", ex.Message);
         }
 
@@ -75,7 +75,7 @@ namespace ABCD.Domain.Tests
         {
             var postId = new PostId(7);
             var fragment = new Fragment(postId, FragmentType.RichText, 3);
-            var ex = Assert.Throws<FragmentPositionException>(() => fragment.MoveDown(3));
+            var ex = Assert.Throws<IllegalOperationException>(() => fragment.MoveDown(3));
             Assert.Contains("Cannot move down. Position is already at maximum value", ex.Message);
         }
 

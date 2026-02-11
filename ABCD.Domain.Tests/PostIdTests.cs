@@ -1,5 +1,3 @@
-using ABCD.Domain.Exceptions;
-
 namespace ABCD.Domain.Tests
 {
     public class PostIdTests
@@ -16,10 +14,8 @@ namespace ABCD.Domain.Tests
         [InlineData(-1)]
         public void PostId_InvalidValue_ShouldThrow(int value)
         {
-            var ex = Assert.Throws<DomainValidationException>(() => new PostId(value));
-            Assert.Equal("PostId must be greater than 0.", ex.Message);
-            Assert.IsType<ArgumentOutOfRangeException>(ex.InnerException);
-            Assert.Equal("value", ((ArgumentOutOfRangeException)ex.InnerException!).ParamName);
+            var ex = Assert.Throws<ArgumentOutOfRangeException>(() => new PostId(value));
+            Assert.Equal("Specified argument was out of the range of valid values. (Parameter 'PostId must be greater than 0.')", ex.Message);
         }
 
         [Fact]

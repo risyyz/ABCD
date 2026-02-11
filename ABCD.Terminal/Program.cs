@@ -12,7 +12,7 @@ var builder = CoconaApp.CreateBuilder();
 builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
 // Read the passphrase from the configuration
-var passphrase = builder.Configuration["CryptoService:Passphrase"] ?? throw new InvalidOperationException("Passphrase not found in configuration");
+var passphrase = builder.Configuration["CryptoService:Passphrase"] ?? throw new ArgumentException("Passphrase not found in configuration");
 
 // Register the CryptoService with the passphrase
 builder.Services.AddSingleton<ICryptoService>(provider => new CryptoService(passphrase));
