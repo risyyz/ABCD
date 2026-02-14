@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Post } from '../models/post.model'; 
 import { PostService } from '../../services/post.service';
 import { Fragment } from '../models/fragment.model';
+import { FragmentPositionChangeRequest } from '../models/fragment-position-change-request.model';
 
 @Component({
   selector: 'app-edit-post',
@@ -25,13 +26,19 @@ export class EditPostComponent implements OnInit {
     });
   }
 
-  onFragmentMoveUp(position: number) {
+  onFragmentMoveUp(fragmentId: number) {
     if (!this.post) return;
     const fragments = this.post.fragments;
-    const index = fragments.findIndex(f => f.position === position);
+    const index = fragments.findIndex(f => f.fragmentId === fragmentId);
     if (index > 0) {
-      const newPosition = fragments[index - 1].position;
-      this.postService.updateFragmentPosition(this.post.postId, position, newPosition)
+      const fragment = fragments[index];
+      const request: FragmentPositionChangeRequest = {
+        postId: this.post.postId,
+        fragmentId: fragmentId,
+        newPosition: fragment.position - 1,
+        version: this.post.version
+      };
+      this.postService.updateFragmentPosition(request)
         .subscribe(() => {
           // Swap positions in the UI after successful API call
           [fragments[index - 1].position, fragments[index].position] = [fragments[index].position, fragments[index - 1].position];
@@ -40,13 +47,19 @@ export class EditPostComponent implements OnInit {
     }
   }
 
-  onFragmentMoveDown(position: number) {
+  onFragmentMoveDown(fragmentId: number) {
     if (!this.post) return;
     const fragments = this.post.fragments;
-    const index = fragments.findIndex(f => f.position === position);
+    const index = fragments.findIndex(f => f.fragmentId === fragmentId);
     if (index !== -1 && index < fragments.length - 1) {
-      const newPosition = fragments[index + 1].position;
-      this.postService.updateFragmentPosition(this.post.postId, position, newPosition)
+      const fragment = fragments[index];
+      const request: FragmentPositionChangeRequest = {
+        postId: this.post.postId,
+        fragmentId: fragmentId,
+        newPosition: fragment.position + 1,
+        version: this.post.version
+      };
+      this.postService.updateFragmentPosition(request)
         .subscribe(() => {
           [fragments[index + 1].position, fragments[index].position] = [fragments[index].position, fragments[index + 1].position];
           fragments.sort((a, b) => a.position - b.position);

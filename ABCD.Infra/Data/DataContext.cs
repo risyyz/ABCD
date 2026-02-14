@@ -57,6 +57,9 @@ namespace ABCD.Infra.Data {
                 entity.Property(e => e.CreatedDate).IsRequired();
                 entity.Property(e => e.UpdatedBy).IsRequired().HasMaxLength(450);
                 entity.Property(e => e.UpdatedDate).IsRequired();
+                entity.Property(e => e.Version)
+                      .IsRowVersion()
+                      .IsRequired();
             });
 
             modelBuilder.Entity<FragmentRecord>(entity => {

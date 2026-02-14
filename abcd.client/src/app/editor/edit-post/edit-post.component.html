@@ -35,7 +35,7 @@
               </div>
             </app-editable-generic>
             <ng-container *ngFor="let fragment of post.fragments">
-              <app-editable-fragment #editableFragmentComp [position]="fragment.position" [fragmentCount]="post.fragments.length" [highlight]="fragment.highlight"
+              <app-editable-fragment #editableFragmentComp [fragmentId]="fragment.fragmentId" [position]="fragment.position" [fragmentCount]="post.fragments.length" [highlight]="fragment.highlight"
                                     (fragmentMoveUp)="onFragmentMoveUp($event)"
                                     (fragmentMoveDown)="onFragmentMoveDown($event)"
                                     (fragmentSave)="onFragmentSave($event)">

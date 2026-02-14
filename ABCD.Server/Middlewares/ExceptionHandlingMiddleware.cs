@@ -18,7 +18,9 @@ namespace ABCD.Server.Middlewares {
             { typeof(RequestContextException), StatusCodes.Status401Unauthorized },
             { typeof(SignInFailedException), StatusCodes.Status401Unauthorized },            
 
-            { typeof(BlogNotFoundException), StatusCodes.Status404NotFound }
+            { typeof(BlogNotFoundException), StatusCodes.Status404NotFound },
+
+            { typeof(VersionConflictException),StatusCodes.Status409Conflict }
         };
 
         public ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger) {

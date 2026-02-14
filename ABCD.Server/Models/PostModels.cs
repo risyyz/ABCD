@@ -13,14 +13,17 @@ namespace ABCD.Server.Models
         public string Status { get; init; } = string.Empty;
         public string? PathSegment { get; init; }
         public DateTime? DateLastPublished { get; init; }
+        public string Version { get; init; } = string.Empty;
     }
 
     public record FragmentResponse
     {
+        public int FragmentId { get; init; }
         public string FragmentType { get; init; } = string.Empty;
         public string Content { get; init; } = string.Empty;
         public int Position { get; init; }
         public bool? Active { get; init; }
+        public string Version { get; init; } = string.Empty;
     }
 
     public record PostDetailResponse {
@@ -33,6 +36,7 @@ namespace ABCD.Server.Models
         public DateTime? DateLastPublished { get; init; }
         public DateTime DateCreated { get; init; }
         public DateTime DateModified { get; init; }
+        public string Version { get; init; } = string.Empty;
         public List<FragmentResponse> Fragments { get; init; } = new();
     }
 

@@ -1,4 +1,3 @@
-
 using ABCD.Domain;
 using Microsoft.EntityFrameworkCore;
 
@@ -61,7 +60,10 @@ namespace ABCD.Infra.Data {
                     fragments.Add(MapToDomain(fragmentRecord));
                 }
             }
-            var post = new Post(new BlogId(record.BlogId), new PostId(record.PostId), record.Title, (PostStatus)record.Status, null, fragments);            
+            var post = new Post(new BlogId(record.BlogId), new PostId(record.PostId), 
+                                record.Title, (PostStatus)record.Status, null, fragments) { 
+                Version = new VersionToken(record.Version) 
+            };            
             return post;
         }
 
@@ -76,15 +78,88 @@ namespace ABCD.Infra.Data {
 
         // Map domain model to EF record
         private PostRecord MapToRecord(Post post) {
-            // TODO: Map all required fields and relationships
             return new PostRecord {
                 PostId = post.PostId?.Value ?? 0,
                 BlogId = post.BlogId.Value,
                 Title = post.Title,
                 Status = post.Status,
                 PathSegment = post.PathSegment?.Value,
-                //DateLastPublished = post.DateLastPublished.HasValue ? post.DateLastPublished.Value : null                
+                Version = post.Version?.Value ?? Array.Empty<byte>(),
+                Fragments = post.Fragments.Select(MapToRecord).ToList()
             };
+        }
+
+        private FragmentRecord MapToRecord(Fragment fragment) {
+            return new FragmentRecord {
+                FragmentId = fragment.FragmentId?.Value ?? 0,
+                PostId = fragment.PostId.Value,
+                Position = fragment.Position,
+                Content = fragment.Content ?? string.Empty,
+                FragmentType = fragment.FragmentType
+            };
+        }
+
+        public async Task<Post> UpdateFragmentPositionAsync(Post post, IEnumerable<Fragment> fragments) {
+            var utcNow = DateTime.UtcNow;
+            using var transaction = await _context.Database.BeginTransactionAsync();
+
+            var fragmentList = fragments.ToList();
+            if (fragmentList.Count == 2) {
+                var first = fragmentList[0];
+                var second = fragmentList[1];
+
+                // Step 1: Set the first fragment's position to a temporary value
+                var trackedFirst = await _context.Fragments.FindAsync(first.FragmentId!.Value);
+                if (trackedFirst != null) {
+                    trackedFirst.Position = -1;
+                    trackedFirst.UpdatedDate = utcNow;
+                    _context.Entry(trackedFirst).Property(f => f.Position).IsModified = true;
+                    _context.Entry(trackedFirst).Property(f => f.UpdatedDate).IsModified = true;
+                }
+                await _context.SaveChangesAsync();
+
+                // Step 2: Set the second fragment's position to the first's original position
+                var trackedSecond = await _context.Fragments.FindAsync(second.FragmentId!.Value);
+                if (trackedSecond != null) {
+                    trackedSecond.Position = first.Position;
+                    trackedSecond.UpdatedDate = utcNow;
+                    _context.Entry(trackedSecond).Property(f => f.Position).IsModified = true;
+                    _context.Entry(trackedSecond).Property(f => f.UpdatedDate).IsModified = true;
+                }
+                await _context.SaveChangesAsync();
+
+                // Step 3: Set the first fragment's position to the second's original position
+                if (trackedFirst != null) {
+                    trackedFirst.Position = second.Position;
+                    trackedFirst.UpdatedDate = utcNow;
+                    _context.Entry(trackedFirst).Property(f => f.Position).IsModified = true;
+                    _context.Entry(trackedFirst).Property(f => f.UpdatedDate).IsModified = true;
+                }
+                await _context.SaveChangesAsync();
+            } else {
+                foreach (var fragment in fragments) {
+                    var tracked = await _context.Fragments.FindAsync(fragment.FragmentId!.Value);
+                    if (tracked != null) {
+                        tracked.Position = fragment.Position;
+                        tracked.UpdatedDate = utcNow;
+                        _context.Entry(tracked).Property(f => f.Position).IsModified = true;
+                        _context.Entry(tracked).Property(f => f.UpdatedDate).IsModified = true;
+                    }
+                }
+                await _context.SaveChangesAsync();
+            }
+
+            // Update the post's last updated date
+            var trackedPost = await _context.Posts.FindAsync(post.PostId!.Value);
+            if (trackedPost != null) {
+                trackedPost.UpdatedDate = utcNow;
+                _context.Entry(trackedPost).Property(p => p.UpdatedDate).IsModified = true;
+            }
+            await _context.SaveChangesAsync();
+
+            await transaction.CommitAsync();
+
+            return await GetByPostIdAsync(post.BlogId!.Value, post.PostId!.Value);
         }
     }
 }

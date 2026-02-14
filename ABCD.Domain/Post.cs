@@ -3,6 +3,7 @@ using ABCD.Domain.Exceptions;
 namespace ABCD.Domain;
 
 public class Post {
+    public VersionToken? Version { get; set; }
     public BlogId BlogId { get; private set; }
     public PostId? PostId { get; private set; }
     public PostStatus Status { get; private set; }
@@ -46,7 +47,7 @@ public class Post {
                 }
             }
             _parent = value;
-        }
+        } 
     }
 
     public Post(BlogId blogId, string title)
@@ -176,17 +177,19 @@ public class Post {
     /// </summary>
     /// <param name="fragmentId"></param>
     /// <param name="newPosition"></param>
-    public void ChangeFragmentPosition(int fragmentId, int newPosition) {
+    public IEnumerable<Fragment> ChangeFragmentPosition(int fragmentId, int newPosition) {
         var fragment = _fragments.FirstOrDefault(f => f.FragmentId!.Value == fragmentId);
-        if (fragment == null) 
+        if (fragment == null)
             throw new ArgumentException($"Post {PostId.Value} does not contain any fragment with id {fragmentId}.", nameof(fragmentId));
 
         ValidatePositionChange(fragment.Position, newPosition);
+        Fragment? impacted = null;
         if (newPosition < fragment.Position) {
-            MoveFragmentUp(fragment!);
+            impacted = MoveFragmentUp(fragment!);
         } else {
-            MoveFragmentDown(fragment!);
+            impacted = MoveFragmentDown(fragment!);
         }
+        return impacted != null ? new[] { fragment, impacted } : new[] { fragment };
     }
 
     private void ValidatePositionChange(int currentPosition, int newPosition) {
@@ -206,19 +209,24 @@ public class Post {
             throw new IllegalOperationException($"Invalid fragment position {newPosition}.");
     }
 
-    private void MoveFragmentUp(Fragment fragment) {
-        
-        var prevFragment = _fragments.First(f => f.Position == fragment.Position - 1);
-        prevFragment.MoveDown(_fragments.Count);
-        fragment.MoveUp();
-        _fragments.Sort((a, b) => a.Position.CompareTo(b.Position));
+    private Fragment? MoveFragmentUp(Fragment fragment) {
+        var prevFragment = _fragments.FirstOrDefault(f => f.Position == fragment.Position - 1);
+        if (prevFragment != null) {
+            prevFragment.MoveDown(_fragments.Count);
+            fragment.MoveUp();
+            _fragments.Sort((a, b) => a.Position.CompareTo(b.Position));
+        }
+        return prevFragment;
     }
 
-    private void MoveFragmentDown(Fragment fragment) {
-        var nextFragment = _fragments.First(f => f.Position == fragment.Position + 1);
-        nextFragment.MoveUp();
-        fragment.MoveDown(_fragments.Count);
-        _fragments.Sort((a, b) => a.Position.CompareTo(b.Position));
+    private Fragment? MoveFragmentDown(Fragment fragment) {
+        var nextFragment = _fragments.FirstOrDefault(f => f.Position == fragment.Position + 1);
+        if (nextFragment != null) {
+            nextFragment.MoveUp();
+            fragment.MoveDown(_fragments.Count);
+            _fragments.Sort((a, b) => a.Position.CompareTo(b.Position));
+        }
+        return nextFragment;
     }
 
     private bool ContainsWord(string input) {

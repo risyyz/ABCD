@@ -12,7 +12,7 @@ public enum FragmentType
 }
 
 public class Fragment 
-{
+{    
     public static readonly int MinPosition = 1;
     public FragmentId? FragmentId { get; }
     public PostId PostId { get; }

@@ -18,6 +18,7 @@ export class EditableFragmentComponent implements AfterContentInit {
   @ContentChild(ImageFragmentComponent) imageFragmentComp?: IFragmentComponent;
   @ContentChild(TableFragmentComponent) tableFragmentComp?: IFragmentComponent;
 
+  @Input() fragmentId!: number;
   @Input() position!: number;
   @Input() fragmentCount!: number;
   @Input() highlight: boolean = false;
@@ -53,13 +54,13 @@ export class EditableFragmentComponent implements AfterContentInit {
   }
 
   onMoveUp() {
-    console.log("moving up" + this.position);
-    this.fragmentMoveUp.emit(this.position);
+    console.log("moving up " + this.fragmentId);
+    this.fragmentMoveUp.emit(this.fragmentId);
   }
 
   onMoveDown() {
-    console.log("moving down" + this.position);
-    this.fragmentMoveDown.emit(this.position);
+    console.log("moving down " + this.fragmentId);
+    this.fragmentMoveDown.emit(this.fragmentId);
   }
 
 

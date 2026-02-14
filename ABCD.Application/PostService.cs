@@ -50,10 +50,12 @@ namespace ABCD.Application {
             var post =  await _postRepository.GetByPostIdAsync(_requestContext.Blog.BlogId.Value!, command.PostId);
             if (post == null) throw new PostNotFoundException($"Post {command.PostId} does not exist.");
 
-            post.ChangeFragmentPosition(command.FragmentId, command.NewPosition);
+            // Version check
+            if (!string.IsNullOrWhiteSpace(command.Version) && post.Version != null && !string.Equals(command.Version, post.Version.AsBase64, StringComparison.Ordinal))
+                throw new VersionConflictException("The resource was updated by another process. Please reload and try again.");
 
-            //await _postRepository.
-            return post;
+            var impactedFragments = post.ChangeFragmentPosition(command.FragmentId, command.NewPosition);
+            return await _postRepository.UpdateFragmentPositionAsync(post, impactedFragments);
         }
     }
 }

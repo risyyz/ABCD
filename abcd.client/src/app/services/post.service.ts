@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Post } from '../editor/models/post.model'; // adjust path as needed
+import { Post } from '../editor/models/post.model'; 
+import { FragmentPositionChangeRequest } from '../editor/models/fragment-position-change-request.model'; 
 
 @Injectable({ providedIn: 'root' })
 export class PostService {
@@ -15,9 +16,11 @@ export class PostService {
     return this.http.get<Post>(`/api/posts/${postId}`);
   }
 
-  updateFragmentPosition(postId: number, position: number, newPosition: number) {
-    return this.http.put(`/api/posts/${postId}/fragments/${position}/position`, { newPosition });
+  updateFragmentPosition(request: FragmentPositionChangeRequest) {
+    return this.http.patch(
+      `/api/posts/${request.postId}/fragments/${request.fragmentId}/position`,
+      { newPosition: request.newPosition, version: request.version }
+    );
   }
-
   // You can add more methods for create, update, delete as needed
 }

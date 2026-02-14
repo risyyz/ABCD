@@ -7,6 +7,7 @@ export class Post {
   dateLastPublished?: string;
   pathSegment?: string;
   synopsis?: string;
+  version: string = '';
   fragments: Fragment[] = [];
 
   constructor(postId: number, title: string, status: 'Draft' | 'Published') {

@@ -51,23 +51,6 @@ namespace ABCD.Server.Controllers
             return Ok(response);
         }
 
-        [HttpPut("{postId:int}/fragments/{fragmentId:int}/position")]
-        public async Task<IActionResult> UpdateFragmentPosition(
-            [FromRoute] int postId,
-            [FromRoute] int fragmentId,
-            [FromBody][Required] FragmentChangePositionRequest request)
-        {
-            // Validate input
-            if (request == null || request.NewPosition <= 0)
-                return BadRequest("Invalid new position.");
-
-            var result = await _postService.UpdateFragmentPositionAsync(new ChangeFragmentPositionCommand(postId, fragmentId, request.NewPosition));
-            //if (!result)
-            //    return NotFound("Fragment not found or could not update position.");
-
-            return NoContent();
-        }
-
         // 1. Create post
         [HttpPost("create")]
         public IActionResult CreatePost([FromBody] object request)
@@ -105,9 +88,19 @@ namespace ABCD.Server.Controllers
 
         // 6. Change fragment position
         [HttpPatch("{postId:int}/fragments/{fragmentId:int}/position")]
-        public IActionResult ChangeFragmentPosition(int postId, int fragmentId, [FromBody] object request)
-        {
-            throw new NotImplementedException();
+        public async Task<IActionResult> UpdateFragmentPosition(
+            [FromRoute] int postId,
+            [FromRoute] int fragmentId,
+            [FromBody][Required] FragmentChangePositionRequest request) {
+            // Validate input
+            if (request == null || request.NewPosition <= 0)
+                return BadRequest("Invalid new position.");
+
+            var result = await _postService.UpdateFragmentPositionAsync(new ChangeFragmentPositionCommand(postId, fragmentId, request.NewPosition, request.Version));
+            //if (!result)
+            //    return NotFound("Fragment not found or could not update position.");
+
+            return NoContent();
         }
 
         // 7. Delete fragment
