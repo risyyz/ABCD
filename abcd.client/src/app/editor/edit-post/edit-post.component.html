@@ -41,10 +41,16 @@
               </div>
             </app-editable-generic>
             <ng-container *ngFor="let fragment of post.fragments">
-              <app-editable-fragment #editableFragmentComp [fragmentId]="fragment.fragmentId" [position]="fragment.position" [fragmentCount]="post.fragments.length" [highlight]="fragment.highlight"
-                                    (fragmentMoveUp)="onFragmentMoveUp($event)"
-                                    (fragmentMoveDown)="onFragmentMoveDown($event)"
-                                    (fragmentSave)="onFragmentSave($event)">
+              <app-editable-fragment #editableFragmentComp
+                                     [fragmentId]="fragment.fragmentId"
+                                     [position]="fragment.position"
+                                     [fragmentCount]="post.fragments.length"
+                                     [highlight]="fragment.highlight"
+                                     [addFragmentDropdownOpen]="activeAddFragmentDropdownId === fragment.fragmentId"
+                                     (fragmentMoveUp)="onFragmentMoveUp($event)"
+                                     (fragmentMoveDown)="onFragmentMoveDown($event)"
+                                     (fragmentSave)="onFragmentSave($event)"
+                                     (addFragmentDropdownOpenChange)="activeAddFragmentDropdownId = $event">
 
                 <app-code-fragment *ngIf="fragment.fragmentType === 'Code'" [fragment]="fragment"></app-code-fragment>
                 <app-image-fragment *ngIf="fragment.fragmentType === 'Image'" [fragment]="fragment"></app-image-fragment>

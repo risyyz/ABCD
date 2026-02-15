@@ -15,6 +15,26 @@
         <i class="fas fa-chevron-down"></i>
       </span>
     </button>
+    <!-- Add Fragment Dropdown (click to open) -->
+    <div class="dropdown add-fragment-dropdown" [class.is-active]="addFragmentDropdownOpen">
+      <div class="dropdown-trigger">
+        <button type="button" class="button" aria-haspopup="true" aria-controls="dropdown-menu" title="Add Fragment"
+                (click)="onAddDropdownButtonClick($event)">
+          <span class="icon"><i class="fas fa-plus"></i></span>
+          <span class="icon is-small">
+            <i class="fas fa-angle-down" aria-hidden="true"></i>
+          </span>
+        </button>
+      </div>
+      <div class="dropdown-menu" id="dropdown-menu" role="menu">
+        <div class="dropdown-content">
+          <a class="dropdown-item" (click)="onAddFragment('Code'); addFragmentDropdownOpen = false;">Code</a>
+          <a class="dropdown-item" (click)="onAddFragment('Image'); addFragmentDropdownOpen = false;">Image</a>
+          <a class="dropdown-item" (click)="onAddFragment('RichText'); addFragmentDropdownOpen = false;">Rich Text</a>
+          <a class="dropdown-item" (click)="onAddFragment('Table'); addFragmentDropdownOpen = false;">Table</a>
+        </div>
+      </div>
+    </div>
   </div>
   <div class="editable-actions" *ngIf="isEditing">
     <button type="button" class="button is-dark-grey" (click)="onSave()" title="Save">

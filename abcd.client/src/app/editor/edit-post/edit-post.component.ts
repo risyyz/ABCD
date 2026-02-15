@@ -14,6 +14,7 @@ import { FragmentPositionChangeRequest } from '../models/fragment-position-chang
 export class EditPostComponent implements OnInit {
   post: Post | null = null;
   errorMessage: string | null = null;
+  activeAddFragmentDropdownId: number | null = null;
 
   constructor(
     private route: ActivatedRoute,
