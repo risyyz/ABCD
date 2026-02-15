@@ -7,12 +7,12 @@
     </button>
     <button type="button" class="button" (click)="onMoveUp()" title="Move Up" *ngIf="position > 1">
       <span class="icon">
-        <i class="fas fa-chevron-up"></i>
+        <i class="fas fa-arrow-up"></i>
       </span>
     </button>
     <button type="button" class="button" (click)="onMoveDown()" title="Move Down" *ngIf="position < fragmentCount"> 
       <span class="icon">
-        <i class="fas fa-chevron-down"></i>
+        <i class="fas fa-arrow-down"></i>
       </span>
     </button>
     <!-- Add Fragment Dropdown (click to open) -->
@@ -20,10 +20,7 @@
       <div class="dropdown-trigger">
         <button type="button" class="button" aria-haspopup="true" aria-controls="dropdown-menu" title="Add Fragment"
                 (click)="onAddDropdownButtonClick($event)">
-          <span class="icon"><i class="fas fa-plus"></i></span>
-          <span class="icon is-small">
-            <i class="fas fa-angle-down" aria-hidden="true"></i>
-          </span>
+          <span class="icon"><i class="fas fa-plus"></i>...</span>
         </button>
       </div>
       <div class="dropdown-menu" id="dropdown-menu" role="menu">
