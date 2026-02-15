@@ -51,7 +51,7 @@ namespace ABCD.Application {
             if (post == null) throw new PostNotFoundException($"Post {command.PostId} does not exist.");
 
             // Version check
-            if (!string.IsNullOrWhiteSpace(command.Version) && post.Version != null && !string.Equals(command.Version, post.Version.AsBase64, StringComparison.Ordinal))
+            if (!string.IsNullOrWhiteSpace(command.Version) && post.Version != null && !string.Equals(command.Version, post.Version.HexString, StringComparison.Ordinal))
                 throw new VersionConflictException("The resource was updated by another process. Please reload and try again.");
 
             var impactedFragments = post.ChangeFragmentPosition(command.FragmentId, command.NewPosition);

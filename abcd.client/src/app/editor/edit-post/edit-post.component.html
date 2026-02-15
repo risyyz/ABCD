@@ -10,8 +10,11 @@
         <div class="box">
           <div class="content">
             <div class="is-flex is-justify-content-flex-end" style="margin-bottom: 1rem;">
-              <span class="has-text-right has-text-grey" *ngIf="post.dateLastPublished">
-                Last published on {{ post.dateLastPublished }}
+              <span class="has-text-right has-text-grey">
+                <span *ngIf="post.dateLastPublished">
+                  Last published on {{ post.dateLastPublished }}
+                </span>
+                <span class="is-size-7" *ngIf="post.version">v{{ post.version }}</span>                
               </span>
             </div>
             <app-editable-generic>

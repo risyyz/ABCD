@@ -19,32 +19,37 @@ namespace ABCD.Domain.Tests
         }
 
         [Fact]
-        public void Constructor_WithBase64String_SetsValue()
+        public void Constructor_WithHexString_SetsValue()
         {
             var bytes = new byte[] { 10, 20, 30, 40 };
-            var base64 = Convert.ToBase64String(bytes);
-            var token = new VersionToken(base64);
+            var hex = "0x0A141E28";
+            var token = new VersionToken(hex);
             Assert.Equal(bytes, token.Value);
         }
 
         [Fact]
-        public void Constructor_WithNullOrEmptyBase64_SetsEmptyArray()
+        public void Constructor_WithNullOrEmptyOrInvalidHexString_ThrowsOrSetsEmptyArray()
         {
+            // Null, empty, or whitespace should result in empty array
             var token1 = new VersionToken((string)null!);
             var token2 = new VersionToken("");
             var token3 = new VersionToken("   ");
             Assert.Empty(token1.Value);
             Assert.Empty(token2.Value);
             Assert.Empty(token3.Value);
+
+            // Odd-length hex string should throw
+            Assert.Throws<ArgumentException>(() => new VersionToken("0x123"));
+            Assert.Throws<ArgumentException>(() => new VersionToken("123"));
         }
 
         [Fact]
-        public void AsBase64_ReturnsCorrectBase64String()
+        public void HexString_ReturnsCorrectHexString()
         {
             var bytes = new byte[] { 5, 6, 7, 8 };
             var token = new VersionToken(bytes);
-            var expected = Convert.ToBase64String(bytes);
-            Assert.Equal(expected, token.AsBase64);
+            var expected = "0x05060708";
+            Assert.Equal(expected, token.HexString);
         }
 
         [Fact]

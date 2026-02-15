@@ -7,6 +7,7 @@ using ABCD.Server.Models;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Hosting;
 
 namespace ABCD.Server.Controllers
 {
@@ -96,11 +97,9 @@ namespace ABCD.Server.Controllers
             if (request == null || request.NewPosition <= 0)
                 return BadRequest("Invalid new position.");
 
-            var result = await _postService.UpdateFragmentPositionAsync(new ChangeFragmentPositionCommand(postId, fragmentId, request.NewPosition, request.Version));
-            //if (!result)
-            //    return NotFound("Fragment not found or could not update position.");
-
-            return NoContent();
+            var updatedPost = await _postService.UpdateFragmentPositionAsync(new ChangeFragmentPositionCommand(postId, fragmentId, request.NewPosition, request.Version));
+            var response = _typeMapper.Map<Post, PostDetailResponse>(updatedPost);
+            return Ok(response);
         }
 
         // 7. Delete fragment

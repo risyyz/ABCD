@@ -121,7 +121,7 @@ namespace ABCD.Infra.Data {
                 // Step 2: Set the second fragment's position to the first's original position
                 var trackedSecond = await _context.Fragments.FindAsync(second.FragmentId!.Value);
                 if (trackedSecond != null) {
-                    trackedSecond.Position = first.Position;
+                    trackedSecond.Position = second.Position;
                     trackedSecond.UpdatedDate = utcNow;
                     _context.Entry(trackedSecond).Property(f => f.Position).IsModified = true;
                     _context.Entry(trackedSecond).Property(f => f.UpdatedDate).IsModified = true;
@@ -130,24 +130,13 @@ namespace ABCD.Infra.Data {
 
                 // Step 3: Set the first fragment's position to the second's original position
                 if (trackedFirst != null) {
-                    trackedFirst.Position = second.Position;
+                    trackedFirst.Position = first.Position;
                     trackedFirst.UpdatedDate = utcNow;
                     _context.Entry(trackedFirst).Property(f => f.Position).IsModified = true;
                     _context.Entry(trackedFirst).Property(f => f.UpdatedDate).IsModified = true;
                 }
                 await _context.SaveChangesAsync();
-            } else {
-                foreach (var fragment in fragments) {
-                    var tracked = await _context.Fragments.FindAsync(fragment.FragmentId!.Value);
-                    if (tracked != null) {
-                        tracked.Position = fragment.Position;
-                        tracked.UpdatedDate = utcNow;
-                        _context.Entry(tracked).Property(f => f.Position).IsModified = true;
-                        _context.Entry(tracked).Property(f => f.UpdatedDate).IsModified = true;
-                    }
-                }
-                await _context.SaveChangesAsync();
-            }
+            } 
 
             // Update the post's last updated date
             var trackedPost = await _context.Posts.FindAsync(post.PostId!.Value);

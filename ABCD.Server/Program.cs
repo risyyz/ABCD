@@ -131,7 +131,7 @@ config.NewConfig<Post, PostSummaryResponse>()
     .Map(dest => dest.PathSegment, src => src.PathSegment != null ? src.PathSegment : null )
     .Map(dest => dest.PostId, src => src.PostId != null ? src.PostId.Value : 0)
     .Map(dest => dest.BlogId, src => src.BlogId.Value)
-    .Map(dest => dest.Version, src => src.Version != null ? src.Version.AsBase64 : null);
+    .Map(dest => dest.Version, src => src.Version != null ? src.Version.HexString : null);
 
 config.NewConfig<Fragment, FragmentResponse>()
     .Map(dest => dest.FragmentId, src => src.FragmentId != null ? src.FragmentId.Value : 0)
@@ -144,7 +144,7 @@ config.NewConfig<Post, PostDetailResponse>()
     .Map(dest => dest.BlogId, src => src.BlogId.Value)
     .Map(dest => dest.Status, src => src.Status.ToString())
     .Map(dest => dest.PathSegment, src => src.PathSegment != null ? src.PathSegment.Value : null)
-    .Map(dest => dest.Version, src => src.Version != null ? src.Version.AsBase64 : null)
+    .Map(dest => dest.Version, src => src.Version != null ? src.Version.HexString : null)
     .Map(dest => dest.Fragments, src => src.Fragments.Adapt<List<FragmentResponse>>());
 
 // Register the config and mapper

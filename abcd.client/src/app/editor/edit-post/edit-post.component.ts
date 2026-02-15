@@ -39,10 +39,8 @@ export class EditPostComponent implements OnInit {
         version: this.post.version
       };
       this.postService.updateFragmentPosition(request)
-        .subscribe(() => {
-          // Swap positions in the UI after successful API call
-          [fragments[index - 1].position, fragments[index].position] = [fragments[index].position, fragments[index - 1].position];
-          fragments.sort((a, b) => a.position - b.position);
+        .subscribe((updatedPost: Post) => {
+          this.post = updatedPost;
         });
     }
   }
@@ -60,9 +58,8 @@ export class EditPostComponent implements OnInit {
         version: this.post.version
       };
       this.postService.updateFragmentPosition(request)
-        .subscribe(() => {
-          [fragments[index + 1].position, fragments[index].position] = [fragments[index].position, fragments[index + 1].position];
-          fragments.sort((a, b) => a.position - b.position);
+        .subscribe((updatedPost: Post) => {
+          this.post = updatedPost;
         });
     }
   }

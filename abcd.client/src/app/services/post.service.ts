@@ -16,8 +16,8 @@ export class PostService {
     return this.http.get<Post>(`/api/posts/${postId}`);
   }
 
-  updateFragmentPosition(request: FragmentPositionChangeRequest) {
-    return this.http.patch(
+  updateFragmentPosition(request: FragmentPositionChangeRequest): Observable<Post> {
+    return this.http.patch<Post>(
       `/api/posts/${request.postId}/fragments/${request.fragmentId}/position`,
       { newPosition: request.newPosition, version: request.version }
     );
