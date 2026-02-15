@@ -29,6 +29,7 @@ namespace ABCD.Application.Tests {
             Assert.Equal("path-segment", result.PathSegment.Value);
         }
 
+
         [Fact]
         public async Task CreatePostAsync_ThrowsDuplicatePostTitleException_WhenTitleExists() {
             var command = new CreatePostCommand("Title", "path-segment");
@@ -61,6 +62,57 @@ namespace ABCD.Application.Tests {
             var result = await service.GetAllAsync();
 
             Assert.Equal(2, ((List<Post>)result).Count);
+        }
+
+        [Fact]
+        public async Task UpdateFragmentPositionAsync_ThrowsPostNotFoundException_WhenPostDoesNotExist() {
+            var command = new ChangeFragmentPositionCommand(999, 1, 1, "11");
+            _postRepoMock.Setup(r => r.GetByPostIdAsync(1, 999)).ReturnsAsync((Post)null);
+            var service = new PostService(_context, _postRepoMock.Object, _blogRepoMock.Object);
+            await Assert.ThrowsAsync<PostNotFoundException>(() => service.UpdateFragmentPositionAsync(command));
+        }
+
+        [Fact]
+        public async Task UpdateFragmentPositionAsync_ThrowsVersionConflictException_WhenPostVersionDoesNotMatch() {
+            var command = new ChangeFragmentPositionCommand(999, 1, 1, "11");
+            _postRepoMock.Setup(r => r.GetByPostIdAsync(1, 999)).ReturnsAsync(new Post(new BlogId(1), "Title") { Version = new VersionToken("22") });
+            var service = new PostService(_context, _postRepoMock.Object, _blogRepoMock.Object);
+            await Assert.ThrowsAsync<VersionConflictException>(() => service.UpdateFragmentPositionAsync(command));
+        }
+
+        [Fact]
+        public async Task AddFragmentAsync_ThrowsPostNotFoundException_WhenPostDoesNotExist() {
+            var command = new AddFragmentCommand(999, 1, FragmentType.Code, "11");
+            _postRepoMock.Setup(r => r.GetByPostIdAsync(1, 999)).ReturnsAsync((Post)null);
+            var service = new PostService(_context, _postRepoMock.Object, _blogRepoMock.Object);
+            await Assert.ThrowsAsync<PostNotFoundException>(() => service.AddFragmentAsync(command));
+        }
+
+        [Fact]
+        public async Task AddFragmentAsync_ThrowsVersionConflictException_WhenPostVersionDoesNotMatch() {
+            var command = new AddFragmentCommand(999, 1, FragmentType.Code, "11");
+            _postRepoMock.Setup(r => r.GetByPostIdAsync(1, 999)).ReturnsAsync(new Post(new BlogId(1), "Title") { Version = new VersionToken("22") });
+            var service = new PostService(_context, _postRepoMock.Object, _blogRepoMock.Object);
+            await Assert.ThrowsAsync<VersionConflictException>(() => service.AddFragmentAsync(command));
+        }
+
+        [Fact]
+        public async Task AddFragmentAsync_ThrowsArgumentException_WhenFragmentDoesNotExist() {
+            var command = new AddFragmentCommand(999, 1, FragmentType.Code, "0x11");
+            _postRepoMock.Setup(r => r.GetByPostIdAsync(1, 999)).ReturnsAsync(new Post(new BlogId(1), "Title") { Version = new VersionToken("11") });
+            var service = new PostService(_context, _postRepoMock.Object, _blogRepoMock.Object);
+            var ex = await Assert.ThrowsAsync<ArgumentException>(() => service.AddFragmentAsync(command));
+            Assert.Equal("No fragment with id 1 exists in this post. (Parameter 'fragmentId')", ex.Message);
+        }
+
+        [Fact]
+        public async Task AddFragmentAsync_SavesToDB() {
+            var command = new AddFragmentCommand(999, 1, FragmentType.Code, "0x11");
+            var fragments = new List<Fragment> { new Fragment(new FragmentId(1), new PostId(999), FragmentType.Heading, 1) };
+            _postRepoMock.Setup(r => r.GetByPostIdAsync(1, 999)).ReturnsAsync(new Post(new BlogId(1), new PostId(999), "Title", PostStatus.Draft, fragments: fragments) { Version = new VersionToken("11") });
+            var service = new PostService(_context, _postRepoMock.Object, _blogRepoMock.Object);
+            await service.AddFragmentAsync(command);
+            _postRepoMock.Verify(r => r.UpdatePostAsync(It.IsAny<Post>()), Times.Once);
         }
     }
 }
