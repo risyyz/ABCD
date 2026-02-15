@@ -187,13 +187,12 @@ namespace ABCD.Domain.Tests
             var blogId = new BlogId(1);
             var postId = new PostId(1);
             var post = new Post(blogId, postId, "Title", PostStatus.Draft);
-            post.AddFragment(FragmentType.RichText, "First");
-            post.AddFragment(FragmentType.RichText, "Second");
-            post.AddFragment(FragmentType.RichText, "Third");
+            post.AddFragment(FragmentType.RichText);
+            post.AddFragment(FragmentType.RichText);
+            post.AddFragment(FragmentType.RichText);
 
             Assert.Equal(3, post.Fragments.Count);
             Assert.Equal(new[] {1, 2, 3}, post.Fragments.Select(f => f.Position));
-            Assert.Equal("Third", post.Fragments.Last().Content);
         }
 
         [Fact]
@@ -202,20 +201,20 @@ namespace ABCD.Domain.Tests
             var blogId = new BlogId(2);
             var postId = new PostId(2);
             var post = new Post(blogId, postId, "Title", PostStatus.Draft);
-            post.AddFragment(FragmentType.RichText, "First"); // pos 1
-            post.AddFragment(FragmentType.RichText, "Second"); // pos 2
-            post.AddFragment(FragmentType.RichText, "Third"); // pos 3
+            post.AddFragment(FragmentType.RichText); // pos 1
+            post.AddFragment(FragmentType.Code); // pos 2
+            post.AddFragment(FragmentType.Table); // pos 3
 
-            post.AddFragment(FragmentType.RichText, "Inserted", 2); // Insert at pos 2
+            post.AddFragment(FragmentType.Image, 2); // Insert at pos 2
 
             Assert.Equal(4, post.Fragments.Count);
             var positions = post.Fragments.Select(f => f.Position).ToArray();
             Assert.Equal(new[] {1, 2, 3, 4}, positions);
-            var contents = post.Fragments.Select(f => f.Content).ToArray();
-            Assert.Equal("First", contents[0]);
-            Assert.Equal("Inserted", contents[1]);
-            Assert.Equal("Second", contents[2]); // shifted
-            Assert.Equal("Third", contents[3]); // shifted
+            var fragmentTypes = post.Fragments.Select(f => f.FragmentType).ToArray();
+            Assert.Equal(FragmentType.RichText, fragmentTypes[0]);
+            Assert.Equal(FragmentType.Image, fragmentTypes[1]);
+            Assert.Equal(FragmentType.Code, fragmentTypes[2]); // shifted
+            Assert.Equal(FragmentType.Table, fragmentTypes[3]); // shifted
         }
 
         [Theory]
@@ -227,11 +226,11 @@ namespace ABCD.Domain.Tests
             var blogId = new BlogId(3);
             var postId = new PostId(3);
             var post = new Post(blogId, postId, "Title", PostStatus.Draft);
-            post.AddFragment(FragmentType.RichText, "First");
-            post.AddFragment(FragmentType.RichText, "Second");
-            post.AddFragment(FragmentType.RichText, "Third");
+            post.AddFragment(FragmentType.RichText);
+            post.AddFragment(FragmentType.RichText);
+            post.AddFragment(FragmentType.RichText);
 
-            var ex = Assert.Throws<IllegalOperationException>(() => post.AddFragment(FragmentType.RichText, "Invalid", invalidPosition));
+            var ex = Assert.Throws<IllegalOperationException>(() => post.AddFragment(FragmentType.RichText, invalidPosition));
             Assert.Contains("Position must be between", ex.Message);
         }
 
@@ -243,14 +242,13 @@ namespace ABCD.Domain.Tests
             var post = new Post(blogId, postId, "Title", PostStatus.Draft);
 
             // Valid: position 1
-            post.AddFragment(FragmentType.RichText, "First", 1);
+            post.AddFragment(FragmentType.RichText, 1);
             Assert.Single(post.Fragments);
             Assert.Equal(1, post.Fragments.First().Position);
-            Assert.Equal("First", post.Fragments.First().Content);
 
             // Invalid: position 2
             var post2 = new Post(blogId, postId, "Title", PostStatus.Draft);
-            var ex = Assert.Throws<IllegalOperationException>(() => post2.AddFragment(FragmentType.RichText, "Invalid", 2));
+            var ex = Assert.Throws<IllegalOperationException>(() => post2.AddFragment(FragmentType.RichText, 2));
             Assert.Contains("Position must be between", ex.Message);
         }
 
