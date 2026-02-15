@@ -8,6 +8,9 @@
     <div class="columns is-centered">
       <div class="column is-10">
         <div class="box">
+          <div *ngIf="errorMessage" class="notification is-danger">
+            {{ errorMessage }}
+          </div>
           <div class="content">
             <div class="is-flex is-justify-content-flex-end" style="margin-bottom: 1rem;">
               <span class="has-text-right has-text-grey">

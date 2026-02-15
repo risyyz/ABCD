@@ -13,6 +13,7 @@ import { FragmentPositionChangeRequest } from '../models/fragment-position-chang
 
 export class EditPostComponent implements OnInit {
   post: Post | null = null;
+  errorMessage: string | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -39,8 +40,14 @@ export class EditPostComponent implements OnInit {
         version: this.post.version
       };
       this.postService.updateFragmentPosition(request)
-        .subscribe((updatedPost: Post) => {
-          this.post = updatedPost;
+        .subscribe({
+          next: (updatedPost: Post) => {
+            this.post = updatedPost;
+            this.errorMessage = null;
+          },
+          error: (err) => {
+            this.errorMessage = 'Failed to update fragment position. Please try again.';
+          }
         });
     }
   }
@@ -58,8 +65,14 @@ export class EditPostComponent implements OnInit {
         version: this.post.version
       };
       this.postService.updateFragmentPosition(request)
-        .subscribe((updatedPost: Post) => {
-          this.post = updatedPost;
+        .subscribe({
+          next: (updatedPost: Post) => {
+            this.post = updatedPost;
+            this.errorMessage = null;
+          },
+          error: (err) => {
+            this.errorMessage = 'Failed to update fragment position. Please try again.';
+          }
         });
     }
   }
