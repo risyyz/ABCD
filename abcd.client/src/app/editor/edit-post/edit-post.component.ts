@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Post } from '../models/post.model'; 
 import { PostService } from '../../services/post.service';
@@ -18,7 +18,8 @@ export class EditPostComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private postService: PostService
+    private postService: PostService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -93,5 +94,20 @@ export class EditPostComponent implements OnInit {
     // Handle the saved fragment (e.g., update post, send to server, etc.)
     console.log('Fragment saved:', fragment);
     // Example: update the fragment in post.fragments if needed
+  }
+
+  onFragmentAdd(event: { afterFragmentId: number, fragmentType: string }) {
+    if (!this.post) return;
+    this.postService.addFragment(this.post.postId, event.afterFragmentId, event.fragmentType, this.post.version)
+      .subscribe({
+        next: (updatedPost: Post) => {
+          this.post = updatedPost;
+          this.errorMessage = null;
+          this.cdr.detectChanges(); // Force UI update if needed
+        },
+        error: (err) => {
+          this.errorMessage = 'Failed to add fragment. Please try again.';
+        }
+      });
   }
 }

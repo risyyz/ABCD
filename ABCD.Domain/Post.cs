@@ -29,6 +29,10 @@ public class Post {
 
     private readonly List<Fragment> _fragments = new();
     public IReadOnlyCollection<Fragment> Fragments => _fragments.AsReadOnly();
+    public Fragment GetFragmentById(int fragmentId) =>    
+        _fragments.FirstOrDefault(f => f.FragmentId!.Value == fragmentId)
+               ?? throw new ArgumentException($"No fragment with id {fragmentId} exists in this post.", nameof(fragmentId));
+    
     private Post? _parent;
     public Post? Parent
     {
@@ -103,13 +107,13 @@ public class Post {
         }
     }
 
-    public void AddFragment(FragmentType fragmentType, string? content, int? position = null) {
+    public void AddFragment(FragmentType fragmentType, int? position = null) {
         int fragmentCount = _fragments.Count;
         int insertPosition = position ?? (fragmentCount == 0 ? Fragment.MinPosition : fragmentCount + Fragment.MinPosition);
         if (insertPosition < Fragment.MinPosition || insertPosition > fragmentCount + Fragment.MinPosition)
             throw new IllegalOperationException($"Position must be between {Fragment.MinPosition} and {fragmentCount + Fragment.MinPosition}.");
 
-        var fragment = new Fragment(this.PostId!, fragmentType, insertPosition) { Content = content };
+        var fragment = new Fragment(this.PostId!, fragmentType, insertPosition);
 
         // Shift positions of fragments at or after the insert position
         foreach (var f in _fragments.Where(f => f.Position >= insertPosition))

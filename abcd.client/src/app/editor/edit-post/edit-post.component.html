@@ -50,7 +50,8 @@
                                      (fragmentMoveUp)="onFragmentMoveUp($event)"
                                      (fragmentMoveDown)="onFragmentMoveDown($event)"
                                      (fragmentSave)="onFragmentSave($event)"
-                                     (addFragmentDropdownOpenChange)="activeAddFragmentDropdownId = $event">
+                                     (addFragmentDropdownOpenChange)="activeAddFragmentDropdownId = $event"
+                                     (fragmentAdd)="onFragmentAdd($event)">
 
                 <app-code-fragment *ngIf="fragment.fragmentType === 'Code'" [fragment]="fragment"></app-code-fragment>
                 <app-image-fragment *ngIf="fragment.fragmentType === 'Image'" [fragment]="fragment"></app-image-fragment>

@@ -62,7 +62,8 @@ namespace ABCD.Infra.Data {
             }
             var post = new Post(new BlogId(record.BlogId), new PostId(record.PostId), 
                                 record.Title, (PostStatus)record.Status, null, fragments) { 
-                Version = new VersionToken(record.Version) 
+                PathSegment = record.PathSegment != null ? new PathSegment(record.PathSegment) : null,
+                Version = new VersionToken(record.Version)
             };            
             return post;
         }
@@ -148,6 +149,44 @@ namespace ABCD.Infra.Data {
 
             await transaction.CommitAsync();
 
+            return await GetByPostIdAsync(post.BlogId!.Value, post.PostId!.Value);
+        }
+
+        public async Task<Post> UpdatePostAsync(Post post) {
+            var trackedPost = await _context.Posts.Include(p => p.Fragments).FirstOrDefaultAsync(p => p.PostId == post.PostId!.Value);
+            if (trackedPost == null) throw new ArgumentException("Post not found", nameof(post));
+
+            trackedPost.Title = post.Title;
+            trackedPost.Status = post.Status;
+            trackedPost.PathSegment = post.PathSegment?.Value;
+            trackedPost.UpdatedDate = DateTime.UtcNow;
+
+            _context.Entry(trackedPost).State = EntityState.Modified;
+
+            //remove fragments that are no longer in the post
+            var fragmentsToRemove = trackedPost.Fragments.Where(f => !post.Fragments.Any(pf => pf.FragmentId?.Value == f.FragmentId)).ToList();
+            foreach(var fragment in fragmentsToRemove) {
+                _context.Fragments.Remove(fragment);
+            }
+
+            //add or update fragments
+            foreach(var fragment in post.Fragments) {
+                var trackedFragment = trackedPost.Fragments.FirstOrDefault(f => f.FragmentId == fragment.FragmentId?.Value);
+                if (trackedFragment != null) {
+                    //update existing fragment
+                    trackedFragment.Content = fragment.Content ?? string.Empty;
+                    trackedFragment.Position = fragment.Position;
+                    trackedFragment.UpdatedDate = DateTime.UtcNow;
+                    _context.Entry(trackedFragment).State = EntityState.Modified;
+                } else {
+                    //add new fragment
+                    var newFragmentRecord = MapToRecord(fragment);
+                    newFragmentRecord.PostId = trackedPost.PostId; // ensure the new fragment is linked to the post
+                    _context.Fragments.Add(newFragmentRecord);
+                }
+            }
+
+            await _context.SaveChangesAsync();
             return await GetByPostIdAsync(post.BlogId!.Value, post.PostId!.Value);
         }
     }

@@ -28,10 +28,13 @@ export class EditableFragmentComponent implements AfterContentInit {
   @Output() fragmentCancel = new EventEmitter<void>();
   @Output() fragmentMoveUp = new EventEmitter<number>();
   @Output() fragmentMoveDown = new EventEmitter<number>();
+  @Output() fragmentAdd = new EventEmitter<{ afterFragmentId: number, fragmentType: string }>();  
 
-  isEditing: boolean = false;
+  //to manage open close actions of add fragment button dropdown
   @Input() addFragmentDropdownOpen: boolean = false;
   @Output() addFragmentDropdownOpenChange = new EventEmitter<number | null>();
+
+  isEditing: boolean = false;
 
   constructor() {
     document.addEventListener('click', this.closeFragmentDropdownOnOutsideClick.bind(this));
@@ -49,7 +52,6 @@ export class EditableFragmentComponent implements AfterContentInit {
       }
     }
   }
-
 
   onEdit() {
     this.isEditing = true;
@@ -88,7 +90,8 @@ export class EditableFragmentComponent implements AfterContentInit {
     }
   }
 
-  onAddFragment(fragment: string) {
+  onAddFragment(fragmentType: string) {
+    this.fragmentAdd.emit({ afterFragmentId: this.fragmentId, fragmentType: fragmentType });
     this.addFragmentDropdownOpenChange.emit(null); // close dropdown after selection
   }
 

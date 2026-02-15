@@ -19,6 +19,13 @@ namespace ABCD.Application {
             _blogRepository = blogRepository ?? throw new ArgumentNullException(nameof(blogRepository));
         }
 
+        public async Task<Post> AddFragmentAsync(AddFragmentCommand command) {
+            var post = await TryGetPostByIdAndVersion(command.PostId, command.Version);
+            var fragment = post.GetFragmentById(command.AfterFragmentId);
+            post.AddFragment(command.FragmentType, fragment?.Position + 1);
+            return await _postRepository.UpdatePostAsync(post);
+        }
+
         public async Task<Post> CreatePostAsync(CreatePostCommand command) {
             var blogId = _requestContext.Blog.BlogId.Value!;
             var post = new Post(_requestContext.Blog.BlogId, command.Title) { PathSegment = new PathSegment(command.Path) };
@@ -47,15 +54,19 @@ namespace ABCD.Application {
         }
 
         public async Task<Post> UpdateFragmentPositionAsync(ChangeFragmentPositionCommand command) {
-            var post =  await _postRepository.GetByPostIdAsync(_requestContext.Blog.BlogId.Value!, command.PostId);
-            if (post == null) throw new PostNotFoundException($"Post {command.PostId} does not exist.");
-
-            // Version check
-            if (!string.IsNullOrWhiteSpace(command.Version) && post.Version != null && !string.Equals(command.Version, post.Version.HexString, StringComparison.Ordinal))
-                throw new VersionConflictException("The resource was updated by another process. Please reload and try again.");
-
+            var post = await TryGetPostByIdAndVersion(command.PostId, command.Version);
             var impactedFragments = post.ChangeFragmentPosition(command.FragmentId, command.NewPosition);
             return await _postRepository.UpdateFragmentPositionAsync(post, impactedFragments);
+        }
+
+        private async Task<Post> TryGetPostByIdAndVersion(int postId, string version) {
+            var post = await _postRepository.GetByPostIdAsync(_requestContext.Blog.BlogId.Value!, postId);
+            if (post == null) throw new PostNotFoundException($"Post {postId} does not exist.");
+            // Version check
+            if (!string.IsNullOrWhiteSpace(version) && post.Version != null && !string.Equals(version, post.Version.HexString, StringComparison.Ordinal))
+                throw new VersionConflictException("The resource was updated by another process. Please reload and try again.");
+            
+            return post;
         }
     }
 }

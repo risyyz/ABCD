@@ -6,6 +6,7 @@ namespace ABCD.Application {
         Task<IEnumerable<Post>> GetAllAsync();
         Task<Post?> GetByIdAsync(int postId);
         Task<Post> UpdateFragmentPositionAsync(ChangeFragmentPositionCommand command);
+        Task<Post> AddFragmentAsync(AddFragmentCommand command);
     }
 
     public record CreatePostCommand(string Title, string Path);

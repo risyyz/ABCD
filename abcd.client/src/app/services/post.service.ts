@@ -22,5 +22,12 @@ export class PostService {
       { newPosition: request.newPosition, version: request.version }
     );
   }
+
+  addFragment(postId: number, afterFragmentId: number, fragmentType: string, version: string): Observable<Post> {
+    return this.http.post<Post>(
+      `/api/posts/${postId}/fragments`,
+      { afterFragmentId, fragmentType, version }
+    );
+  }
   // You can add more methods for create, update, delete as needed
 }

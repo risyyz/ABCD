@@ -74,10 +74,16 @@ namespace ABCD.Server.Controllers
         }
 
         // 4. Add fragment
-        [HttpPost("{postId:int}/fragments/add")]
-        public IActionResult AddFragment(int postId, [FromBody] object request)
+        [HttpPost("{postId:int}/fragments")]
+        public async Task<IActionResult> AddFragment(int postId, [FromBody] FragmentAddRequest request)
         {
-            throw new NotImplementedException();
+            if (!Enum.TryParse<FragmentType>(request.FragmentType, true, out var fragmentTypeEnum))
+	            return BadRequest($"Invalid fragment type: {request.FragmentType}");
+
+            var command = new AddFragmentCommand(postId, request.AfterFragmentId, fragmentTypeEnum, request.Version);
+            var result = await _postService.AddFragmentAsync(command);
+            var response = _typeMapper.Map<Post, PostDetailResponse>(result);
+            return Ok(response);
         }
 
         // 5. Update fragment
