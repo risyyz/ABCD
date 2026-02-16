@@ -5,12 +5,17 @@
         <i class="fas fa-edit"></i>
       </span>
     </button>
+      <button type="button" class="button is-danger" (click)="onDelete()" title="Delete Fragment">
+        <span class="icon">
+          <i class="fas fa-trash"></i>        
+        </span>
+    </button>
     <button type="button" class="button" (click)="onMoveUp()" title="Move Up" *ngIf="position > 1">
       <span class="icon">
         <i class="fas fa-arrow-up"></i>
       </span>
     </button>
-    <button type="button" class="button" (click)="onMoveDown()" title="Move Down" *ngIf="position < fragmentCount"> 
+    <button type="button" class="button" (click)="onMoveDown()" title="Move Down" *ngIf="position < fragmentCount">
       <span class="icon">
         <i class="fas fa-arrow-down"></i>
       </span>
@@ -25,10 +30,10 @@
       </div>
       <div class="dropdown-menu" id="dropdown-menu" role="menu">
         <div class="dropdown-content">
-          <a class="dropdown-item" (click)="onAddFragment('Code'); addFragmentDropdownOpen = false;">Code</a>
-          <a class="dropdown-item" (click)="onAddFragment('Image'); addFragmentDropdownOpen = false;">Image</a>
-          <a class="dropdown-item" (click)="onAddFragment('RichText'); addFragmentDropdownOpen = false;">Rich Text</a>
-          <a class="dropdown-item" (click)="onAddFragment('Table'); addFragmentDropdownOpen = false;">Table</a>
+          <a class="dropdown-item" (click)="onAdd('Code'); addFragmentDropdownOpen = false;">Code</a>
+          <a class="dropdown-item" (click)="onAdd('Image'); addFragmentDropdownOpen = false;">Image</a>
+          <a class="dropdown-item" (click)="onAdd('RichText'); addFragmentDropdownOpen = false;">Rich Text</a>
+          <a class="dropdown-item" (click)="onAdd('Table'); addFragmentDropdownOpen = false;">Table</a>
         </div>
       </div>
     </div>
@@ -47,5 +52,22 @@
   </div>
   <div class="editable-wrapper" [class.inactive]="!isEditing">
     <ng-content></ng-content>
+  </div>
+</div>
+
+<div class="modal" [ngClass]="{'is-active': showDeleteConfirm}">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Confirm Deletion</p>
+      <button class="delete" aria-label="close" (click)="cancelDelete()"></button>
+    </header>
+    <section class="modal-card-body">
+      Please confirm deletion.
+    </section>
+    <footer class="modal-card-foot">
+      <button class="button is-danger" (click)="confirmDelete()">Delete</button>
+      <button class="button" (click)="cancelDelete()">Cancel</button>
+    </footer>
   </div>
 </div>

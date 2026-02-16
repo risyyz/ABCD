@@ -109,10 +109,15 @@ namespace ABCD.Server.Controllers
         }
 
         // 7. Delete fragment
-        [HttpDelete("{postId:int}/fragments/delete/{fragmentId:int}")]
-        public IActionResult DeleteFragment(int postId, int fragmentId)
+        [HttpDelete("{postId:int}/fragments/{fragmentId:int}")]
+        public async Task<IActionResult> DeleteFragment(FragmentDeleteRequest request)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrEmpty(request.Version))
+                return BadRequest("Missing If-Match header.");
+
+            var updatedPost = await _postService.DeleteFragmentAsync(new DeleteFragmentCommand(request.PostId, request.FragmentId, request.Version));
+            var response = _typeMapper.Map<Post, PostDetailResponse>(updatedPost);
+            return Ok(response);
         }
 
         public class UpdateFragmentPositionRequest

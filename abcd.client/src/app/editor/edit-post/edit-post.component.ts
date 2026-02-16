@@ -46,6 +46,7 @@ export class EditPostComponent implements OnInit {
           next: (updatedPost: Post) => {
             this.post = updatedPost;
             this.errorMessage = null;
+            this.cdr.detectChanges(); // Force UI update if needed
           },
           error: (err) => {
             this.errorMessage = 'Failed to update fragment position. Please try again.';
@@ -71,6 +72,7 @@ export class EditPostComponent implements OnInit {
           next: (updatedPost: Post) => {
             this.post = updatedPost;
             this.errorMessage = null;
+            this.cdr.detectChanges(); // Force UI update if needed
           },
           error: (err) => {
             this.errorMessage = 'Failed to update fragment position. Please try again.';
@@ -107,6 +109,21 @@ export class EditPostComponent implements OnInit {
         },
         error: (err) => {
           this.errorMessage = 'Failed to add fragment. Please try again.';
+        }
+      });
+  }
+
+  onFragmentDelete(fragmentId: number) {
+    if (!this.post) return;
+    this.postService.deleteFragment(this.post.postId, fragmentId, this.post.version)
+      .subscribe({
+        next: (updatedPost: Post) => {
+          this.post = updatedPost;
+          this.errorMessage = null;
+          this.cdr.detectChanges(); // Force UI update if needed
+        },
+        error: (err) => {
+          this.errorMessage = 'Failed to delete fragment. Please try again.';
         }
       });
   }

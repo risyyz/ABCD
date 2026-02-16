@@ -29,5 +29,12 @@ export class PostService {
       { afterFragmentId, fragmentType, version }
     );
   }
+
+  deleteFragment(postId: number, fragmentId: number, version: string): Observable<Post> {
+    return this.http.delete<Post>(
+      `/api/posts/${postId}/fragments/${fragmentId}`,
+      { headers: { 'If-Match': version } }
+    );
+  }
   // You can add more methods for create, update, delete as needed
 }

@@ -1,14 +1,12 @@
 using ABCD.Application.Exceptions;
 using ABCD.Domain;
-using ABCD.Domain.Exceptions;
 
 namespace ABCD.Application {
     public class PostService : IPostService {
         private readonly RequestContext _requestContext;
         private readonly IPostRepository _postRepository;
-        private readonly IBlogRepository _blogRepository;
 
-        public PostService(RequestContext requestContext, IPostRepository postRepository, IBlogRepository blogRepository) {
+        public PostService(RequestContext requestContext, IPostRepository postRepository) {
             _requestContext = requestContext ?? throw new ArgumentNullException(nameof(requestContext));
             if(_requestContext.Blog == null)
                 throw new ArgumentException("RequestContext must have a Blog set.", nameof(requestContext));
@@ -16,7 +14,6 @@ namespace ABCD.Application {
                 throw new ArgumentException("RequestContext.Blog must have a valid BlogId", nameof(requestContext));
 
             _postRepository = postRepository ?? throw new ArgumentNullException(nameof(postRepository));
-            _blogRepository = blogRepository ?? throw new ArgumentNullException(nameof(blogRepository));
         }
 
         public async Task<Post> AddFragmentAsync(AddFragmentCommand command) {
@@ -42,6 +39,12 @@ namespace ABCD.Application {
             // Persist
             await _postRepository.AddAsync(post);
             return post;
+        }
+
+        public async Task<Post> DeleteFragmentAsync(DeleteFragmentCommand command) {
+            var post = await TryGetPostByIdAndVersion(command.PostId, command.Version);
+            post.RemoveFragment(command.FragmentId);
+            return await _postRepository.UpdatePostAsync(post);
         }
 
         public async Task<IEnumerable<Post>> GetAllAsync()

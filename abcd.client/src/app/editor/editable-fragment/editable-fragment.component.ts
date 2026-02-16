@@ -28,13 +28,15 @@ export class EditableFragmentComponent implements AfterContentInit {
   @Output() fragmentCancel = new EventEmitter<void>();
   @Output() fragmentMoveUp = new EventEmitter<number>();
   @Output() fragmentMoveDown = new EventEmitter<number>();
-  @Output() fragmentAdd = new EventEmitter<{ afterFragmentId: number, fragmentType: string }>();  
+  @Output() fragmentAdd = new EventEmitter<{ afterFragmentId: number, fragmentType: string }>();
+  @Output() fragmentDelete = new EventEmitter<number>();
 
   //to manage open close actions of add fragment button dropdown
   @Input() addFragmentDropdownOpen: boolean = false;
   @Output() addFragmentDropdownOpenChange = new EventEmitter<number | null>();
 
   isEditing: boolean = false;
+  showDeleteConfirm = false;
 
   constructor() {
     document.addEventListener('click', this.closeFragmentDropdownOnOutsideClick.bind(this));
@@ -90,9 +92,23 @@ export class EditableFragmentComponent implements AfterContentInit {
     }
   }
 
-  onAddFragment(fragmentType: string) {
+  onAdd(fragmentType: string) {
     this.fragmentAdd.emit({ afterFragmentId: this.fragmentId, fragmentType: fragmentType });
     this.addFragmentDropdownOpenChange.emit(null); // close dropdown after selection
+  }
+
+  onDelete() {
+    this.showDeleteConfirm = true;        
+  }
+
+  confirmDelete() {
+    this.showDeleteConfirm = false;
+    // Call your actual delete logic here
+    this.fragmentDelete.emit(this.fragmentId);
+  }
+
+  cancelDelete() {
+    this.showDeleteConfirm = false;
   }
 
   get fragmentComponent(): IFragmentComponent | undefined {

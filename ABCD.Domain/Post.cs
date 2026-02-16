@@ -126,6 +126,20 @@ public class Post {
         _fragments.Sort((a, b) => a.Position.CompareTo(b.Position));
     }
 
+    public void RemoveFragment(int fragmentId) {
+        var fragment = _fragments.FirstOrDefault(f => f.FragmentId!.Value == fragmentId);
+        if (fragment == null)
+            throw new ArgumentException($"Post {PostId.Value} does not contain any fragment with id {fragmentId}.", nameof(fragmentId));
+
+        int removedPosition = fragment.Position;
+        _fragments.Remove(fragment);
+        // Shift positions of fragments after the removed position
+        foreach (var f in _fragments.Where(f => f.Position > removedPosition))
+        {
+            f.MoveUp(); // MoveUp will decrement position
+        }
+    }
+
     public PublishEligibilityResult EligibleForPublishing() {
         var result = new PublishEligibilityResult();
 

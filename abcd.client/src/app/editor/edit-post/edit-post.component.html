@@ -51,7 +51,8 @@
                                      (fragmentMoveDown)="onFragmentMoveDown($event)"
                                      (fragmentSave)="onFragmentSave($event)"
                                      (addFragmentDropdownOpenChange)="activeAddFragmentDropdownId = $event"
-                                     (fragmentAdd)="onFragmentAdd($event)">
+                                     (fragmentAdd)="onFragmentAdd($event)"
+                                     (fragmentDelete)="onFragmentDelete($event)">
 
                 <app-code-fragment *ngIf="fragment.fragmentType === 'Code'" [fragment]="fragment"></app-code-fragment>
                 <app-image-fragment *ngIf="fragment.fragmentType === 'Image'" [fragment]="fragment"></app-image-fragment>
