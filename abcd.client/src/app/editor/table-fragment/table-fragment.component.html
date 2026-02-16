@@ -1,19 +1,21 @@
-  <div class="table-fragment-wrapper">
+<div class="table-fragment-wrapper">
     <div class="field">
       <label class="label">Table</label>
       <div class="control">
         <table class="table is-bordered is-fullwidth">
           <thead>
             <tr>
-              <th *ngFor="let col of columns; let i = index">
-                <input class="input" [(ngModel)]="columns[i]" placeholder="Column {{i + 1}}" #editableControl />
+              <th *ngFor="let col of columnIndexes; let i = index">
+                <!--<input class="input" [(ngModel)]="columns[i]" placeholder="Column {{i + 1}}" #editableControl />-->
+                Heading {{i}}
               </th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let row of rows; let rowIndex = index">
-              <td *ngFor="let col of columns; let colIndex = index">
-                <input class="input" [(ngModel)]="rows[rowIndex][colIndex]" placeholder="Cell" #editableControl />
+            <tr *ngFor="let row of rowIndexes; let rowIndex = index">
+              <td *ngFor="let col of columnIndexes; let colIndex = index">
+                <!--<input class="input" [(ngModel)]="rows[rowIndex][colIndex]" placeholder="Cell" #editableControl />-->
+                Cell {{row}},{{col}}
               </td>
             </tr>
           </tbody>

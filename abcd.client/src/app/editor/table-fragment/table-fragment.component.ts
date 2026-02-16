@@ -11,8 +11,8 @@ import { IFragmentComponent } from '../models/fragment-component.interface';
 export class TableFragmentComponent implements IFragmentComponent {
   @Input() fragment!: Fragment;
   // Add table logic and properties here as needed
-  columns: any = 5;
-  rows: any = 6
+  columns: number = 5;
+  rows: number = 6;
 
   setEditMode(isEditing: boolean) {
     console.log('TableFragmentComponent setEditMode: ' + isEditing);
@@ -25,5 +25,13 @@ export class TableFragmentComponent implements IFragmentComponent {
   getCurrentFragment(): Fragment {
     console.log('returning latest table fragment');
     return this.fragment;
+  }
+
+  get columnIndexes(): number[] {
+    return Array.from({ length: this.columns }, (_, i) => i);
+  }
+
+  get rowIndexes(): number[] {
+    return Array.from({ length: this.rows }, (_, i) => i);
   }
 }
