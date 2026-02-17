@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Post } from '../models/post.model'; 
 import { PostService } from '../../services/post.service';
@@ -18,8 +18,7 @@ export class EditPostComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private postService: PostService,
-    private cdr: ChangeDetectorRef
+    private postService: PostService
   ) {}
 
   ngOnInit(): void {
@@ -46,7 +45,6 @@ export class EditPostComponent implements OnInit {
           next: (updatedPost: Post) => {
             this.post = updatedPost;
             this.errorMessage = null;
-            this.cdr.detectChanges(); // Force UI update if needed
           },
           error: (err) => {
             this.errorMessage = 'Failed to update fragment position. Please try again.';
@@ -72,7 +70,6 @@ export class EditPostComponent implements OnInit {
           next: (updatedPost: Post) => {
             this.post = updatedPost;
             this.errorMessage = null;
-            this.cdr.detectChanges(); // Force UI update if needed
           },
           error: (err) => {
             this.errorMessage = 'Failed to update fragment position. Please try again.';
@@ -105,7 +102,6 @@ export class EditPostComponent implements OnInit {
         next: (updatedPost: Post) => {
           this.post = updatedPost;
           this.errorMessage = null;
-          this.cdr.detectChanges(); // Force UI update if needed
         },
         error: (err) => {
           this.errorMessage = 'Failed to add fragment. Please try again.';
@@ -120,7 +116,6 @@ export class EditPostComponent implements OnInit {
         next: (updatedPost: Post) => {
           this.post = updatedPost;
           this.errorMessage = null;
-          this.cdr.detectChanges(); // Force UI update if needed
         },
         error: (err) => {
           this.errorMessage = 'Failed to delete fragment. Please try again.';
