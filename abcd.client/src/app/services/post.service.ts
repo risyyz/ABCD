@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Post } from '../editor/models/post.model'; 
 import { FragmentPositionChangeRequest } from '../editor/models/fragment-position-change-request.model'; 
+import { FragmentUpdateRequest } from '../editor/models/fragment-update-request.model';
 
 @Injectable({ providedIn: 'root' })
 export class PostService {
@@ -36,5 +37,11 @@ export class PostService {
       { headers: { 'If-Match': version } }
     );
   }
-  // You can add more methods for create, update, delete as needed
+
+  saveFragment(request: FragmentUpdateRequest): Observable<Post> {
+    return this.http.put<Post>(
+      `/api/posts/${request.postId}/fragments/${request.fragmentId}`,
+      { content: request.content, version: request.version }
+    );
+  }
 }

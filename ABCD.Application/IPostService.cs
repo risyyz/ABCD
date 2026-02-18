@@ -7,6 +7,7 @@ namespace ABCD.Application {
         Task<Post?> GetByIdAsync(int postId);
         Task<Post> UpdateFragmentPositionAsync(ChangeFragmentPositionCommand command);
         Task<Post> AddFragmentAsync(AddFragmentCommand command);
+        Task<Post> UpdateFragmentAsync(int postId, int fragmentId, string content, string version);
         Task<Post> DeleteFragmentAsync(DeleteFragmentCommand command);
     }
 

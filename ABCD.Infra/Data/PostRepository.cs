@@ -74,7 +74,9 @@ namespace ABCD.Infra.Data {
                 new PostId(fragmentRecord.PostId),
                 (FragmentType)fragmentRecord.FragmentType,
                 fragmentRecord.Position
-            );
+            ) { 
+                Content = fragmentRecord.Content
+            };
         }
 
         // Map domain model to EF record

@@ -64,6 +64,7 @@ export class EditableFragmentComponent implements AfterContentInit {
   onCancel() {
     this.isEditing = false;
     this.fragmentComponent?.revert();
+    this.fragmentComponent?.setEditMode(false);
     this.fragmentCancel.emit();
   }
 

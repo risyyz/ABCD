@@ -4,6 +4,7 @@ import { Post } from '../models/post.model';
 import { PostService } from '../../services/post.service';
 import { Fragment } from '../models/fragment.model';
 import { FragmentPositionChangeRequest } from '../models/fragment-position-change-request.model';
+import { FragmentUpdateRequest } from '../models/fragment-update-request.model';
 
 @Component({
   selector: 'app-edit-post',
@@ -90,9 +91,23 @@ export class EditPostComponent implements OnInit {
   }
 
   onFragmentSave(fragment: Fragment) {
-    // Handle the saved fragment (e.g., update post, send to server, etc.)
-    console.log('Fragment saved:', fragment);
-    // Example: update the fragment in post.fragments if needed
+    if (!this.post) return;
+    const request: FragmentUpdateRequest = {
+      postId: this.post.postId,
+      fragmentId: fragment.fragmentId,
+      content: fragment.content,
+      version: this.post.version
+    };
+    this.postService.saveFragment(request)
+      .subscribe({
+        next: (updatedPost: Post) => {
+          this.post = updatedPost;
+          this.errorMessage = null;
+        },
+        error: (err) => {
+          this.errorMessage = 'Failed to save fragment. Please try again.';
+        }
+      });
   }
 
   onFragmentAdd(event: { afterFragmentId: number, fragmentType: string }) {

@@ -87,10 +87,17 @@ namespace ABCD.Server.Controllers
         }
 
         // 5. Update fragment
-        [HttpPut("{postId:int}/fragments/update/{fragmentId:int}")]
-        public IActionResult UpdateFragment(int postId, int fragmentId, [FromBody] object request)
+        [HttpPut("{postId:int}/fragments/{fragmentId:int}")]
+        public IActionResult UpdateFragment(
+            [FromRoute] int postId,
+            [FromRoute] int fragmentId, [FromBody][Required] FragmentUpdateRequest request)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrWhiteSpace(request?.Version))
+                return BadRequest("Invalid request or missing version.");
+
+            var updatedPost = _postService.UpdateFragmentAsync(postId, fragmentId, request.Content ?? string.Empty, request.Version).GetAwaiter().GetResult();
+            var response = _typeMapper.Map<Post, PostDetailResponse>(updatedPost);
+            return Ok(response);
         }
 
         // 6. Change fragment position
@@ -100,7 +107,10 @@ namespace ABCD.Server.Controllers
             [FromRoute] int fragmentId,
             [FromBody][Required] FragmentChangePositionRequest request) {
             // Validate input
-            if (request == null || request.NewPosition <= 0)
+
+            if (string.IsNullOrWhiteSpace(request?.Version))
+                return BadRequest("Invalid request or missing version.");
+            else if (request.NewPosition <= 0)
                 return BadRequest("Invalid new position.");
 
             var updatedPost = await _postService.UpdateFragmentPositionAsync(new ChangeFragmentPositionCommand(postId, fragmentId, request.NewPosition, request.Version));
@@ -118,12 +128,6 @@ namespace ABCD.Server.Controllers
             var updatedPost = await _postService.DeleteFragmentAsync(new DeleteFragmentCommand(request.PostId, request.FragmentId, request.Version));
             var response = _typeMapper.Map<Post, PostDetailResponse>(updatedPost);
             return Ok(response);
-        }
-
-        public class UpdateFragmentPositionRequest
-        {
-            [Required]
-            public int NewPosition { get; set; }
         }
     }
 }

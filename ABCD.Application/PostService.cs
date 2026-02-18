@@ -62,6 +62,14 @@ namespace ABCD.Application {
             return await _postRepository.UpdateFragmentPositionAsync(post, impactedFragments);
         }
 
+        public async Task<Post> UpdateFragmentAsync(int postId, int fragmentId, string content, string version)
+        {
+            var post = await TryGetPostByIdAndVersion(postId, version);
+            var fragment = post.GetFragmentById(fragmentId);
+            fragment.Content = content;
+            return await _postRepository.UpdatePostAsync(post);
+        }
+
         private async Task<Post> TryGetPostByIdAndVersion(int postId, string version) {
             var post = await _postRepository.GetByPostIdAsync(_requestContext.Blog.BlogId.Value!, postId);
             if (post == null) throw new PostNotFoundException($"Post {postId} does not exist.");
