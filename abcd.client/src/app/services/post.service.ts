@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Post } from '../editor/models/post.model'; 
-import { FragmentPositionChangeRequest } from '../editor/models/fragment-position-change-request.model'; 
+import { FragmentPositionChangeRequest } from '../editor/models/move-fragment-request.model'; 
 import { FragmentUpdateRequest } from '../editor/models/fragment-update-request.model';
 
 @Injectable({ providedIn: 'root' })
@@ -17,7 +17,7 @@ export class PostService {
     return this.http.get<Post>(`/api/posts/${postId}`);
   }
 
-  updateFragmentPosition(request: FragmentPositionChangeRequest): Observable<Post> {
+  moveFragment(request: FragmentPositionChangeRequest): Observable<Post> {
     return this.http.patch<Post>(
       `/api/posts/${request.postId}/fragments/${request.fragmentId}/position`,
       { newPosition: request.newPosition, version: request.version }

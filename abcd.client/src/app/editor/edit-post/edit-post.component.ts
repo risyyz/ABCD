@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Post } from '../models/post.model'; 
 import { PostService } from '../../services/post.service';
 import { Fragment } from '../models/fragment.model';
-import { FragmentPositionChangeRequest } from '../models/fragment-position-change-request.model';
+import { MoveFragmentRequest } from '../models/move-fragment-request.model';
 import { FragmentUpdateRequest } from '../models/fragment-update-request.model';
 
 @Component({
@@ -35,13 +35,13 @@ export class EditPostComponent implements OnInit {
     const index = fragments.findIndex(f => f.fragmentId === fragmentId);
     if (index > 0) {
       const fragment = fragments[index];
-      const request: FragmentPositionChangeRequest = {
+      const request: MoveFragmentRequest = {
         postId: this.post.postId,
         fragmentId: fragmentId,
         newPosition: fragment.position - 1,
         version: this.post.version
       };
-      this.postService.updateFragmentPosition(request)
+      this.postService.moveFragment(request)
         .subscribe({
           next: (updatedPost: Post) => {
             this.post = updatedPost;
@@ -60,13 +60,13 @@ export class EditPostComponent implements OnInit {
     const index = fragments.findIndex(f => f.fragmentId === fragmentId);
     if (index !== -1 && index < fragments.length - 1) {
       const fragment = fragments[index];
-      const request: FragmentPositionChangeRequest = {
+      const request: MoveFragmentRequest = {
         postId: this.post.postId,
         fragmentId: fragmentId,
         newPosition: fragment.position + 1,
         version: this.post.version
       };
-      this.postService.updateFragmentPosition(request)
+      this.postService.moveFragment(request)
         .subscribe({
           next: (updatedPost: Post) => {
             this.post = updatedPost;
