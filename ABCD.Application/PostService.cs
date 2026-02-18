@@ -56,18 +56,17 @@ namespace ABCD.Application {
             return await _postRepository.GetByPostIdAsync(_requestContext.Blog.BlogId.Value!, postId);
         }
 
-        public async Task<Post> UpdateFragmentPositionAsync(ChangeFragmentPositionCommand command) {
+        public async Task<Post> UpdateFragmentAsync(UpdateFragmentCommand command) {
             var post = await TryGetPostByIdAndVersion(command.PostId, command.Version);
-            var impactedFragments = post.ChangeFragmentPosition(command.FragmentId, command.NewPosition);
-            return await _postRepository.UpdateFragmentPositionAsync(post, impactedFragments);
+            var fragment = post.GetFragmentById(command.FragmentId);
+            fragment.Content = command.Content;
+            return await _postRepository.UpdatePostAsync(post);
         }
 
-        public async Task<Post> UpdateFragmentAsync(int postId, int fragmentId, string content, string version)
-        {
-            var post = await TryGetPostByIdAndVersion(postId, version);
-            var fragment = post.GetFragmentById(fragmentId);
-            fragment.Content = content;
-            return await _postRepository.UpdatePostAsync(post);
+        public async Task<Post> MoveFragmentAsync(MoveFragmentCommand command) {
+            var post = await TryGetPostByIdAndVersion(command.PostId, command.Version);
+            var impactedFragments = post.ChangeFragmentPosition(command.FragmentId, command.NewPosition);
+            return await _postRepository.MoveFragmentsAsync(post, impactedFragments);
         }
 
         private async Task<Post> TryGetPostByIdAndVersion(int postId, string version) {

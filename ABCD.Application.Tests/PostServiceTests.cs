@@ -65,18 +65,18 @@ namespace ABCD.Application.Tests {
 
         [Fact]
         public async Task UpdateFragmentPositionAsync_ThrowsPostNotFoundException_WhenPostDoesNotExist() {
-            var command = new ChangeFragmentPositionCommand(999, 1, 1, "11");
+            var command = new MoveFragmentCommand(999, 1, 1, "11");
             _postRepoMock.Setup(r => r.GetByPostIdAsync(1, 999)).ReturnsAsync((Post)null);
             var service = new PostService(_context, _postRepoMock.Object);
-            await Assert.ThrowsAsync<PostNotFoundException>(() => service.UpdateFragmentPositionAsync(command));
+            await Assert.ThrowsAsync<PostNotFoundException>(() => service.MoveFragmentAsync(command));
         }
 
         [Fact]
         public async Task UpdateFragmentPositionAsync_ThrowsVersionConflictException_WhenPostVersionDoesNotMatch() {
-            var command = new ChangeFragmentPositionCommand(999, 1, 1, "11");
+            var command = new MoveFragmentCommand(999, 1, 1, "11");
             _postRepoMock.Setup(r => r.GetByPostIdAsync(1, 999)).ReturnsAsync(new Post(new BlogId(1), "Title") { Version = new VersionToken("22") });
             var service = new PostService(_context, _postRepoMock.Object);
-            await Assert.ThrowsAsync<VersionConflictException>(() => service.UpdateFragmentPositionAsync(command));
+            await Assert.ThrowsAsync<VersionConflictException>(() => service.MoveFragmentAsync(command));
         }
 
         [Fact]

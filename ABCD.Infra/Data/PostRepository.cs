@@ -102,7 +102,7 @@ namespace ABCD.Infra.Data {
             };
         }
 
-        public async Task<Post> UpdateFragmentPositionAsync(Post post, IEnumerable<Fragment> fragments) {
+        public async Task<Post> MoveFragmentsAsync(Post post, IEnumerable<Fragment> fragments) {
             var utcNow = DateTime.UtcNow;
             using var transaction = await _context.Database.BeginTransactionAsync();
 

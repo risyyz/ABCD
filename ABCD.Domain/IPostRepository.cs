@@ -5,7 +5,7 @@
         Task<IEnumerable<Post>> GetAllByBlogIdAsync(int blogId); // Returns all posts for a blog
         Task<Post?> GetByBlogIdAndPathSegmentAsync(int blogId, string path);
         Task<Post?> GetByBlogIdAndTitleAsync(int blogId, string title);
-        Task<Post> UpdateFragmentPositionAsync(Post post, IEnumerable<Fragment> fragments);
+        Task<Post> MoveFragmentsAsync(Post post, IEnumerable<Fragment> fragments);
         Task<Post> UpdatePostAsync(Post post);
     }
 }

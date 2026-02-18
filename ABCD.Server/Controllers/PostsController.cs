@@ -88,24 +88,24 @@ namespace ABCD.Server.Controllers
 
         // 5. Update fragment
         [HttpPut("{postId:int}/fragments/{fragmentId:int}")]
-        public IActionResult UpdateFragment(
+        public async Task<IActionResult> UpdateFragment(
             [FromRoute] int postId,
             [FromRoute] int fragmentId, [FromBody][Required] FragmentUpdateRequest request)
         {
             if (string.IsNullOrWhiteSpace(request?.Version))
                 return BadRequest("Invalid request or missing version.");
 
-            var updatedPost = _postService.UpdateFragmentAsync(postId, fragmentId, request.Content ?? string.Empty, request.Version).GetAwaiter().GetResult();
+            var updatedPost = await _postService.UpdateFragmentAsync(new UpdateFragmentCommand(postId, fragmentId, request.Content ?? string.Empty, request.Version));
             var response = _typeMapper.Map<Post, PostDetailResponse>(updatedPost);
             return Ok(response);
         }
 
         // 6. Change fragment position
         [HttpPatch("{postId:int}/fragments/{fragmentId:int}/position")]
-        public async Task<IActionResult> UpdateFragmentPosition(
+        public async Task<IActionResult> MoveFragment(
             [FromRoute] int postId,
             [FromRoute] int fragmentId,
-            [FromBody][Required] FragmentChangePositionRequest request) {
+            [FromBody][Required] FragmentMoveRequest request) {
             // Validate input
 
             if (string.IsNullOrWhiteSpace(request?.Version))
@@ -113,7 +113,7 @@ namespace ABCD.Server.Controllers
             else if (request.NewPosition <= 0)
                 return BadRequest("Invalid new position.");
 
-            var updatedPost = await _postService.UpdateFragmentPositionAsync(new ChangeFragmentPositionCommand(postId, fragmentId, request.NewPosition, request.Version));
+            var updatedPost = await _postService.MoveFragmentAsync(new MoveFragmentCommand(postId, fragmentId, request.NewPosition, request.Version));
             var response = _typeMapper.Map<Post, PostDetailResponse>(updatedPost);
             return Ok(response);
         }
