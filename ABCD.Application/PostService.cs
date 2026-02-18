@@ -60,7 +60,7 @@ namespace ABCD.Application {
             var post = await TryGetPostByIdAndVersion(command.PostId, command.Version);
             var fragment = post.GetFragmentById(command.FragmentId);
             fragment.Content = command.Content;
-            return await _postRepository.UpdatePostAsync(post);
+            return await _postRepository.UpdateFragmentAsync(post, fragment);
         }
 
         public async Task<Post> MoveFragmentAsync(MoveFragmentCommand command) {

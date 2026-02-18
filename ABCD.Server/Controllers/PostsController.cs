@@ -106,7 +106,6 @@ namespace ABCD.Server.Controllers
             [FromRoute] int postId,
             [FromRoute] int fragmentId,
             [FromBody][Required] FragmentMoveRequest request) {
-            // Validate input
 
             if (string.IsNullOrWhiteSpace(request?.Version))
                 return BadRequest("Invalid request or missing version.");

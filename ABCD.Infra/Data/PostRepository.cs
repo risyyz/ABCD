@@ -191,5 +191,27 @@ namespace ABCD.Infra.Data {
             await _context.SaveChangesAsync();
             return await GetByPostIdAsync(post.BlogId!.Value, post.PostId!.Value);
         }
+
+        public async Task<Post> UpdateFragmentAsync(Post post, Fragment fragment)
+        {
+            var trackedPost = await _context.Posts.Include(p => p.Fragments).FirstOrDefaultAsync(p => p.PostId == post.PostId!.Value);
+            if (trackedPost == null) throw new ArgumentException("Post not found", nameof(post));
+
+            // Update fragment
+            var trackedFragment = trackedPost.Fragments.FirstOrDefault(f => f.FragmentId == fragment.FragmentId?.Value);
+            if (trackedFragment != null)
+            {
+                trackedFragment.Content = fragment.Content ?? string.Empty;
+                trackedFragment.UpdatedDate = DateTime.UtcNow;
+                _context.Entry(trackedFragment).State = EntityState.Modified;
+            }
+
+            // Update post version
+            trackedPost.UpdatedDate = DateTime.UtcNow;
+            _context.Entry(trackedPost).State = EntityState.Modified;
+
+            await _context.SaveChangesAsync();
+            return await GetByPostIdAsync(post.BlogId!.Value, post.PostId!.Value);
+        }
     }
 }

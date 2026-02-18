@@ -6,6 +6,42 @@ using Moq;
 
 namespace ABCD.Application.Tests {
     public class PostServiceTests {
+        [Fact]
+        public async Task UpdateFragmentAsync_UpdatesFragmentContent_WhenValid()
+        {
+            var command = new UpdateFragmentCommand(999, 1, "new content", "0x11");
+            var fragments = new List<Fragment>
+            {
+                new Fragment(new FragmentId(1), new PostId(999), FragmentType.Heading, 1) { Content = "old content" }
+            };
+            var post = new Post(new BlogId(1), new PostId(999), "Title", PostStatus.Draft, fragments: fragments) { Version = new VersionToken("11") };
+            _postRepoMock.Setup(r => r.GetByPostIdAsync(1, 999)).ReturnsAsync(post);
+            _postRepoMock.Setup(r => r.UpdateFragmentAsync(post, fragments[0])).ReturnsAsync(post);
+            var service = new PostService(_context, _postRepoMock.Object);
+            var result = await service.UpdateFragmentAsync(command);
+            _postRepoMock.Verify(r => r.UpdateFragmentAsync(post, It.Is<Fragment>(f => f.Content == "new content")), Times.Once);
+            Assert.Equal("new content", result.Fragments.First().Content);
+        }
+
+        [Fact]
+        public async Task UpdateFragmentAsync_ThrowsPostNotFoundException_WhenPostDoesNotExist()
+        {
+            var command = new UpdateFragmentCommand(999, 1, "new content", "0x11");
+            _postRepoMock.Setup(r => r.GetByPostIdAsync(1, 999)).ReturnsAsync((Post)null);
+            var service = new PostService(_context, _postRepoMock.Object);
+            await Assert.ThrowsAsync<PostNotFoundException>(() => service.UpdateFragmentAsync(command));
+        }
+
+        [Fact]
+        public async Task UpdateFragmentAsync_ThrowsVersionConflictException_WhenPostVersionDoesNotMatch()
+        {
+            var command = new UpdateFragmentCommand(999, 1, "new content", "0x11");
+            var post = new Post(new BlogId(1), new PostId(999), "Title", PostStatus.Draft) { Version = new VersionToken("22") };
+            _postRepoMock.Setup(r => r.GetByPostIdAsync(1, 999)).ReturnsAsync(post);
+            var service = new PostService(_context, _postRepoMock.Object);
+            await Assert.ThrowsAsync<VersionConflictException>(() => service.UpdateFragmentAsync(command));
+        }
+        
         private readonly Mock<IPostRepository> _postRepoMock = new();
         private readonly Blog _blog = new(new BlogId(1)) { Name = "Test Blog" };
         private readonly RequestContext _context;
@@ -64,7 +100,7 @@ namespace ABCD.Application.Tests {
         }
 
         [Fact]
-        public async Task UpdateFragmentPositionAsync_ThrowsPostNotFoundException_WhenPostDoesNotExist() {
+        public async Task MoveFragmentAsync_ThrowsPostNotFoundException_WhenPostDoesNotExist() {
             var command = new MoveFragmentCommand(999, 1, 1, "11");
             _postRepoMock.Setup(r => r.GetByPostIdAsync(1, 999)).ReturnsAsync((Post)null);
             var service = new PostService(_context, _postRepoMock.Object);
@@ -72,7 +108,7 @@ namespace ABCD.Application.Tests {
         }
 
         [Fact]
-        public async Task UpdateFragmentPositionAsync_ThrowsVersionConflictException_WhenPostVersionDoesNotMatch() {
+        public async Task MoveFragmentAsync_ThrowsVersionConflictException_WhenPostVersionDoesNotMatch() {
             var command = new MoveFragmentCommand(999, 1, 1, "11");
             _postRepoMock.Setup(r => r.GetByPostIdAsync(1, 999)).ReturnsAsync(new Post(new BlogId(1), "Title") { Version = new VersionToken("22") });
             var service = new PostService(_context, _postRepoMock.Object);
