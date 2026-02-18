@@ -1,4 +1,6 @@
-﻿namespace ABCD.Server {
+﻿using ABCD.Application;
+
+namespace ABCD.Server {
     public class BearerTokenReader {
         private readonly IHttpContextAccessor _httpContextAccessor;
 
@@ -6,14 +8,14 @@
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public virtual string? GetToken() {
-            var authorizationHeader = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].FirstOrDefault();
+        public virtual string? GetAccessToken() {
+            var token = _httpContextAccessor.HttpContext?.Request.Cookies[AppConstants.ACCESS_TOKEN];
+            return string.IsNullOrWhiteSpace(token) ? null : token.Trim();
+        }
 
-            if (string.IsNullOrWhiteSpace(authorizationHeader) || !authorizationHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase)) {
-                return null; // Return null if the header is missing or invalid
-            }
-
-            return authorizationHeader["Bearer ".Length..].Trim(); // Extract and return the token
+        public virtual string? GetRefreshToken() {
+            var token = _httpContextAccessor.HttpContext?.Request.Cookies[AppConstants.REFRESH_TOKEN];
+            return string.IsNullOrWhiteSpace(token) ? null : token.Trim();
         }
     }
 }

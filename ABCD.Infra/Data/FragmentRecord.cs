@@ -3,6 +3,7 @@ using ABCD.Domain; // Import the domain namespace for FragmentType
 
 namespace ABCD.Infra.Data {
     public class FragmentRecord {
+        public int FragmentId { get; set; }
         public int PostId { get; set; }
 
         public int Position { get; set; }

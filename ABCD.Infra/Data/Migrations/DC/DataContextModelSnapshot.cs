@@ -59,11 +59,11 @@ namespace ABCD.Infra.Data.Migrations.DC
 
             modelBuilder.Entity("ABCD.Infra.Data.FragmentRecord", b =>
                 {
-                    b.Property<int>("PostId")
+                    b.Property<int>("FragmentId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("Position")
-                        .HasColumnType("int");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FragmentId"));
 
                     b.Property<string>("Content")
                         .IsRequired()
@@ -85,6 +85,12 @@ namespace ABCD.Infra.Data.Migrations.DC
                         .HasMaxLength(15)
                         .HasColumnType("nvarchar(15)");
 
+                    b.Property<int>("Position")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PostId")
+                        .HasColumnType("int");
+
                     b.Property<string>("UpdatedBy")
                         .IsRequired()
                         .HasMaxLength(450)
@@ -93,7 +99,10 @@ namespace ABCD.Infra.Data.Migrations.DC
                     b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("datetime2");
 
-                    b.HasKey("PostId", "Position");
+                    b.HasKey("FragmentId");
+
+                    b.HasIndex("PostId", "Position")
+                        .IsUnique();
 
                     b.ToTable("Fragments", (string)null);
                 });
@@ -109,9 +118,6 @@ namespace ABCD.Infra.Data.Migrations.DC
                     b.Property<int>("BlogId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Content")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("CreatedBy")
                         .IsRequired()
                         .HasMaxLength(450)
@@ -123,8 +129,7 @@ namespace ABCD.Infra.Data.Migrations.DC
                     b.Property<int?>("ParentPostId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Slug")
-                        .IsRequired()
+                    b.Property<string>("PathSegment")
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
@@ -150,14 +155,21 @@ namespace ABCD.Infra.Data.Migrations.DC
                     b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<byte[]>("Version")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
                     b.HasKey("PostId");
 
                     b.HasIndex("BlogId");
 
                     b.HasIndex("ParentPostId");
 
-                    b.HasIndex("Slug")
-                        .IsUnique();
+                    b.HasIndex("PathSegment")
+                        .IsUnique()
+                        .HasFilter("[PathSegment] IS NOT NULL");
 
                     b.ToTable("Posts", (string)null);
                 });

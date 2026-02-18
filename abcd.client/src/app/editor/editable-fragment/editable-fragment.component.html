@@ -1,0 +1,73 @@
+<div class="editable-wrapper-parent" [class.highlighted]="highlight">
+  <div class="editable-actions" *ngIf="!isEditing">
+    <button type="button" class="button" (click)="onEdit()" title="Edit">
+      <span class="icon">
+        <i class="fas fa-edit"></i>
+      </span>
+    </button>
+      <button type="button" class="button is-danger" (click)="onDelete()" title="Delete Fragment">
+        <span class="icon">
+          <i class="fas fa-trash"></i>        
+        </span>
+    </button>
+    <button type="button" class="button" (click)="onMoveUp()" title="Move Up" *ngIf="position > 1">
+      <span class="icon">
+        <i class="fas fa-arrow-up"></i>
+      </span>
+    </button>
+    <button type="button" class="button" (click)="onMoveDown()" title="Move Down" *ngIf="position < fragmentCount">
+      <span class="icon">
+        <i class="fas fa-arrow-down"></i>
+      </span>
+    </button>
+    <!-- Add Fragment Dropdown (click to open) -->
+    <div class="dropdown add-fragment-dropdown" [class.is-active]="addFragmentDropdownOpen">
+      <div class="dropdown-trigger">
+        <button type="button" class="button" aria-haspopup="true" aria-controls="dropdown-menu" title="Add Fragment"
+                (click)="onAddDropdownButtonClick($event)">
+          <span class="icon"><i class="fas fa-plus"></i>...</span>
+        </button>
+      </div>
+      <div class="dropdown-menu" id="dropdown-menu" role="menu">
+        <div class="dropdown-content">
+          <a class="dropdown-item" (click)="onAdd('Code'); addFragmentDropdownOpen = false;">Code</a>
+          <a class="dropdown-item" (click)="onAdd('Image'); addFragmentDropdownOpen = false;">Image</a>
+          <a class="dropdown-item" (click)="onAdd('RichText'); addFragmentDropdownOpen = false;">Rich Text</a>
+          <a class="dropdown-item" (click)="onAdd('Table'); addFragmentDropdownOpen = false;">Table</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="editable-actions" *ngIf="isEditing">
+    <button type="button" class="button is-dark-grey" (click)="onSave()" title="Save">
+      <span class="icon">
+        <i class="fas fa-save"></i>
+      </span>
+    </button>
+    <button type="button" class="button" (click)="onCancel()" title="Cancel">
+      <span class="icon">
+        <i class="fas fa-times"></i>
+      </span>
+    </button>
+  </div>
+  <div class="editable-wrapper" [class.inactive]="!isEditing">
+    <ng-content></ng-content>
+  </div>
+</div>
+
+<div class="modal" [ngClass]="{'is-active': showDeleteConfirm}">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Confirm Deletion</p>
+      <button class="delete" aria-label="close" (click)="cancelDelete()"></button>
+    </header>
+    <section class="modal-card-body">
+      Please confirm deletion.
+    </section>
+    <footer class="modal-card-foot">
+      <button class="button is-danger" (click)="confirmDelete()">Delete</button>
+      <button class="button" (click)="cancelDelete()">Cancel</button>
+    </footer>
+  </div>
+</div>

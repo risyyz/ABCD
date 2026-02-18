@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using ABCD.Application;
+
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace ABCD.Server.Middlewares {
@@ -9,7 +11,6 @@ namespace ABCD.Server.Middlewares {
     public class TokenValidationMiddleware {
         private readonly RequestDelegate _next;
         private readonly IMemoryCache _cache;
-        private const string AUTH_HEADER = "Authorization";
 
         public TokenValidationMiddleware(RequestDelegate next, IMemoryCache cache) {
             _next = next;
@@ -18,10 +19,10 @@ namespace ABCD.Server.Middlewares {
 
         public async Task InvokeAsync(HttpContext context) {
             var authorizeAttribute = context.GetEndpoint()?.Metadata.GetMetadata<AuthorizeAttribute>();
-            if (authorizeAttribute != null && context.Request.Headers.ContainsKey(AUTH_HEADER)) {
-                var token = context.Request.Headers[AUTH_HEADER].ToString().Replace("Bearer ", "");
+            if (authorizeAttribute != null && context.Request.Cookies.ContainsKey(AppConstants.ACCESS_TOKEN)) {
+                var token = context.Request.Cookies[AppConstants.ACCESS_TOKEN];
 
-                if (_cache.TryGetValue(token, out _)) {
+                if (!string.IsNullOrWhiteSpace(token) && _cache.TryGetValue(token, out _)) {
                     context.Response.StatusCode = StatusCodes.Status401Unauthorized;
                     await context.Response.WriteAsync("invalid token");
                     return;

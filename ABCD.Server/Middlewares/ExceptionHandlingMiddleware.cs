@@ -1,11 +1,27 @@
 using System.Text.Json;
 
-using ABCD.Lib.Exceptions; // Ensure this namespace is included
+using ABCD.Application.Exceptions;
+using ABCD.Domain.Exceptions;
 
 namespace ABCD.Server.Middlewares {
     public class ExceptionHandlingMiddleware {
         private readonly RequestDelegate _next;
         private readonly ILogger<ExceptionHandlingMiddleware> _logger;
+
+        private static readonly Dictionary<Type, int> ExceptionStatusCodes = new()
+        {
+            { typeof(IllegalOperationException), StatusCodes.Status400BadRequest },
+            { typeof(InvalidFragmentException), StatusCodes.Status400BadRequest },
+            { typeof(DuplicatePathSegmentException), StatusCodes.Status400BadRequest },
+            { typeof(DuplicatePostTitleException), StatusCodes.Status400BadRequest },
+
+            { typeof(RequestContextException), StatusCodes.Status401Unauthorized },
+            { typeof(SignInFailedException), StatusCodes.Status401Unauthorized },            
+
+            { typeof(BlogNotFoundException), StatusCodes.Status404NotFound },
+
+            { typeof(VersionConflictException),StatusCodes.Status409Conflict }
+        };
 
         public ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger) {
             _next = next;
@@ -22,32 +38,12 @@ namespace ABCD.Server.Middlewares {
         }
 
         private static Task HandleExceptionAsync(HttpContext context, Exception exception) {
-            int statusCode;
-            string errorMessage = exception.Message;
-
-            switch (exception) {
-                case SignInFailedException:
-                case RequestContextException:                
-                    statusCode = StatusCodes.Status401Unauthorized;
-                    break;
-
-                case BlogNotFoundException:
-                    statusCode = StatusCodes.Status404NotFound;
-                    break;  
-
-                default:
-                    statusCode = StatusCodes.Status500InternalServerError;
-                    errorMessage = "An unexpected error occurred.";
-                    break;
-            }
+            int statusCode = ExceptionStatusCodes.TryGetValue(exception.GetType(), out var code) ? code : StatusCodes.Status500InternalServerError;
+            string errorMessage = statusCode == StatusCodes.Status500InternalServerError ? "An unexpected error occurred." : exception.Message;
 
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = statusCode;
-
-            var result = JsonSerializer.Serialize(new {
-                error = errorMessage
-            });
-
+            var result = JsonSerializer.Serialize(new { error = errorMessage });
             return context.Response.WriteAsync(result);
         }
     }

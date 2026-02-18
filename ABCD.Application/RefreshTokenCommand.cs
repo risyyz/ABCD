@@ -1,0 +1,23 @@
+﻿using FluentValidation;
+
+namespace ABCD.Application {
+    public record RefreshTokenCommand {
+        public required string Email { get; init; }
+        public required string JWT { get; init; }
+        public required string RefreshToken { get; init; }
+    }
+
+    public class RefreshTokenCommandValidator : AbstractValidator<RefreshTokenCommand> {
+        public RefreshTokenCommandValidator() {
+            RuleFor(x => x.Email)
+                .NotEmpty().WithMessage("Email is required")
+                .EmailAddress().WithMessage("Invalid email format");
+
+            RuleFor(x => x.JWT)
+                .NotEmpty().WithMessage("JWT is required");
+
+            RuleFor(x => x.RefreshToken)
+                .NotEmpty().WithMessage("RefreshToken is required");
+        }
+    }
+}

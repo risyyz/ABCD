@@ -1,20 +1,19 @@
-﻿using ABCD.Domain;
-using ABCD.Lib;
-using ABCD.Lib.Exceptions;
+﻿using ABCD.Application.Exceptions;
+using ABCD.Domain;
 
 namespace ABCD.Application {
     public class BlogService : IBlogService {
-        private readonly RequestContext _context;
+        private readonly RequestContext _requestContext;
         private readonly IBlogRepository _repository;
-        public BlogService(RequestContext context, IBlogRepository repository) {
-            _context = context;
+        public BlogService(RequestContext requestContext, IBlogRepository repository) {
+            _requestContext = requestContext;
             _repository = repository;
         }
 
         public async Task<Blog> GetBlogByIdAsync(int blogId) {
             var blog = await _repository.GetByIdAsync(blogId);
             if (blog == null)
-                throw new BlogNotFoundException($"Blog with Id {blogId} does not exist.");
+                throw new BlogNotFoundException($"Blog {blogId} does not exist.");
 
             return blog;
         }

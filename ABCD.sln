@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.8.34525.116
+# Visual Studio Version 18
+VisualStudioVersion = 18.2.11430.68 d18.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ABCD.Server", "ABCD.Server\ABCD.Server.csproj", "{3A974E62-A057-43C7-A535-E3063C473BAF}"
 EndProject
@@ -21,7 +21,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ABCD.Lib", "ABCD.Lib\ABCD.L
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E33BB759-D56D-435B-8C38-302AD18E73E3}"
 	ProjectSection(SolutionItems) = preProject
-		tips.txt = tips.txt
+		notes.txt = notes.txt
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ABCD.Application", "ABCD.Application\ABCD.Application.csproj", "{D7C573B5-5CE0-4B83-AFA8-44729570A6B8}"

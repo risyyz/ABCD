@@ -6,8 +6,11 @@ using ABCD.Infra.Data;
 using ABCD.Lib;
 using ABCD.Server;
 using ABCD.Server.Middlewares;
+using ABCD.Server.Models;
 
 using FluentValidation;
+
+using Mapster;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -43,8 +46,8 @@ if (builder.Environment.IsDevelopment()) {
 // Bind Settings class to configuration
 var configuration = builder.Configuration;
 builder.Services.Configure<Settings>(options => {
-    options.ConnectionString = configuration.GetConnectionString("DefaultConnection");
-    options.CryptoPassPhrase = configuration["Crypto:PassPhrase"];
+    options.ConnectionString = configuration.GetConnectionString("DefaultConnection")!;
+    options.CryptoPassPhrase = configuration["Crypto:PassPhrase"]!;
 });
 
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection(JwtSettings.SectionName));
@@ -67,25 +70,44 @@ builder.Services.AddAuthentication(options => {
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
 }).AddJwtBearer(options => {
-    options.TokenValidationParameters = jwtSettings.GetTokenValidationParameters();
+    options.TokenValidationParameters = jwtSettings!.GetTokenValidationParameters();
+    
+    // Configure to read JWT token from cookie instead of Authorization header
+    options.Events = new JwtBearerEvents {
+        OnMessageReceived = context => {
+            // Read token from cookie
+            context.Token = context.Request.Cookies[AppConstants.ACCESS_TOKEN];
+            return Task.CompletedTask;
+        }
+    };
 });
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddAuthorization();
+
+// Add CORS configuration to allow credentials (for cookie-based auth)
+builder.Services.AddCors(options => {
+    options.AddPolicy("AllowAngularClient", policy => {
+        policy.WithOrigins("https://localhost:4200", "http://localhost:4200")
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials(); // Required for cookies
+    });
+});
+
 builder.Services.AddControllers();
-builder.Services.AddValidatorsFromAssemblyContaining<UserRegistrationValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<RegisterUserCommandValidator>();
 
 builder.Services.Configure<WeatherForecastOptions>(builder.Configuration.GetSection("WeatherForecast"));
 builder.Services.AddScoped<ICryptoService>(provider => {
     var configuration = provider.GetRequiredService<IConfiguration>();
-    return new CryptoService(configuration["Crypto:PassPhrase"]);
+    return new CryptoService(configuration["Crypto:PassPhrase"]!);
 });
 
-
 var passwordPolicy = builder.Configuration.GetSection("PasswordPolicy").Get<PasswordPolicy>();
-builder.Services.AddScoped<PasswordPolicy>(provider => passwordPolicy);
-builder.Services.AddScoped<IValidator<UserRegistration>, UserRegistrationValidator>();
-builder.Services.AddScoped<IValidator<SignInCredentials>, SignInCredentialsValidator>();
+builder.Services.AddScoped<PasswordPolicy>(provider => passwordPolicy!);
+builder.Services.AddScoped<IValidator<RegisterUserCommand>, RegisterUserCommandValidator>();
+builder.Services.AddScoped<IValidator<SignInCommand>, SignInCommandValidator>();
 builder.Services.AddScoped<SecurityTokenHandler, JwtSecurityTokenHandler>();
 
 builder.Services.AddScoped<IUserService, UserService>();
@@ -94,17 +116,40 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<BearerTokenReader>();
 
 builder.Services.AddScoped<RequestContextAccessor>();
-builder.Services.AddScoped<RequestContext>(ctx => {
-    var contextAccessor = ctx.GetRequiredService<RequestContextAccessor>();
-    return contextAccessor.RequestContext;
-});
-
+builder.Services.AddScoped<RequestContext>(ctx => ctx.GetRequiredService<RequestContextAccessor>().RequestContext);
 builder.Services.AddScoped<IBlogRepository, BlogRepository>();
 builder.Services.AddScoped<IBlogService, BlogService>();
+builder.Services.AddScoped<IPostRepository, PostRepository>();
+builder.Services.AddScoped<IPostService, PostService>();
 
-var mapper = AutoMapperConfig.Initialize();
-builder.Services.AddSingleton(mapper);
-builder.Services.AddSingleton<IClassMapper, ClassMapper>();
+
+var config = TypeAdapterConfig.GlobalSettings;
+
+// Example: Map domain Post to PostResponseModel
+config.NewConfig<Post, PostSummaryResponse>()
+    .Map(dest => dest.Status, src => src.Status.ToString())
+    .Map(dest => dest.PathSegment, src => src.PathSegment != null ? src.PathSegment : null )
+    .Map(dest => dest.PostId, src => src.PostId != null ? src.PostId.Value : 0)
+    .Map(dest => dest.BlogId, src => src.BlogId.Value)
+    .Map(dest => dest.Version, src => src.Version != null ? src.Version.HexString : null);
+
+config.NewConfig<Fragment, FragmentResponse>()
+    .Map(dest => dest.FragmentId, src => src.FragmentId != null ? src.FragmentId.Value : 0)
+    .Map(dest => dest.FragmentType, src => src.FragmentType.ToString())
+    .Map(dest => dest.Content, src => src.Content != null ? src.Content : null)
+    .Map(dest => dest.Position, src => src.Position);
+
+config.NewConfig<Post, PostDetailResponse>()
+    .Map(dest => dest.PostId, src => src.PostId != null ? src.PostId.Value : 0)
+    .Map(dest => dest.BlogId, src => src.BlogId.Value)
+    .Map(dest => dest.Status, src => src.Status.ToString())
+    .Map(dest => dest.PathSegment, src => src.PathSegment != null ? src.PathSegment.Value : null)
+    .Map(dest => dest.Version, src => src.Version != null ? src.Version.HexString : null)
+    .Map(dest => dest.Fragments, src => src.Fragments.Adapt<List<FragmentResponse>>());
+
+// Register the config and mapper
+builder.Services.AddSingleton(config);
+builder.Services.AddSingleton<ITypeMapper, TypeMapper>();
 
 var app = builder.Build();
 
@@ -116,10 +161,11 @@ if (app.Environment.IsDevelopment()) {
 // Configure the HTTP request pipeline.
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseHttpsRedirection();
+app.UseCors("AllowAngularClient"); // Enable CORS for cookie-based auth
 app.UseAuthentication();
 app.UseMiddleware<TokenValidationMiddleware>();
 app.UseAuthorization();
-app.UseMiddleware<RequestContextMiddleware>();
+app.UseMiddleware<RequestContextMiddleware>(); //TODO: do not use this middleware for live blog - only for backend scenarios
 app.MapControllers();
 
 // Apply migrations

@@ -5,7 +5,6 @@ namespace ABCD.Infra.Data {
     public class PostRecord {
         public int PostId { get; set; }
         public string Title { get; set; } = string.Empty;
-        public string? Content { get; set; }
         public int BlogId { get; set; }
         public BlogRecord Blog { get; set; } = null!;
         public ICollection<FragmentRecord> Fragments { get; set; } = new List<FragmentRecord>();
@@ -20,6 +19,7 @@ namespace ABCD.Infra.Data {
         public int? ParentPostId { get; set; } // nullable for root posts
         public PostRecord? ParentPost { get; set; } // navigation property (optional)
         public ICollection<PostRecord> ChildPosts { get; set; } = new List<PostRecord>(); // navigation property (optional)
-        public string Slug { get; set; } = string.Empty; // URL path to access the post
+        public string? PathSegment { get; set; } // URL path to access the post
+        public byte[] Version { get; set; } = Array.Empty<byte>(); // RowVersion for concurrency
     }
 }

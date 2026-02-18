@@ -41,14 +41,13 @@ namespace ABCD.Infra.Data {
                 entity.HasKey(e => e.PostId);
                 entity.Property(e => e.PostId).ValueGeneratedOnAdd();
                 entity.Property(e => e.Title).IsRequired().HasMaxLength(250);
-                entity.Property(e => e.Content);
                 entity.Property(e => e.BlogId).IsRequired();
                 entity.Property(e => e.Status)
                       .HasConversion<string>()
                       .IsRequired()
                       .HasMaxLength(15);                
-                entity.Property(e => e.Slug).HasMaxLength(250);
-                entity.HasIndex(e => e.Slug).IsUnique();
+                entity.Property(e => e.PathSegment).HasMaxLength(250);
+                entity.HasIndex(e => e.PathSegment).IsUnique();
                 entity.HasMany(e => e.Fragments)
                       .WithOne(e => e.Post)
                       .HasForeignKey(e => e.PostId)
@@ -58,13 +57,18 @@ namespace ABCD.Infra.Data {
                 entity.Property(e => e.CreatedDate).IsRequired();
                 entity.Property(e => e.UpdatedBy).IsRequired().HasMaxLength(450);
                 entity.Property(e => e.UpdatedDate).IsRequired();
+                entity.Property(e => e.Version)
+                      .IsRowVersion()
+                      .IsRequired();
             });
 
             modelBuilder.Entity<FragmentRecord>(entity => {
                 entity.ToTable("Fragments");
-                entity.HasKey(e => new { e.PostId, e.Position });
+                entity.HasKey(e => e.FragmentId);
+                entity.Property(e => e.FragmentId).ValueGeneratedOnAdd();
                 entity.Property(e => e.PostId).IsRequired();
                 entity.Property(e => e.Position).IsRequired();
+                entity.HasIndex(e => new { e.PostId, e.Position }).IsUnique();
                 entity.Property(e => e.Content).IsRequired();
                 entity.Property(e => e.Excluded).IsRequired(false);
                 entity.Property(e => e.FragmentType)
