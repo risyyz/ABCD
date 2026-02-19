@@ -1,26 +1,44 @@
 <div class="table-fragment-wrapper">
-    <div class="field">
-      <label class="label">Table</label>
-      <div class="control">
-        <table class="table is-bordered is-fullwidth">
-          <thead>
-            <tr>
-              <th *ngFor="let col of columnIndexes; let i = index">
-                <!--<input class="input" [(ngModel)]="columns[i]" placeholder="Column {{i + 1}}" #editableControl />-->
-                Heading {{i}}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let row of rowIndexes; let rowIndex = index">
-              <td *ngFor="let col of columnIndexes; let colIndex = index">
-                <!--<input class="input" [(ngModel)]="rows[rowIndex][colIndex]" placeholder="Cell" #editableControl />-->
-                Cell {{row}},{{col}}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+  <div class="field">
+    <div class="control">
+      <table class="table is-bordered is-fullwidth">
+        <caption>
+          <input class="input" [(ngModel)]="table.caption" placeholder="Enter table caption..." style="width: 100%; font-weight: bold; text-align: center;" [disabled]="!isTableEditing" />
+        </caption>
+        <thead>
+          <tr>
+            <th *ngFor="let col of table.columns; let colIndex = index">
+              <button (click)="insertColumn(colIndex)" title="Insert column left" class="insert-btn" [disabled]="!isTableEditing">+</button>
+              <input class="input" [(ngModel)]="col.header" [style.max-width.px]="col.maxWidth || 200" [disabled]="!isTableEditing" />
+              <select [(ngModel)]="col.alignment" class="select is-small" style="width:auto;display:inline-block;" [disabled]="!isTableEditing">
+                <option value="left">Left</option>
+                <option value="center">Center</option>
+                <option value="right">Right</option>
+              </select>
+              <button (click)="removeColumn(colIndex)" title="Remove column" [disabled]="!isTableEditing">&times;</button>
+            </th>
+            <th>
+              <button (click)="addColumn()" title="Add column" [disabled]="!isTableEditing">+</button>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of table.rows; let rowIndex = index">
+            <td *ngFor="let cell of row; let colIndex = index" [ngClass]="'align-' + (table.columns[colIndex].alignment || 'left')">
+              <input class="input" [(ngModel)]="cell.value" [disabled]="!isTableEditing" />
+            </td>
+            <td>
+              <button (click)="insertRow(rowIndex)" title="Insert row above" class="insert-btn" [disabled]="!isTableEditing">+</button>
+              <button (click)="removeRow(rowIndex)" title="Remove row" [disabled]="!isTableEditing">&times;</button>
+            </td>
+          </tr>
+          <tr>
+            <td [attr.colspan]="table.columns.length + 1">
+              <button (click)="addRow()" title="Add row" [disabled]="!isTableEditing">Add Row</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
-    <!-- Add buttons for adding/removing rows/columns as needed -->
   </div>
+</div>
