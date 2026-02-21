@@ -2,20 +2,64 @@
   <div class="field">
     <label class="label">Upload Image</label>
     <div class="control">
-      <input type="file" (change)="onFileChange($event)" accept="image/*" #editableControl />
+      <input type="file" class="input" (change)="onFileChange($event)" accept="image/*" [disabled]="!isEditable" #editableControl />
     </div>
   </div>
+
+  <div class="field">
+    <label class="label">Destination File Name</label>
+    <div class="control">
+      <input
+        type="text"
+        class="input"
+        [(ngModel)]="image.fileName"
+        [disabled]="!isEditable"
+        placeholder="Enter destination file name..."
+        #editableControl
+      />
+    </div>
+  </div>
+
   <div class="field">
     <label class="label">Image Caption</label>
     <div class="control">
-      <input type="text" class="input" [(ngModel)]="caption" placeholder="Enter caption..." #editableControl />
+      <input
+        type="text"
+        class="input"
+        [(ngModel)]="image.caption"
+        [disabled]="!isEditable"
+        placeholder="Enter caption..."
+        #editableControl
+      />
     </div>
   </div>
-  @if (imageSrc) {
+
+  <div class="field">
+    <div class="control">
+      <button
+        type="button"
+        class="button is-dark-grey"
+        (click)="uploadSelectedFile()"
+        [disabled]="!isEditable || isUploading"
+      >
+        {{ isUploading ? 'Uploading...' : 'Upload Image' }}
+      </button>
+    </div>
+  </div>
+
+  @if (errorMessage) {
+    <p class="help is-danger">{{ errorMessage }}</p>
+  }
+
+  @if (uploadSuccessMessage) {
+    <p class="help is-success">{{ uploadSuccessMessage }}</p>
+  }
+
+  @if (previewUrl) {
     <div class="field">
       <label class="label">Preview</label>
       <div class="control">
-        <img [src]="imageSrc" [alt]="caption" class="image-preview" />
+        <img [src]="previewUrl" [alt]="image.caption" class="image-preview" />
       </div>
     </div>
   }

@@ -14,9 +14,11 @@ using Mapster;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 
 using Swashbuckle.AspNetCore.Filters;
@@ -52,6 +54,7 @@ builder.Services.Configure<Settings>(options => {
 
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection(JwtSettings.SectionName));
 builder.Services.Configure<CachingSettings>(builder.Configuration.GetSection(CachingSettings.SectionName));
+builder.Services.Configure<FileUploadSettings>(builder.Configuration.GetSection(FileUploadSettings.SectionName));
 
 // Add services to the container.
 var connectionString = configuration.GetConnectionString("DefaultConnection");
@@ -158,9 +161,28 @@ if (app.Environment.IsDevelopment()) {
     app.UseSwaggerUI();
 }
 
+var fileUploadSettings = app.Services.GetRequiredService<IOptions<FileUploadSettings>>().Value;
+if (string.IsNullOrWhiteSpace(fileUploadSettings.RootPath)) {
+    fileUploadSettings.RootPath = "uploads";
+}
+if (!Path.IsPathRooted(fileUploadSettings.RootPath)) {
+    fileUploadSettings.RootPath = Path.GetFullPath(Path.Combine(app.Environment.ContentRootPath, fileUploadSettings.RootPath));
+}
+if (string.IsNullOrWhiteSpace(fileUploadSettings.RequestPath)) {
+    fileUploadSettings.RequestPath = "/uploads";
+}
+if (!fileUploadSettings.RequestPath.StartsWith('/')) {
+    fileUploadSettings.RequestPath = "/" + fileUploadSettings.RequestPath;
+}
+Directory.CreateDirectory(fileUploadSettings.RootPath);
+
 // Configure the HTTP request pipeline.
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseHttpsRedirection();
+app.UseStaticFiles(new StaticFileOptions {
+    FileProvider = new PhysicalFileProvider(fileUploadSettings.RootPath),
+    RequestPath = fileUploadSettings.RequestPath
+});
 app.UseCors("AllowAngularClient"); // Enable CORS for cookie-based auth
 app.UseAuthentication();
 app.UseMiddleware<TokenValidationMiddleware>();

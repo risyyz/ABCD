@@ -68,7 +68,7 @@
                     <app-code-fragment [fragment]="fragment"></app-code-fragment>
                   }
                   @if (fragment.fragmentType === 'Image') {
-                    <app-image-fragment [fragment]="fragment"></app-image-fragment>
+                    <app-image-fragment [fragment]="fragment" [postId]="post.postId"></app-image-fragment>
                   }
                   @if (fragment.fragmentType === 'RichText') {
                     <app-rich-text-fragment [fragment]="fragment"></app-rich-text-fragment>
