@@ -1,23 +1,18 @@
 <div class="code-fragment-wrapper">
-  <div class="field">
-    <label class="label">Language</label>
+  <div class="field">    
     <div class="control">
-      <!--<select class="input" [(ngModel)]="language" #editableControl>
-        @for (lang of languages; track lang) {
-          <option [value]="lang.value">{{ lang.label }}</option>
-        }
-      </select>-->
+      <div class="select">
+        <select [(ngModel)]="editableCode.language" (ngModelChange)="onLanguageChange()" [disabled]="!isEditing" #editableControl>
+          <option *ngFor="let lang of languages" [value]="lang.value">{{ lang.label }}</option>
+        </select>
+      </div>
     </div>
   </div>
   <div class="field">
-    <label class="label">Code</label>
     <div class="control">
       <ngx-monaco-editor
-        [(ngModel)]="code"
-        [options]="{
-          theme: 'vs-dark',
-          language: 'javascript'
-        }"
+        [(ngModel)]="editableCode.code"
+        [options]="{ ...editorOptions, readOnly: !isEditing }"
         style="min-height: 200px; width: 100%;">
       </ngx-monaco-editor>
     </div>
