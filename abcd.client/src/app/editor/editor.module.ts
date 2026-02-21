@@ -13,6 +13,7 @@ import { NgxEditorModule } from 'ngx-editor';
 import { ImageFragmentComponent } from './image-fragment/image-fragment.component';
 import { TableFragmentComponent } from './table-fragment/table-fragment.component';
 import { CodeFragmentComponent } from './code-fragment/code-fragment.component';
+import { MonacoEditorModule } from 'ngx-monaco-editor-v2';
 
 @NgModule({
   declarations: [
@@ -30,7 +31,8 @@ import { CodeFragmentComponent } from './code-fragment/code-fragment.component';
     FormsModule,
     EditorRoutingModule,
     CreatePostComponent,
-    NgxEditorModule
+    NgxEditorModule,
+    MonacoEditorModule.forRoot()
   ]
 })
 export class EditorModule { }

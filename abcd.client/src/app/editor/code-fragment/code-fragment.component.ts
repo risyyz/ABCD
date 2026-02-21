@@ -1,7 +1,7 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { Editor, Toolbar } from 'ngx-editor';
+import { Component, Input } from '@angular/core';
 import { Fragment } from '../models/fragment.model';
 import { IFragmentComponent } from '../models/fragment-component.interface';
+
 
 @Component({
   selector: 'app-code-fragment',
@@ -9,16 +9,12 @@ import { IFragmentComponent } from '../models/fragment-component.interface';
   styleUrls: ['./code-fragment.component.scss'],
   standalone: false
 })
-export class CodeFragmentComponent implements OnInit, OnDestroy, IFragmentComponent {
+export class CodeFragmentComponent implements IFragmentComponent {
   @Input() fragment!: Fragment;
-  original!: Fragment;
-  isEditable: boolean = false;
-
+  code: string = "function x() {\nconsole.log('Hello world!');\n}";
   language: string = 'javascript';
-  editor: Editor;
-  toolbar: Toolbar = [
-    ['code']
-  ];
+  isEditing: boolean = false;
+
   languages = [
     { value: 'javascript', label: 'JavaScript' },
     { value: 'csharp', label: 'C#' },
@@ -26,34 +22,16 @@ export class CodeFragmentComponent implements OnInit, OnDestroy, IFragmentCompon
     { value: 'html', label: 'HTML' }
   ];
 
-  constructor() {
-    this.editor = new Editor();
-  }
-
-  ngOnInit() {
-    this.original = this.deepCopy(this.fragment);
-  }
-
-  ngOnDestroy(): void {
-    this.editor.destroy();
-  }
-
   setEditMode(isEditing: boolean) {
-    console.log('CodeFragmentComponent setEditMode: ' + isEditing);
-    this.isEditable = isEditing;
+    this.isEditing = isEditing;
   }
 
   revert() {
-    console.log('reverting code fragment to original');
-    Object.assign(this.fragment, this.original);
+    // Implement revert logic if needed
   }
 
   getCurrentFragment(): Fragment {
-    console.log('returning latest code fragment');
+    console.log(this.code);
     return this.fragment;
-  }
-
-  deepCopy(fragment: Fragment): Fragment {
-    return JSON.parse(JSON.stringify(fragment));
   }
 }

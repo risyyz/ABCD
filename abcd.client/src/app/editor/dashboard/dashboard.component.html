@@ -36,63 +36,75 @@
                 <div class="level-item">
                   <div class="field has-addons">
                     <div class="control">
-                      <input class="input"
-                             type="text"
-                             placeholder="Search posts by title..."
-                             [(ngModel)]="searchTerm"/>
-                    </div>
-                    <div class="control">
-                      <button class="button no-border" title="Search">
-                        <span class="icon">
-                          <i class="fa-solid fa-magnifying-glass"></i>
-                        </span>
-                      </button>
+                      <!--<input class="input"
+                        type="text"
+                        placeholder="Search posts by title..."
+                        [(ngModel)]="searchTerm"/>-->
+                      </div>
+                      <div class="control">
+                        <button class="button no-border" title="Search">
+                          <span class="icon">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                          </span>
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
+
+              @if (showCreatePost) {
+                <app-create-post (close)="closeCreatePost()"></app-create-post>
+              }
+
+              <table class="table is-fullwidth">
+                <thead>
+                  <tr>
+                    <th>Title</th>
+                    <th>Path</th>
+                    <th class="has-text-centered">Status</th>
+                    <th>Date Published</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (post of filteredPosts; track post) {
+                    <tr>
+                      <td>
+                        <a [routerLink]="['/editor/edit', post.postId]">{{ post.title }}</a>
+                      </td>
+                      <td>{{ post.pathSegment?.value }}</td>
+                      <td class="has-text-centered">
+                        @if (post.status === 'draft') {
+                          <span>
+                            <i class="fa-solid fa-pencil-alt"></i>
+                          </span>
+                        }
+                        @if (post.status === 'published') {
+                          <span>
+                            <i class="fa-solid fa-tower-broadcast"></i>
+                          </span>
+                        }
+                      </td>
+                      <td>
+                        @if (post.status === 'published') {
+                          <span>
+                            {{ post.datePublished | date:'mediumDate' }}
+                          </span>
+                        }
+                      </td>
+                    </tr>
+                  }
+                  @if (filteredPosts.length === 0) {
+                    <tr>
+                      <td colspan="3" class="has-text-centered">No posts found.</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
             </div>
-
-            <app-create-post *ngIf="showCreatePost" (close)="closeCreatePost()"></app-create-post>
-
-            <table class="table is-fullwidth">
-              <thead>
-                <tr>
-                  <th>Title</th>
-                  <th>Path</th>
-                  <th class="has-text-centered">Status</th>
-                  <th>Date Published</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let post of filteredPosts">
-                  <td>
-                    <a [routerLink]="['/editor/edit', post.postId]">{{ post.title }}</a>
-                  </td>
-                  <td>{{ post.pathSegment?.value }}</td>
-                  <td class="has-text-centered">
-                    <span *ngIf="post.status === 'draft'">
-                      <i class="fa-solid fa-pencil-alt"></i>
-                    </span>
-                    <span *ngIf="post.status === 'published'">
-                      <i class="fa-solid fa-tower-broadcast"></i>
-                    </span>
-                  </td>
-                  <td>
-                    <span *ngIf="post.status === 'published'">
-                      {{ post.datePublished | date:'mediumDate' }}
-                    </span>
-                  </td>
-                </tr>
-                <tr *ngIf="filteredPosts.length === 0">
-                  <td colspan="3" class="has-text-centered">No posts found.</td>
-                </tr>
-              </tbody>
-            </table>
           </div>
         </div>
       </div>
-    </div>
 
-  </main>
-</div>
+    </main>
+  </div>

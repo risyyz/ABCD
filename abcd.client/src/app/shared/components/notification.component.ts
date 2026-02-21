@@ -5,13 +5,15 @@ import { NotificationService, NotificationMessage } from '../services/notificati
   selector: 'app-notification',
   standalone: false,
   template: `
-    <div class="notification-container" *ngFor="let notification of notifications; trackBy: trackByIndex">
-      <div class="notification" [ngClass]="'is-' + notification.type">
-        <button class="delete" (click)="removeNotification(notification)"></button>
-        {{ notification.message }}
+    @for (notification of notifications; track trackByIndex) {
+      <div class="notification-container">
+        <div class="notification" [ngClass]="'is-' + notification.type">
+          <button class="delete" (click)="removeNotification(notification)"></button>
+          {{ notification.message }}
+        </div>
       </div>
-    </div>
-  `,
+    }
+    `,
   styles: [`
     .notification-container {
       position: fixed;

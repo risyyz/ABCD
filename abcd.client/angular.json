@@ -23,7 +23,7 @@
         "build": {
           "builder": "@angular/build:application",
           "options": {
-            "outputPath": "dist/abcd.client",
+            "outputPath": "assets/monacodist/abcd.client",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -31,9 +31,12 @@
             ],
             "tsConfig": "tsconfig.app.json",
             "assets": [
+              "src/favicon.ico",
+              "src/assets",
               {
                 "glob": "**/*",
-                "input": "public"
+                "input": "node_modules/monaco-editor",
+                "output": "assets/monaco"
               }
             ],
             "styles": [

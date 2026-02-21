@@ -15,7 +15,7 @@
                 <div class="control has-floating-label">
                   <input class="input is-medium with-floating-label" id="email" placeholder=" " type="text" required formControlName="email">
                   <label class="label is-floating-label" for="email">Email</label>
-                </div>                
+                </div>
               </div>
 
               <!-- Password Field -->
@@ -24,42 +24,48 @@
                   <input class="input is-medium with-floating-label" id="password" placeholder=" " type="password" required formControlName="password">
                   <label class="label is-floating-label" for="password">Password</label>
                 </div>
-                <p class="help is-danger" *ngIf="password?.invalid && password?.touched">
-                  <span *ngIf="password?.errors?.['required']">Password is required</span>
-                </p>
+                @if (password?.invalid && password?.touched) {
+                  <p class="help is-danger">
+                    @if (password?.errors?.['required']) {
+                      <span>Password is required</span>
+                    }
+                  </p>
+                }
               </div>
               <!-- Captcha Checkbox -->
               <div class="field">
                 <div class="control">
                   <label class="checkbox">
-                    <input 
-                      type="checkbox" 
+                    <input
+                      type="checkbox"
                       formControlName="captcha"
                       (change)="onCaptchaChange($any($event.target).checked)">
-                    I am not a robot
-                  </label>
+                      I am not a robot
+                    </label>
+                  </div>
+                  @if (captcha?.invalid && captcha?.touched) {
+                    <p class="help is-danger">
+                      Please verify that you are human
+                    </p>
+                  }
                 </div>
-                <p class="help is-danger" *ngIf="captcha?.invalid && captcha?.touched">
-                  Please verify that you are human
-                </p>
-              </div>
 
-              <!-- Submit Button -->
-              <div class="field">
-                <div class="control">
-                  <button 
-                    class="button is-dark-grey is-fullwidth is-medium"
-                    type="submit"
-                    [disabled]="isSignInDisabled()"
-                    [class.is-loading]="isLoading">
-                    <span>Sign In</span>
-                  </button>
+                <!-- Submit Button -->
+                <div class="field">
+                  <div class="control">
+                    <button
+                      class="button is-dark-grey is-fullwidth is-medium"
+                      type="submit"
+                      [disabled]="isSignInDisabled()"
+                      [class.is-loading]="isLoading">
+                      <span>Sign In</span>
+                    </button>
+                  </div>
                 </div>
-              </div>
-            </form>
+              </form>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-</div>

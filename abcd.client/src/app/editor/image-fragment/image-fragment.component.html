@@ -11,10 +11,12 @@
       <input type="text" class="input" [(ngModel)]="caption" placeholder="Enter caption..." #editableControl />
     </div>
   </div>
-  <div class="field" *ngIf="imageSrc">
-    <label class="label">Preview</label>
-    <div class="control">
-      <img [src]="imageSrc" [alt]="caption" class="image-preview" />
+  @if (imageSrc) {
+    <div class="field">
+      <label class="label">Preview</label>
+      <div class="control">
+        <img [src]="imageSrc" [alt]="caption" class="image-preview" />
+      </div>
     </div>
-  </div>
+  }
 </div>

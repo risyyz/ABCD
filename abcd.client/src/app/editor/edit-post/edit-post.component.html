@@ -1,69 +1,87 @@
-<div *ngIf="post" class="container">
-  <div class="is-flex is-align-items-center is-justify-content-space-between">
-    <h2 class="title">Edit Post</h2>
-    <button type="button" class="button is-dark-grey" style="margin-left:auto;" *ngIf="post.status === 'Draft'">Publish</button>
-    <button type="button" class="button is-dark-grey" style="margin-left:auto;" *ngIf="post.status === 'Published'">Convert to Draft</button>
-  </div>  
-  <main class="section">
-    <div class="columns is-centered">
-      <div class="column is-10">
-        <div class="box">
-          <div *ngIf="errorMessage" class="notification is-danger">
-            {{ errorMessage }}
-          </div>
-          <div class="content">
-            <div class="is-flex is-justify-content-flex-end" style="margin-bottom: 1rem;">
-              <span class="has-text-right has-text-grey">
-                <span *ngIf="post.dateLastPublished">
-                  Last published on {{ post.dateLastPublished }}
+@if (post) {
+  <div class="container">
+    <div class="is-flex is-align-items-center is-justify-content-space-between">
+      <h2 class="title">Edit Post</h2>
+      @if (post.status === 'Draft') {
+        <button type="button" class="button is-dark-grey" style="margin-left:auto;">Publish</button>
+      }
+      @if (post.status === 'Published') {
+        <button type="button" class="button is-dark-grey" style="margin-left:auto;">Convert to Draft</button>
+      }
+    </div>
+    <main class="section">
+      <div class="columns is-centered">
+        <div class="column is-10">
+          <div class="box">
+            @if (errorMessage) {
+              <div class="notification is-danger">
+                {{ errorMessage }}
+              </div>
+            }
+            <div class="content">
+              <div class="is-flex is-justify-content-flex-end" style="margin-bottom: 1rem;">
+                <span class="has-text-right has-text-grey">
+                  @if (post.dateLastPublished) {
+                    <span>
+                      Last published on {{ post.dateLastPublished }}
+                    </span>
+                  }
+                  @if (post.version) {
+                    <span class="is-size-7">v{{ post.version }}</span>
+                  }
                 </span>
-                <span class="is-size-7" *ngIf="post.version">v{{ post.version }}</span>                
-              </span>
+              </div>
+              <app-editable-generic>
+                <div class="field">
+                  <div class="control has-floating-label">
+                    <input class="input is-medium with-floating-label" placeholder=" " id="title" type="text" [(ngModel)]="post.title" name="title" required maxlength="250" #editableControl />
+                    <label class="label is-floating-label" for="title">Title</label>
+                  </div>
+                </div>
+                <div class="field">
+                  <div class="control has-floating-label">
+                    <textarea class="textarea is-medium with-floating-label" placeholder=" " id="synopsis" [(ngModel)]="post.synopsis" name="synopsis" rows="3" #editableControl></textarea>
+                    <label class="label is-floating-label" for="synopsis">Synopsis</label>
+                  </div>
+                </div>
+                <div class="field">
+                  <div class="control has-floating-label">
+                    <input class="input is-medium with-floating-label" placeholder=" " id="pathSegment" type="text" [(ngModel)]="post.pathSegment" name="pathSegment" required maxlength="250" #editableControl />
+                    <label class="label is-floating-label" for="pathSegment">Path Segment</label>
+                  </div>
+                </div>
+              </app-editable-generic>
+              @for (fragment of post.fragments; track fragment) {
+                <app-editable-fragment #editableFragmentComp
+                  [fragmentId]="fragment.fragmentId"
+                  [position]="fragment.position"
+                  [fragmentCount]="post.fragments.length"
+                  [highlight]="fragment.highlight"
+                  [addFragmentDropdownOpen]="activeAddFragmentDropdownId === fragment.fragmentId"
+                  (fragmentMoveUp)="onFragmentMoveUp($event)"
+                  (fragmentMoveDown)="onFragmentMoveDown($event)"
+                  (fragmentSave)="onFragmentSave($event)"
+                  (addFragmentDropdownOpenChange)="activeAddFragmentDropdownId = $event"
+                  (fragmentAdd)="onFragmentAdd($event)"
+                  (fragmentDelete)="onFragmentDelete($event)">
+                  @if (fragment.fragmentType === 'Code') {
+                    <app-code-fragment [fragment]="fragment"></app-code-fragment>
+                  }
+                  @if (fragment.fragmentType === 'Image') {
+                    <app-image-fragment [fragment]="fragment"></app-image-fragment>
+                  }
+                  @if (fragment.fragmentType === 'RichText') {
+                    <app-rich-text-fragment [fragment]="fragment"></app-rich-text-fragment>
+                  }
+                  @if (fragment.fragmentType === 'Table') {
+                    <app-table-fragment [fragment]="fragment"></app-table-fragment>
+                  }
+                </app-editable-fragment>
+              }
             </div>
-            <app-editable-generic>
-              <div class="field">
-                <div class="control has-floating-label">
-                  <input class="input is-medium with-floating-label" placeholder=" " id="title" type="text" [(ngModel)]="post.title" name="title" required maxlength="250" #editableControl />
-                  <label class="label is-floating-label" for="title">Title</label>
-                </div>
-              </div>
-              <div class="field">
-                <div class="control has-floating-label">
-                  <textarea class="textarea is-medium with-floating-label" placeholder=" " id="synopsis" [(ngModel)]="post.synopsis" name="synopsis" rows="3" #editableControl></textarea>
-                  <label class="label is-floating-label" for="synopsis">Synopsis</label>
-                </div>
-              </div>
-              <div class="field">
-                <div class="control has-floating-label">
-                  <input class="input is-medium with-floating-label" placeholder=" " id="pathSegment" type="text" [(ngModel)]="post.pathSegment" name="pathSegment" required maxlength="250" #editableControl />
-                  <label class="label is-floating-label" for="pathSegment">Path Segment</label>
-                </div>
-              </div>
-            </app-editable-generic>
-            <ng-container *ngFor="let fragment of post.fragments">
-              <app-editable-fragment #editableFragmentComp
-                                     [fragmentId]="fragment.fragmentId"
-                                     [position]="fragment.position"
-                                     [fragmentCount]="post.fragments.length"
-                                     [highlight]="fragment.highlight"
-                                     [addFragmentDropdownOpen]="activeAddFragmentDropdownId === fragment.fragmentId"
-                                     (fragmentMoveUp)="onFragmentMoveUp($event)"
-                                     (fragmentMoveDown)="onFragmentMoveDown($event)"
-                                     (fragmentSave)="onFragmentSave($event)"
-                                     (addFragmentDropdownOpenChange)="activeAddFragmentDropdownId = $event"
-                                     (fragmentAdd)="onFragmentAdd($event)"
-                                     (fragmentDelete)="onFragmentDelete($event)">
-
-                <app-code-fragment *ngIf="fragment.fragmentType === 'Code'" [fragment]="fragment"></app-code-fragment>
-                <app-image-fragment *ngIf="fragment.fragmentType === 'Image'" [fragment]="fragment"></app-image-fragment>
-                <app-rich-text-fragment *ngIf="fragment.fragmentType === 'RichText'" [fragment]="fragment"></app-rich-text-fragment>
-                <app-table-fragment *ngIf="fragment.fragmentType === 'Table'" [fragment]="fragment"></app-table-fragment>
-
-              </app-editable-fragment>
-            </ng-container>
           </div>
         </div>
       </div>
-    </div>
-  </main>
-</div>
+    </main>
+  </div>
+}

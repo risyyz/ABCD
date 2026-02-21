@@ -7,31 +7,37 @@
         </caption>
         <thead>
           <tr>
-            <th *ngFor="let col of table.columns; let colIndex = index">
-              <button (click)="insertColumn(colIndex)" title="Insert column left" class="insert-btn" [disabled]="!isTableEditing">+</button>
-              <input class="input" [(ngModel)]="col.header" [style.max-width.px]="col.maxWidth || 200" [disabled]="!isTableEditing" />
-              <select [(ngModel)]="col.alignment" class="select is-small" style="width:auto;display:inline-block;" [disabled]="!isTableEditing">
-                <option value="left">Left</option>
-                <option value="center">Center</option>
-                <option value="right">Right</option>
-              </select>
-              <button (click)="removeColumn(colIndex)" title="Remove column" [disabled]="!isTableEditing">&times;</button>
-            </th>
+            @for (col of table.columns; track col; let colIndex = $index) {
+              <th>
+                <button (click)="insertColumn(colIndex)" title="Insert column left" class="insert-btn" [disabled]="!isTableEditing">+</button>
+                <input class="input" [(ngModel)]="col.header" [style.max-width.px]="col.maxWidth || 200" [disabled]="!isTableEditing" />
+                <select [(ngModel)]="col.alignment" class="select is-small" style="width:auto;display:inline-block;" [disabled]="!isTableEditing">
+                  <option value="left">Left</option>
+                  <option value="center">Center</option>
+                  <option value="right">Right</option>
+                </select>
+                <button (click)="removeColumn(colIndex)" title="Remove column" [disabled]="!isTableEditing">&times;</button>
+              </th>
+            }
             <th>
               <button (click)="addColumn()" title="Add column" [disabled]="!isTableEditing">+</button>
             </th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let row of table.rows; let rowIndex = index">
-            <td *ngFor="let cell of row; let colIndex = index" [ngClass]="'align-' + (table.columns[colIndex].alignment || 'left')">
-              <input class="input" [(ngModel)]="cell.value" [disabled]="!isTableEditing" />
-            </td>
-            <td>
-              <button (click)="insertRow(rowIndex)" title="Insert row above" class="insert-btn" [disabled]="!isTableEditing">+</button>
-              <button (click)="removeRow(rowIndex)" title="Remove row" [disabled]="!isTableEditing">&times;</button>
-            </td>
-          </tr>
+          @for (row of table.rows; track row; let rowIndex = $index) {
+            <tr>
+              @for (cell of row; track cell; let colIndex = $index) {
+                <td [ngClass]="'align-' + (table.columns[colIndex].alignment || 'left')">
+                  <input class="input" [(ngModel)]="cell.value" [disabled]="!isTableEditing" />
+                </td>
+              }
+              <td>
+                <button (click)="insertRow(rowIndex)" title="Insert row above" class="insert-btn" [disabled]="!isTableEditing">+</button>
+                <button (click)="removeRow(rowIndex)" title="Remove row" [disabled]="!isTableEditing">&times;</button>
+              </td>
+            </tr>
+          }
           <tr>
             <td [attr.colspan]="table.columns.length + 1">
               <button (click)="addRow()" title="Add row" [disabled]="!isTableEditing">Add Row</button>
