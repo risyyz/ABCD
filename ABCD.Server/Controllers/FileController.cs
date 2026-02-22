@@ -1,9 +1,11 @@
 using ABCD.Server.Models;
 
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
 
 namespace ABCD.Server.Controllers {
     [ApiController]
@@ -51,8 +53,14 @@ namespace ABCD.Server.Controllers {
 
             var destinationPath = Path.Combine(postFolderPath, destinationFileName);
 
+            // Save original image
             await using (var stream = new FileStream(destinationPath, FileMode.Create, FileAccess.Write)) {
                 await file.CopyToAsync(stream);
+            }
+
+            // Save resized images (open a new stream)
+            await using (var imageStream = file.OpenReadStream()) {
+                await SaveResizedImagesAsync(imageStream, postFolderPath, destinationFileName);
             }
 
             var requestPath = _fileUploadSettings.RequestPath.TrimEnd('/');
@@ -62,6 +70,20 @@ namespace ABCD.Server.Controllers {
                 ImageUrl = imageUrl,
                 FileName = destinationFileName
             });
+        }
+
+        private async Task SaveResizedImagesAsync(Stream input, string basePath, string fileName) {
+            var sizes = new[] { 480, 800, 1200 };
+            using var image = await SixLabors.ImageSharp.Image.LoadAsync(input);
+
+            foreach (var width in sizes) {
+                var resized = image.Clone(ctx => ctx.Resize(new ResizeOptions {
+                    Mode = ResizeMode.Max,
+                    Size = new Size(width, 0)
+                }));
+                var resizedPath = Path.Combine(basePath, $"{Path.GetFileNameWithoutExtension(fileName)}-{width}w{Path.GetExtension(fileName)}");
+                await resized.SaveAsync(resizedPath);
+            }
         }
     }
 }
