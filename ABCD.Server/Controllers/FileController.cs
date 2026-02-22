@@ -1,6 +1,7 @@
 using ABCD.Server.Models;
 
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
@@ -10,9 +11,11 @@ namespace ABCD.Server.Controllers {
     [Authorize]
     public class FileController : ControllerBase {
         private readonly FileUploadSettings _fileUploadSettings;
+        private readonly IWebHostEnvironment _env;
 
-        public FileController(IOptions<FileUploadSettings> fileUploadSettings) {
+        public FileController(IOptions<FileUploadSettings> fileUploadSettings, IWebHostEnvironment env) {
             _fileUploadSettings = fileUploadSettings.Value;
+            _env = env;
         }
 
         [HttpPost("posts/{postId:int}/image")]
@@ -42,7 +45,8 @@ namespace ABCD.Server.Controllers {
             if (!string.Equals(destinationFileName, Path.GetFileName(destinationFileName), StringComparison.Ordinal))
                 return BadRequest("Destination file name must not include directory separators.");
 
-            var postFolderPath = Path.Combine(_fileUploadSettings.RootPath, postId.ToString());
+            var wwwrootPath = Path.Combine(_env.ContentRootPath, "wwwroot");
+            var postFolderPath = Path.Combine(wwwrootPath, _fileUploadSettings.RootPath, postId.ToString());
             Directory.CreateDirectory(postFolderPath);
 
             var destinationPath = Path.Combine(postFolderPath, destinationFileName);

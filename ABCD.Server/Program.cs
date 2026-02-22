@@ -161,28 +161,11 @@ if (app.Environment.IsDevelopment()) {
     app.UseSwaggerUI();
 }
 
-var fileUploadSettings = app.Services.GetRequiredService<IOptions<FileUploadSettings>>().Value;
-if (string.IsNullOrWhiteSpace(fileUploadSettings.RootPath)) {
-    fileUploadSettings.RootPath = "uploads";
-}
-if (!Path.IsPathRooted(fileUploadSettings.RootPath)) {
-    fileUploadSettings.RootPath = Path.GetFullPath(Path.Combine(app.Environment.ContentRootPath, fileUploadSettings.RootPath));
-}
-if (string.IsNullOrWhiteSpace(fileUploadSettings.RequestPath)) {
-    fileUploadSettings.RequestPath = "/uploads";
-}
-if (!fileUploadSettings.RequestPath.StartsWith('/')) {
-    fileUploadSettings.RequestPath = "/" + fileUploadSettings.RequestPath;
-}
-Directory.CreateDirectory(fileUploadSettings.RootPath);
 
 // Configure the HTTP request pipeline.
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseHttpsRedirection();
-app.UseStaticFiles(new StaticFileOptions {
-    FileProvider = new PhysicalFileProvider(fileUploadSettings.RootPath),
-    RequestPath = fileUploadSettings.RequestPath
-});
+app.UseStaticFiles();
 app.UseCors("AllowAngularClient"); // Enable CORS for cookie-based auth
 app.UseAuthentication();
 app.UseMiddleware<TokenValidationMiddleware>();

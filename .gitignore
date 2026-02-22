@@ -395,6 +395,5 @@ FodyWeavers.xsd
 *.msp
 
 # JetBrains Rider
-*.sln.iml
-/ABCD.Server/uploads
-/ABCD.Server/wwwroot/uploads/1
+*.sln.iml1
+/ABCD.Server/wwwroot/

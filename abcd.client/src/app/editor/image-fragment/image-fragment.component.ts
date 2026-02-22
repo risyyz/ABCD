@@ -128,5 +128,8 @@ export class ImageFragmentComponent implements IFragmentComponent, OnInit, OnCha
     this.selectedFile = null;
     this.errorMessage = null;
     this.uploadSuccessMessage = null;
+
+    console.log(this.originalContent);
+    console.log(this.previewUrl);
   }
 }
