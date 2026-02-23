@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild, ElementRef } from '@angular/core';
 import { Fragment } from '../models/fragment.model';
 import { IFragmentComponent } from '../models/fragment-component.interface';
 import { EditableImage } from '../../models/editable-image.model';
@@ -13,6 +13,8 @@ import { PostService } from '../../services/post.service';
 export class ImageFragmentComponent implements IFragmentComponent, OnInit, OnChanges, OnDestroy {
   @Input() fragment!: Fragment;
   @Input() postId!: number;
+
+  @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
   image: EditableImage = new EditableImage();
   previewUrl: string = '';
@@ -123,6 +125,9 @@ export class ImageFragmentComponent implements IFragmentComponent, OnInit, OnCha
     this.selectedFile = null;
     this.errorMessage = null;
     this.uploadSuccessMessage = null;
+    if (this.fileInput) {
+      this.fileInput.nativeElement.value = '';
+    }
   }
 
   getCurrentFragment(): Fragment {
@@ -137,8 +142,5 @@ export class ImageFragmentComponent implements IFragmentComponent, OnInit, OnCha
     this.selectedFile = null;
     this.errorMessage = null;
     this.uploadSuccessMessage = null;
-
-    console.log(this.originalContent);
-    console.log(this.previewUrl);
   }
 }

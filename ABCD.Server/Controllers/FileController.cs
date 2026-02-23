@@ -25,11 +25,11 @@ namespace ABCD.Server.Controllers {
         [RequestSizeLimit(10 * 1024 * 1024)]
         public async Task<IActionResult> UploadImageAsync(ImageUploadRequest request) {
             ValidateImageUpload(request);
+
             var destinationFileName = request.DestinationFileName;
             var postFolderPath = Path.Combine(WWWRootPath, _fileUploadSettings.RootPath, request.PostId.ToString());
-            
             Directory.CreateDirectory(postFolderPath);
-            var destinationPath = Path.Combine(postFolderPath, destinationFileName!);
+            var destinationPath = Path.Combine(postFolderPath, destinationFileName);
 
             // Save original image
             await using (var stream = new FileStream(destinationPath, FileMode.Create, FileAccess.Write)) {
