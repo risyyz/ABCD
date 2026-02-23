@@ -2,6 +2,7 @@ using System.Text.Json;
 
 using ABCD.Application.Exceptions;
 using ABCD.Domain.Exceptions;
+using ABCD.Server.Exceptions;
 
 namespace ABCD.Server.Middlewares {
     public class ExceptionHandlingMiddleware {
@@ -10,6 +11,7 @@ namespace ABCD.Server.Middlewares {
 
         private static readonly Dictionary<Type, int> ExceptionStatusCodes = new()
         {
+            { typeof(ImageUploadException), StatusCodes.Status400BadRequest},
             { typeof(IllegalOperationException), StatusCodes.Status400BadRequest },
             { typeof(InvalidFragmentException), StatusCodes.Status400BadRequest },
             { typeof(DuplicatePathSegmentException), StatusCodes.Status400BadRequest },
@@ -43,7 +45,7 @@ namespace ABCD.Server.Middlewares {
 
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = statusCode;
-            var result = JsonSerializer.Serialize(new { error = errorMessage });
+            var result = JsonSerializer.Serialize(new { message = errorMessage });
             return context.Response.WriteAsync(result);
         }
     }

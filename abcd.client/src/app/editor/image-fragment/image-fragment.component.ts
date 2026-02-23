@@ -85,7 +85,7 @@ export class ImageFragmentComponent implements IFragmentComponent, OnInit, OnCha
     }
 
     this.isUploading = true;
-    this.postService.uploadImage(this.postId, this.selectedFile, this.image.fileName.trim())
+    this.postService.uploadImage(this.postId, this.selectedFile, this.image.fileName)
       .subscribe({
         next: response => {
           this.image.imageUrl = response.imageUrl;
@@ -95,8 +95,17 @@ export class ImageFragmentComponent implements IFragmentComponent, OnInit, OnCha
           this.isUploading = false;
           this.selectedFile = null;
         },
-        error: _ => {
-          this.errorMessage = 'Failed to upload image.';
+        error: err => {
+          // Try to extract the error message from the backend response
+          if (err?.error && typeof err.error === 'string') {
+            this.errorMessage = err.error;
+          } else if (err?.error?.message) {
+            this.errorMessage = err.error.message;
+          } else if (err?.message) {
+            this.errorMessage = err.message;
+          } else {
+            this.errorMessage = 'Failed to upload image.';
+          }
           this.isUploading = false;
         }
       });
