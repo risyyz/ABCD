@@ -5,7 +5,7 @@ import { NotificationService, NotificationMessage } from '../services/notificati
   selector: 'app-notification',
   standalone: false,
   template: `
-    @for (notification of notifications; track trackByIndex) {
+    @for (notification of notifications; track trackByIndex($index)) {
       <div class="notification-container">
         <div class="notification" [ngClass]="'is-' + notification.type">
           <button class="delete" (click)="removeNotification(notification)"></button>
