@@ -11,6 +11,16 @@
         public override bool Equals(object? obj) => obj is EntityId<T> other && Equals(other);
         public override int GetHashCode() => Value.GetHashCode();
         public override string ToString() => Value.ToString();
+
+        public static bool operator ==(EntityId<T>? left, EntityId<T>? right) {
+            if (ReferenceEquals(left, right)) return true;
+            if (left is null || right is null) return false;
+            return left.Value.Equals(right.Value);
+        }
+
+        public static bool operator !=(EntityId<T>? left, EntityId<T>? right) {
+            return !(left == right);
+        }
     }
 
     public sealed class BlogId : EntityId<int> {

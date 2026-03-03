@@ -154,7 +154,7 @@ namespace ABCD.Infra.Data {
             return await GetByPostIdAsync(post.BlogId!.Value, post.PostId!.Value);
         }
 
-        public async Task<Post> UpdatePostAsync(Post post) {
+        public async Task<Post> UpdatePostFragmentsAsync(Post post) {
             var trackedPost = await _context.Posts.Include(p => p.Fragments).FirstOrDefaultAsync(p => p.PostId == post.PostId!.Value);
             if (trackedPost == null) throw new ArgumentException("Post not found", nameof(post));
 
@@ -192,7 +192,7 @@ namespace ABCD.Infra.Data {
             return await GetByPostIdAsync(post.BlogId!.Value, post.PostId!.Value);
         }
 
-        public async Task<Post> UpdateFragmentAsync(Post post, Fragment fragment)
+        public async Task<Post> UpdatePostFragmentAsync(Post post, Fragment fragment)
         {
             var trackedPost = await _context.Posts.Include(p => p.Fragments).FirstOrDefaultAsync(p => p.PostId == post.PostId!.Value);
             if (trackedPost == null) throw new ArgumentException("Post not found", nameof(post));

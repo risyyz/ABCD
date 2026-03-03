@@ -12,6 +12,7 @@ export interface ImageUploadResponse {
 
 @Injectable({ providedIn: 'root' })
 export class PostService {
+  [x: string]: any;
   constructor(private http: HttpClient) {}
 
   getPosts(): Observable<any[]> {
@@ -56,5 +57,12 @@ export class PostService {
     formData.append('destinationFileName', destinationFileName);
 
     return this.http.post<ImageUploadResponse>(`/api/file/posts/${postId}/image`, formData);
+  }
+
+  savePost(request: Post): Observable<Post> {
+    return this.http.put<Post>(
+      `/api/posts/${request.postId}`,
+      { title: request.title, synopsis: request.synopsis, pathSegment: request.pathSegment, version: request.version }
+    );
   }
 }

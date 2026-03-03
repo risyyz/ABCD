@@ -20,7 +20,7 @@ namespace ABCD.Application {
             var post = await TryGetPostByIdAndVersion(command.PostId, command.Version);
             var fragment = post.GetFragmentById(command.AfterFragmentId);
             post.AddFragment(command.FragmentType, fragment?.Position + 1);
-            return await _postRepository.UpdatePostAsync(post);
+            return await _postRepository.UpdatePostFragmentsAsync(post);
         }
 
         public async Task<Post> CreatePostAsync(CreatePostCommand command) {
@@ -44,7 +44,7 @@ namespace ABCD.Application {
         public async Task<Post> DeleteFragmentAsync(DeleteFragmentCommand command) {
             var post = await TryGetPostByIdAndVersion(command.PostId, command.Version);
             post.RemoveFragment(command.FragmentId);
-            return await _postRepository.UpdatePostAsync(post);
+            return await _postRepository.UpdatePostFragmentsAsync(post);
         }
 
         public async Task<IEnumerable<Post>> GetAllAsync()
@@ -60,7 +60,7 @@ namespace ABCD.Application {
             var post = await TryGetPostByIdAndVersion(command.PostId, command.Version);
             var fragment = post.GetFragmentById(command.FragmentId);
             fragment.Content = command.Content;
-            return await _postRepository.UpdateFragmentAsync(post, fragment);
+            return await _postRepository.UpdatePostFragmentAsync(post, fragment);
         }
 
         public async Task<Post> MoveFragmentAsync(MoveFragmentCommand command) {
@@ -78,5 +78,18 @@ namespace ABCD.Application {
             
             return post;
         }
+
+        public async Task<Post> UpdatePostAsync(UpdatePostCommand command) {
+            var post = await TryGetPostByIdAndVersion(command.PostId, command.Version);
+            var postWithSamePathSegment = await _postRepository.GetByBlogIdAndPathSegmentAsync(_requestContext.Blog.BlogId.Value!, command.PathSegment?.Trim());
+
+            if(postWithSamePathSegment != null && postWithSamePathSegment.PostId != post.PostId)
+                throw new DuplicatePathSegmentException($"A post with the path segment '{command.PathSegment}' already exists in this blog.");
+
+            post.Title = command.Title;
+            //post.Synopsis = command.Synopsis;
+            post.PathSegment = new PathSegment(command.PathSegment);
+            return await _postRepository.UpdatePostFragmentsAsync(post);
+        }        
     }
 }

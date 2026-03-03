@@ -16,6 +16,8 @@ export class EditPostComponent implements OnInit {
   post: Post | null = null;
   errorMessage: string | null = null;
   activeAddFragmentDropdownId: number | null = null;
+  isHeaderEditing: boolean = false;
+  originalHeader: { title: string; synopsis: string; pathSegment?: string } | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -134,6 +136,42 @@ export class EditPostComponent implements OnInit {
         },
         error: (err) => {
           this.errorMessage = 'Failed to delete fragment. Please try again.';
+        }
+      });
+  }
+
+  onHeaderEdit() {
+    this.isHeaderEditing = true;
+    if (this.post) {
+      this.originalHeader = {
+        title: this.post.title,
+        synopsis: this.post.synopsis ?? '',
+        pathSegment: this.post.pathSegment
+      };
+    }
+  }
+
+  onHeaderCancel() {
+    this.isHeaderEditing = false;
+    if (this.post && this.originalHeader) {
+      this.post.title = this.originalHeader.title;
+      this.post.synopsis = this.originalHeader.synopsis;
+      this.post.pathSegment = this.originalHeader.pathSegment;
+    }
+  }
+
+  onHeaderSave() {
+    if (!this.post) return;
+    this.postService.savePost(this.post)
+      .subscribe({
+        next: (updatedPost: Post) => {
+          this.post = updatedPost;
+          this.errorMessage = null;
+          this.isHeaderEditing = false;
+        },
+        error: (err) => {
+          this.errorMessage = 'Failed to update post.';
+          this.isHeaderEditing = true;
         }
       });
   }
