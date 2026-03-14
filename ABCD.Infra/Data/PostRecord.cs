@@ -20,6 +20,7 @@ namespace ABCD.Infra.Data {
         public PostRecord? ParentPost { get; set; } // navigation property (optional)
         public ICollection<PostRecord> ChildPosts { get; set; } = new List<PostRecord>(); // navigation property (optional)
         public string? PathSegment { get; set; } // URL path to access the post
+        public DateTime? DateLastPublished { get; set; }
         public byte[] Version { get; set; } = Array.Empty<byte>(); // RowVersion for concurrency
     }
 }

@@ -52,22 +52,20 @@ namespace ABCD.Server.Controllers
             return Ok(response);
         }
 
-        // 1. Create post
-        [HttpPost("create")]
-        public IActionResult CreatePost([FromBody] object request)
-        {
-            throw new NotImplementedException();
-        }
-
         // 2. Update post
-        [HttpPut("update/{postId:int}")]
-        public IActionResult UpdatePost(int postId, [FromBody] object request)
-        {
-            throw new NotImplementedException();
+        [HttpPut("{postId:int}")]
+        public async Task<IActionResult> UpdatePostAsync(int postId, [FromBody] PostUpdateRequest request) {
+            if (string.IsNullOrWhiteSpace(request?.Version))
+                return BadRequest("Invalid request or missing version.");
+
+            var command = new UpdatePostCommand(postId, request.Title, request.Synopsis, request.PathSegment, request.Version);
+            var result = await _postService.UpdatePostAsync(command);
+            var response = _typeMapper.Map<Post, PostDetailResponse>(result);
+            return Ok(response);
         }
 
-        // 3. Delete post
-        [HttpDelete("delete/{postId:int}")]
+            // 3. Delete post
+        [HttpDelete("{postId:int}")]
         public IActionResult DeletePost(int postId)
         {
             throw new NotImplementedException();
@@ -126,6 +124,14 @@ namespace ABCD.Server.Controllers
 
             var updatedPost = await _postService.DeleteFragmentAsync(new DeleteFragmentCommand(request.PostId, request.FragmentId, request.Version));
             var response = _typeMapper.Map<Post, PostDetailResponse>(updatedPost);
+            return Ok(response);
+        }
+
+        [HttpPost("{postId:int}/status")]
+        public async Task<IActionResult> TogglePostStatusAsync([FromRoute] int postId, [FromBody] TogglePostStatusRequest request)
+        {
+            var result = await _postService.TogglePostStatusAsync(new TogglePostStatusCommand(postId, request.Version));
+            var response = _typeMapper.Map<Post, PostDetailResponse>(result);
             return Ok(response);
         }
     }

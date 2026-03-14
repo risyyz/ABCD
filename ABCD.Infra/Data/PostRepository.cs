@@ -61,7 +61,7 @@ namespace ABCD.Infra.Data {
                 }
             }
             var post = new Post(new BlogId(record.BlogId), new PostId(record.PostId), 
-                                record.Title, (PostStatus)record.Status, null, fragments) { 
+                                record.Title, (PostStatus)record.Status, record.DateLastPublished, fragments) { 
                 PathSegment = record.PathSegment != null ? new PathSegment(record.PathSegment) : null,
                 Version = new VersionToken(record.Version)
             };            
@@ -87,6 +87,7 @@ namespace ABCD.Infra.Data {
                 Title = post.Title,
                 Status = post.Status,
                 PathSegment = post.PathSegment?.Value,
+                DateLastPublished = post.DateLastPublished,
                 Version = post.Version?.Value ?? Array.Empty<byte>(),
                 Fragments = post.Fragments.Select(MapToRecord).ToList()
             };
@@ -154,12 +155,11 @@ namespace ABCD.Infra.Data {
             return await GetByPostIdAsync(post.BlogId!.Value, post.PostId!.Value);
         }
 
-        public async Task<Post> UpdatePostAsync(Post post) {
+        public async Task<Post> UpdatePostFragmentsAsync(Post post) {
             var trackedPost = await _context.Posts.Include(p => p.Fragments).FirstOrDefaultAsync(p => p.PostId == post.PostId!.Value);
             if (trackedPost == null) throw new ArgumentException("Post not found", nameof(post));
 
             trackedPost.Title = post.Title;
-            trackedPost.Status = post.Status;
             trackedPost.PathSegment = post.PathSegment?.Value;
             trackedPost.UpdatedDate = DateTime.UtcNow;
 
@@ -192,7 +192,23 @@ namespace ABCD.Infra.Data {
             return await GetByPostIdAsync(post.BlogId!.Value, post.PostId!.Value);
         }
 
-        public async Task<Post> UpdateFragmentAsync(Post post, Fragment fragment)
+        public async Task<Post> UpdatePostStatusAsync(Post post) {
+            var trackedPost = await _context.Posts.FindAsync(post.PostId!.Value);
+            if (trackedPost == null) throw new ArgumentException("Post not found", nameof(post));
+
+            trackedPost.Status = post.Status;
+            trackedPost.DateLastPublished = post.DateLastPublished;
+            trackedPost.UpdatedDate = DateTime.UtcNow;
+
+            _context.Entry(trackedPost).Property(p => p.Status).IsModified = true;
+            _context.Entry(trackedPost).Property(p => p.DateLastPublished).IsModified = true;
+            _context.Entry(trackedPost).Property(p => p.UpdatedDate).IsModified = true;
+
+            await _context.SaveChangesAsync();
+            return await GetByPostIdAsync(post.BlogId!.Value, post.PostId!.Value);
+        }
+
+        public async Task<Post> UpdatePostFragmentAsync(Post post, Fragment fragment)
         {
             var trackedPost = await _context.Posts.Include(p => p.Fragments).FirstOrDefaultAsync(p => p.PostId == post.PostId!.Value);
             if (trackedPost == null) throw new ArgumentException("Post not found", nameof(post));

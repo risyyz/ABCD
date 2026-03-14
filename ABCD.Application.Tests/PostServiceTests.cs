@@ -16,10 +16,10 @@ namespace ABCD.Application.Tests {
             };
             var post = new Post(new BlogId(1), new PostId(999), "Title", PostStatus.Draft, fragments: fragments) { Version = new VersionToken("11") };
             _postRepoMock.Setup(r => r.GetByPostIdAsync(1, 999)).ReturnsAsync(post);
-            _postRepoMock.Setup(r => r.UpdateFragmentAsync(post, fragments[0])).ReturnsAsync(post);
+            _postRepoMock.Setup(r => r.UpdatePostFragmentAsync(post, fragments[0])).ReturnsAsync(post);
             var service = new PostService(_context, _postRepoMock.Object);
             var result = await service.UpdateFragmentAsync(command);
-            _postRepoMock.Verify(r => r.UpdateFragmentAsync(post, It.Is<Fragment>(f => f.Content == "new content")), Times.Once);
+            _postRepoMock.Verify(r => r.UpdatePostFragmentAsync(post, It.Is<Fragment>(f => f.Content == "new content")), Times.Once);
             Assert.Equal("new content", result.Fragments.First().Content);
         }
 
@@ -147,7 +147,7 @@ namespace ABCD.Application.Tests {
             _postRepoMock.Setup(r => r.GetByPostIdAsync(1, 999)).ReturnsAsync(new Post(new BlogId(1), new PostId(999), "Title", PostStatus.Draft, fragments: fragments) { Version = new VersionToken("11") });
             var service = new PostService(_context, _postRepoMock.Object);
             await service.AddFragmentAsync(command);
-            _postRepoMock.Verify(r => r.UpdatePostAsync(It.IsAny<Post>()), Times.Once);
+            _postRepoMock.Verify(r => r.UpdatePostFragmentsAsync(It.IsAny<Post>()), Times.Once);
         }
 
         [Fact]
@@ -161,10 +161,10 @@ namespace ABCD.Application.Tests {
             };
             var post = new Post(new BlogId(1), new PostId(999), "Title", PostStatus.Draft, fragments: fragments) { Version = new VersionToken("11") };
             _postRepoMock.Setup(r => r.GetByPostIdAsync(1, 999)).ReturnsAsync(post);
-            _postRepoMock.Setup(r => r.UpdatePostAsync(It.IsAny<Post>())).ReturnsAsync(post);
+            _postRepoMock.Setup(r => r.UpdatePostFragmentsAsync(It.IsAny<Post>())).ReturnsAsync(post);
             var service = new PostService(_context, _postRepoMock.Object);
             var result = await service.DeleteFragmentAsync(command);
-            _postRepoMock.Verify(r => r.UpdatePostAsync(It.IsAny<Post>()), Times.Once);
+            _postRepoMock.Verify(r => r.UpdatePostFragmentsAsync(It.IsAny<Post>()), Times.Once);
             Assert.Single(result.Fragments);
             Assert.Equal(2, result.Fragments.First().FragmentId.Value);
         }

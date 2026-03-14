@@ -8,6 +8,8 @@ export class Post {
   pathSegment?: string;
   synopsis?: string;
   version: string = '';
+  canPublish: boolean = false;
+  publishReasons: string[] = [];
   fragments: Fragment[] = [];
 
   constructor(postId: number, title: string, status: 'Draft' | 'Published') {

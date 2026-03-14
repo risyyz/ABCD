@@ -85,6 +85,7 @@ public class Post {
         PostId = postId;
         Title = title;
         Status = status;
+        DateLastPublished = dateLastPublished;
     }
 
     private void InitializeFragments(IEnumerable<Fragment>? fragments, PostId postId) {
@@ -151,6 +152,9 @@ public class Post {
 
         if (PathSegment == null)
             result.AddReason("PathSegment must be set");
+
+        if (_fragments.Count == 0)
+            result.AddReason("Post must have at least one fragment");
 
         // Gather all path segments from this post and its ancestors
         var pathSegments = new HashSet<string>(StringComparer.OrdinalIgnoreCase);

@@ -14,9 +14,11 @@ using Mapster;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 
 using Swashbuckle.AspNetCore.Filters;
@@ -52,6 +54,7 @@ builder.Services.Configure<Settings>(options => {
 
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection(JwtSettings.SectionName));
 builder.Services.Configure<CachingSettings>(builder.Configuration.GetSection(CachingSettings.SectionName));
+builder.Services.Configure<FileUploadSettings>(builder.Configuration.GetSection(FileUploadSettings.SectionName));
 
 // Add services to the container.
 var connectionString = configuration.GetConnectionString("DefaultConnection");
@@ -140,12 +143,14 @@ config.NewConfig<Fragment, FragmentResponse>()
     .Map(dest => dest.Position, src => src.Position);
 
 config.NewConfig<Post, PostDetailResponse>()
-    .Map(dest => dest.PostId, src => src.PostId != null ? src.PostId.Value : 0)
-    .Map(dest => dest.BlogId, src => src.BlogId.Value)
-    .Map(dest => dest.Status, src => src.Status.ToString())
-    .Map(dest => dest.PathSegment, src => src.PathSegment != null ? src.PathSegment.Value : null)
-    .Map(dest => dest.Version, src => src.Version != null ? src.Version.HexString : null)
-    .Map(dest => dest.Fragments, src => src.Fragments.Adapt<List<FragmentResponse>>());
+.Map(dest => dest.PostId, src => src.PostId != null ? src.PostId.Value : 0)
+.Map(dest => dest.BlogId, src => src.BlogId.Value)
+.Map(dest => dest.Status, src => src.Status.ToString())
+.Map(dest => dest.PathSegment, src => src.PathSegment != null ? src.PathSegment.Value : null)
+.Map(dest => dest.Version, src => src.Version != null ? src.Version.HexString : null)
+.Map(dest => dest.Fragments, src => src.Fragments.Adapt<List<FragmentResponse>>())
+.Map(dest => dest.CanPublish, src => src.EligibleForPublishing().CanPublish)
+.Map(dest => dest.PublishReasons, src => src.EligibleForPublishing().Reasons.ToList());
 
 // Register the config and mapper
 builder.Services.AddSingleton(config);
@@ -158,9 +163,11 @@ if (app.Environment.IsDevelopment()) {
     app.UseSwaggerUI();
 }
 
+
 // Configure the HTTP request pipeline.
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseHttpsRedirection();
+app.UseStaticFiles();
 app.UseCors("AllowAngularClient"); // Enable CORS for cookie-based auth
 app.UseAuthentication();
 app.UseMiddleware<TokenValidationMiddleware>();

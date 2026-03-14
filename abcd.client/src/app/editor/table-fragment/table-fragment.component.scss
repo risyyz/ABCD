@@ -24,3 +24,35 @@
   outline: none;
   background: #fff;
 }
+
+.align-left {
+  text-align: left;
+}
+.align-center {
+  text-align: center;
+}
+.align-right {
+  text-align: right;
+}
+
+.table th button,
+.table td button {
+  margin-left: 0.25rem;
+  background: none;
+  border: none;
+  color: #b71c1c;
+  cursor: pointer;
+  font-size: 1.1em;
+  vertical-align: middle;
+}
+
+.table th button:hover,
+.table td button:hover {
+  color: #222;
+}
+
+.table select {
+  margin-left: 0.25rem;
+  font-size: 0.95em;
+  padding: 0.1em 0.3em;
+}

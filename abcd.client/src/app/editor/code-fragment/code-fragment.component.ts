@@ -1,7 +1,7 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { Editor, Toolbar } from 'ngx-editor';
+import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { Fragment } from '../models/fragment.model';
 import { IFragmentComponent } from '../models/fragment-component.interface';
+import { EditableCode } from '../../models/editable-code.model';
 
 @Component({
   selector: 'app-code-fragment',
@@ -9,51 +9,79 @@ import { IFragmentComponent } from '../models/fragment-component.interface';
   styleUrls: ['./code-fragment.component.scss'],
   standalone: false
 })
-export class CodeFragmentComponent implements OnInit, OnDestroy, IFragmentComponent {
+export class CodeFragmentComponent implements IFragmentComponent, OnInit, OnChanges {
   @Input() fragment!: Fragment;
-  original!: Fragment;
-  isEditable: boolean = false;
+  editableCode: EditableCode = new EditableCode();
+  isEditing: boolean = false;
 
-  language: string = 'javascript';
-  editor: Editor;
-  toolbar: Toolbar = [
-    ['code']
-  ];
+  //https://microsoft.github.io/monaco-editor/docs.html
+  editorOptions = {
+    theme: 'vs-dark',
+    language: 'javascript',
+    automaticLayout: true
+  };
+
   languages = [
     { value: 'javascript', label: 'JavaScript' },
     { value: 'csharp', label: 'C#' },
-    { value: 'java', label: 'Java' },
-    { value: 'html', label: 'HTML' }
+    { value: 'html', label: 'HTML' },
+    { value: 'python', label: 'Python' },
+    { value: 'sql', label: 'SQL' },
+    { value: 'typescript', label: 'TypeScript' }
   ];
 
-  constructor() {
-    this.editor = new Editor();
-  }
-
   ngOnInit() {
-    this.original = this.deepCopy(this.fragment);
+    this.initFromFragment();
   }
 
-  ngOnDestroy(): void {
-    this.editor.destroy();
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['fragment']) {
+      this.initFromFragment();
+    }
+  }
+
+  private initFromFragment() {
+    if (this.fragment && this.fragment.content) {
+      try {
+        this.editableCode = EditableCode.fromJSON(this.fragment.content);
+      } catch {
+        this.editableCode = new EditableCode();
+      }
+    } else {
+      this.editableCode = new EditableCode();
+    }
+    this.updateEditorOptions();
   }
 
   setEditMode(isEditing: boolean) {
-    console.log('CodeFragmentComponent setEditMode: ' + isEditing);
-    this.isEditable = isEditing;
+    this.isEditing = isEditing;
+    if (isEditing) {
+      this._original = this.editableCode.toJSON();
+    }
   }
 
+  private _original: string = '';
+
   revert() {
-    console.log('reverting code fragment to original');
-    Object.assign(this.fragment, this.original);
+    if (this._original) {
+      this.editableCode = EditableCode.fromJSON(this._original);
+      this.updateEditorOptions();
+    }
+  }
+
+  onLanguageChange() {
+    this.updateEditorOptions();
+  }
+
+  private updateEditorOptions() {
+    this.editorOptions = {
+      ...this.editorOptions,
+      language: this.editableCode.language
+    };
   }
 
   getCurrentFragment(): Fragment {
-    console.log('returning latest code fragment');
+    this.fragment.content = this.editableCode.toJSON();
     return this.fragment;
-  }
-
-  deepCopy(fragment: Fragment): Fragment {
-    return JSON.parse(JSON.stringify(fragment));
   }
 }

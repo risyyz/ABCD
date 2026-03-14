@@ -5,8 +5,14 @@ import { Post } from '../editor/models/post.model';
 import { MoveFragmentRequest } from '../editor/models/move-fragment-request.model'; 
 import { FragmentUpdateRequest } from '../editor/models/fragment-update-request.model';
 
+export interface ImageUploadResponse {
+  imageUrl: string;
+  fileName: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class PostService {
+  [x: string]: any;
   constructor(private http: HttpClient) {}
 
   getPosts(): Observable<any[]> {
@@ -42,6 +48,28 @@ export class PostService {
     return this.http.put<Post>(
       `/api/posts/${request.postId}/fragments/${request.fragmentId}`,
       { content: request.content, version: request.version }
+    );
+  }
+
+  uploadImage(postId: number, file: File, destinationFileName: string): Observable<ImageUploadResponse> {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('destinationFileName', destinationFileName);
+
+    return this.http.post<ImageUploadResponse>(`/api/file/posts/${postId}/image`, formData);
+  }
+
+  savePost(request: Post): Observable<Post> {
+    return this.http.put<Post>(
+      `/api/posts/${request.postId}`,
+      { title: request.title, synopsis: request.synopsis, pathSegment: request.pathSegment, version: request.version }
+    );
+  }
+
+  togglePostStatus(postId: number, version: string): Observable<Post> {
+    return this.http.post<Post>(
+      `/api/posts/${postId}/status`,
+      { version }
     );
   }
 }
