@@ -143,12 +143,14 @@ config.NewConfig<Fragment, FragmentResponse>()
     .Map(dest => dest.Position, src => src.Position);
 
 config.NewConfig<Post, PostDetailResponse>()
-    .Map(dest => dest.PostId, src => src.PostId != null ? src.PostId.Value : 0)
-    .Map(dest => dest.BlogId, src => src.BlogId.Value)
-    .Map(dest => dest.Status, src => src.Status.ToString())
-    .Map(dest => dest.PathSegment, src => src.PathSegment != null ? src.PathSegment.Value : null)
-    .Map(dest => dest.Version, src => src.Version != null ? src.Version.HexString : null)
-    .Map(dest => dest.Fragments, src => src.Fragments.Adapt<List<FragmentResponse>>());
+.Map(dest => dest.PostId, src => src.PostId != null ? src.PostId.Value : 0)
+.Map(dest => dest.BlogId, src => src.BlogId.Value)
+.Map(dest => dest.Status, src => src.Status.ToString())
+.Map(dest => dest.PathSegment, src => src.PathSegment != null ? src.PathSegment.Value : null)
+.Map(dest => dest.Version, src => src.Version != null ? src.Version.HexString : null)
+.Map(dest => dest.Fragments, src => src.Fragments.Adapt<List<FragmentResponse>>())
+.Map(dest => dest.CanPublish, src => src.EligibleForPublishing().CanPublish)
+.Map(dest => dest.PublishReasons, src => src.EligibleForPublishing().Reasons.ToList());
 
 // Register the config and mapper
 builder.Services.AddSingleton(config);

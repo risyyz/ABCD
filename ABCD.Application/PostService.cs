@@ -90,6 +90,15 @@ namespace ABCD.Application {
             //post.Synopsis = command.Synopsis;
             post.PathSegment = new PathSegment(command.PathSegment);
             return await _postRepository.UpdatePostFragmentsAsync(post);
-        }        
+        }
+
+        public async Task<Post> TogglePostStatusAsync(TogglePostStatusCommand command) {
+            var post = await TryGetPostByIdAndVersion(command.PostId, command.Version);
+            if (post.Status == PostStatus.Published)
+                post.UnPublish();
+            else
+                post.Publish();
+            return await _postRepository.UpdatePostStatusAsync(post);
+        }
     }
 }

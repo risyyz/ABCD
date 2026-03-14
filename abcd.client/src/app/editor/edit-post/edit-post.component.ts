@@ -175,4 +175,24 @@ export class EditPostComponent implements OnInit {
         }
       });
   }
+
+  onToggleStatus() {
+    if (!this.post) return;
+    this.postService.togglePostStatus(this.post.postId, this.post.version)
+      .subscribe({
+        next: (updatedPost: Post) => {
+          this.post = updatedPost;
+          this.errorMessage = null;
+        },
+        error: (err) => {
+          if (err?.error && typeof err.error === 'string') {
+            this.errorMessage = err.error;
+          } else if (err?.error?.message) {
+            this.errorMessage = err.error.message;
+          } else {
+            this.errorMessage = 'Failed to update post status.';
+          }
+        }
+      });
+  }
 }

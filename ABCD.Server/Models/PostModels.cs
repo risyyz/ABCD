@@ -38,6 +38,8 @@ namespace ABCD.Server.Models
         public DateTime DateModified { get; init; }
         public string Version { get; init; } = string.Empty;
         public List<FragmentResponse> Fragments { get; init; } = new();
+        public bool CanPublish { get; init; }
+        public List<string> PublishReasons { get; init; } = new();
     }
 
     public record PostListResponseModel

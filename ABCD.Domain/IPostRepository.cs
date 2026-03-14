@@ -8,5 +8,6 @@
         Task<Post> MoveFragmentsAsync(Post post, IEnumerable<Fragment> fragments);
         Task<Post> UpdatePostFragmentAsync(Post post, Fragment fragment);
         Task<Post> UpdatePostFragmentsAsync(Post post);
+        Task<Post> UpdatePostStatusAsync(Post post);
     }
 }

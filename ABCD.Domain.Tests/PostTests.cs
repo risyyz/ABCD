@@ -155,6 +155,7 @@ namespace ABCD.Domain.Tests
         public void Publish_ShouldSetStatusAndDate_WhenDraft() {
             var blogId = new BlogId(4);
             var post = new Post(blogId, new PostId(7), "Valid Title", PostStatus.Draft) { PathSegment = new PathSegment("valid-segment") };
+            post.AddFragment(FragmentType.RichText);
             post.Publish();
             Assert.Equal(PostStatus.Published, post.Status);
             Assert.NotNull(post.DateLastPublished);
@@ -164,6 +165,7 @@ namespace ABCD.Domain.Tests
         public void Publish_ShouldThrow_WhenAlreadyPublished() {
             var blogId = new BlogId(5);
             var post = new Post(blogId, new PostId(7), "Valid Title", PostStatus.Draft) { PathSegment = new PathSegment("valid-segment") };
+            post.AddFragment(FragmentType.RichText);
             post.Publish();
             var ex = Assert.Throws<IllegalOperationException>(() => post.Publish());
             Assert.Contains("Post cannot be published because it does not meet all publishing requirements.", ex.Message);
@@ -173,7 +175,8 @@ namespace ABCD.Domain.Tests
         [Fact]
         public void SetAsDraft_ShouldSetStatusToDraft() {
             var blogId = new BlogId(6);
-            var post = new Post(blogId, new PostId(7), "Valid Title", PostStatus.Draft) { PathSegment = new PathSegment("valid-segment") }; ;
+            var post = new Post(blogId, new PostId(7), "Valid Title", PostStatus.Draft) { PathSegment = new PathSegment("valid-segment") };
+            post.AddFragment(FragmentType.RichText);
             post.Publish();
             var publishedDate = post.DateLastPublished;
             post.UnPublish();
@@ -309,6 +312,7 @@ namespace ABCD.Domain.Tests
             var blogId = new BlogId(1);
             var post = new Post(blogId, new PostId(1), "Title", PostStatus.Draft);
             post.PathSegment = new PathSegment("valid-segment");
+            post.AddFragment(FragmentType.RichText);
             var result = post.EligibleForPublishing();
             Assert.True(result.CanPublish);
             Assert.Empty(result.Reasons);
@@ -320,6 +324,7 @@ namespace ABCD.Domain.Tests
             var blogId = new BlogId(1);
             var post = new Post(blogId, new PostId(1), "Title", PostStatus.Draft);
             post.PathSegment = new PathSegment("valid-segment");
+            post.AddFragment(FragmentType.RichText);
             post.Publish();
             var result = post.EligibleForPublishing();
             Assert.False(result.CanPublish);
@@ -407,6 +412,17 @@ namespace ABCD.Domain.Tests
         }
 
         [Fact]
+        public void EligibleForPublishing_ReturnsFalse_WhenNoFragments()
+        {
+            var blogId = new BlogId(1);
+            var post = new Post(blogId, new PostId(1), "Title", PostStatus.Draft);
+            post.PathSegment = new PathSegment("valid-segment");
+            var result = post.EligibleForPublishing();
+            Assert.False(result.CanPublish);
+            Assert.Contains("Post must have at least one fragment", result.Reasons, StringComparer.OrdinalIgnoreCase);
+        }
+
+        [Fact]
         public void Publish_Throws_WhenCannotPublish()
         {
             var blogId = new BlogId(1);
@@ -423,6 +439,7 @@ namespace ABCD.Domain.Tests
             var blogId = new BlogId(1);
             var post = new Post(blogId, new PostId(1), "Title", PostStatus.Draft);
             post.PathSegment = new PathSegment("valid-segment");
+            post.AddFragment(FragmentType.RichText);
             post.Publish();
             Assert.Equal(PostStatus.Published, post.Status);
             Assert.NotNull(post.DateLastPublished);
@@ -434,6 +451,7 @@ namespace ABCD.Domain.Tests
             var blogId = new BlogId(1);
             var post = new Post(blogId, new PostId(1), "Title", PostStatus.Draft);
             post.PathSegment = new PathSegment("valid-segment");
+            post.AddFragment(FragmentType.RichText);
             post.Publish();
             post.UnPublish();
             Assert.Equal(PostStatus.Draft, post.Status);

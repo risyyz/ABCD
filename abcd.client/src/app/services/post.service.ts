@@ -65,4 +65,11 @@ export class PostService {
       { title: request.title, synopsis: request.synopsis, pathSegment: request.pathSegment, version: request.version }
     );
   }
+
+  togglePostStatus(postId: number, version: string): Observable<Post> {
+    return this.http.post<Post>(
+      `/api/posts/${postId}/status`,
+      { version }
+    );
+  }
 }

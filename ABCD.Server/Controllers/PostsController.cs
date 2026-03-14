@@ -126,5 +126,13 @@ namespace ABCD.Server.Controllers
             var response = _typeMapper.Map<Post, PostDetailResponse>(updatedPost);
             return Ok(response);
         }
+
+        [HttpPost("{postId:int}/status")]
+        public async Task<IActionResult> TogglePostStatusAsync([FromRoute] int postId, [FromBody] TogglePostStatusRequest request)
+        {
+            var result = await _postService.TogglePostStatusAsync(new TogglePostStatusCommand(postId, request.Version));
+            var response = _typeMapper.Map<Post, PostDetailResponse>(result);
+            return Ok(response);
+        }
     }
 }

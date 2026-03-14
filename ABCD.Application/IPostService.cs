@@ -10,5 +10,6 @@ namespace ABCD.Application {
         Task<Post> UpdatePostAsync(UpdatePostCommand command);
         Task<Post> UpdateFragmentAsync(UpdateFragmentCommand command);
         Task<Post> DeleteFragmentAsync(DeleteFragmentCommand command);
+        Task<Post> TogglePostStatusAsync(TogglePostStatusCommand command);
     }
 }
