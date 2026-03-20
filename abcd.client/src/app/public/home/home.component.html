@@ -1,0 +1,17 @@
+<div *ngIf="isLoading" class="has-text-centered py-6">
+  <span class="has-text-grey">Loading…</span>
+</div>
+
+<div *ngIf="error" class="notification is-danger">{{ error }}</div>
+
+<div *ngIf="!isLoading && posts.length === 0 && !error" class="has-text-centered py-6">
+  <p class="has-text-grey">No posts yet.</p>
+</div>
+
+<div *ngFor="let post of posts" class="box mb-4">
+  <a [routerLink]="['/', post.pathSegment]" class="title is-5 has-text-dark">{{ post.title }}</a>
+  <p *ngIf="post.synopsis" class="mt-2 has-text-grey-dark">{{ post.synopsis }}</p>
+  <p class="is-size-7 has-text-grey mt-2">
+    Published {{ post.dateLastPublished | date:'mediumDate' }}
+  </p>
+</div>

@@ -5,6 +5,14 @@ import { Post } from '../editor/models/post.model';
 import { MoveFragmentRequest } from '../editor/models/move-fragment-request.model'; 
 import { FragmentUpdateRequest } from '../editor/models/fragment-update-request.model';
 
+export interface PostSummary {
+  postId: number;
+  title: string;
+  synopsis?: string;
+  pathSegment?: string;
+  dateLastPublished?: string;
+}
+
 export interface ImageUploadResponse {
   imageUrl: string;
   fileName: string;
@@ -71,5 +79,9 @@ export class PostService {
       `/api/posts/${postId}/status`,
       { version }
     );
+  }
+
+  getPublishedPosts(): Observable<PostSummary[]> {
+    return this.http.get<PostSummary[]>('/api/posts/published');
   }
 }

@@ -1,0 +1,28 @@
+<header class="navbar is-light" role="navigation" aria-label="main navigation">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item has-text-weight-bold" routerLink="/">ABCD</a>
+    </div>
+    <div class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" routerLink="/" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }">Home</a>
+        <a class="navbar-item" routerLink="/about" routerLinkActive="is-active">About</a>
+        <a class="navbar-item" routerLink="/contact" routerLinkActive="is-active">Contact</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="section">
+  <div class="container">
+    <router-outlet></router-outlet>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="container has-text-centered">
+    <p class="is-size-7 has-text-grey">
+      <a routerLink="/privacy">Privacy Policy</a>
+    </p>
+  </div>
+</footer>

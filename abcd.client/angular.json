@@ -42,7 +42,8 @@
             "styles": [
               "src/styles.scss"
             ],
-            "scripts": []
+            "scripts": [],
+            "server": "src/main.server.ts"
           },
           "configurations": {
             "production": {
@@ -58,7 +59,11 @@
                   "maximumError": "4kB"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "prerender": {
+                "discoverRoutes": false,
+                "routes": ["/about", "/contact", "/privacy"]
+              }
             },
             "development": {
               "optimization": false,

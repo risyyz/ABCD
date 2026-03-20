@@ -1,8 +1,10 @@
 import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import { RouterModule, Routes, PreloadAllModules } from '@angular/router';
 import { authGuard } from './auth/guards/auth.guard';
+import { PUBLIC_ROUTES } from './public/public-routing.module';
 
 const routes: Routes = [
+  ...PUBLIC_ROUTES,
   {
     path: 'auth',
     loadChildren: () => import('./auth/auth.module').then(m => m.AuthModule)
@@ -13,18 +15,14 @@ const routes: Routes = [
     canActivate: [authGuard]
   },
   {
-    path: '',
-    redirectTo: '/auth/login',
-    pathMatch: 'full'
-  },
-  {
     path: '**',
-    redirectTo: '/auth/login'
+    redirectTo: ''
   }
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules })],
   exports: [RouterModule]
 })
 export class AppRoutingModule { }
+
