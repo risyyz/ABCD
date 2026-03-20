@@ -9,8 +9,7 @@
 </div>
 
 <div *ngFor="let post of posts" class="box mb-4">
-  <a [routerLink]="['/', post.pathSegment]" class="title is-5 has-text-dark">{{ post.title }}</a>
-  <p *ngIf="post.synopsis" class="mt-2 has-text-grey-dark">{{ post.synopsis }}</p>
+  <a [routerLink]="post.url" class="title is-5 has-text-dark">{{ post.title }}</a>
   <p class="is-size-7 has-text-grey mt-2">
     Published {{ post.dateLastPublished | date:'mediumDate' }}
   </p>

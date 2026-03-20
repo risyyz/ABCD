@@ -4,7 +4,9 @@ namespace ABCD.Application {
     public interface IPostService {
         Task<Post> CreatePostAsync(CreatePostCommand command);
         Task<IEnumerable<Post>> GetAllAsync();
+        Task<IEnumerable<Post>> GetPublishedAsync(int limit, int skip);
         Task<Post?> GetByIdAsync(int postId);
+        Task<Post?> GetPublishedByPathSegmentAsync(string pathSegment);
         Task<Post> MoveFragmentAsync(MoveFragmentCommand command);
         Task<Post> AddFragmentAsync(AddFragmentCommand command);
         Task<Post> UpdatePostAsync(UpdatePostCommand command);

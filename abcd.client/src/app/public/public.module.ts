@@ -6,6 +6,7 @@ import { HomeComponent } from './home/home.component';
 import { AboutComponent } from './about/about.component';
 import { ContactComponent } from './contact/contact.component';
 import { PrivacyComponent } from './privacy/privacy.component';
+import { PostDetailComponent } from './post-detail/post-detail.component';
 
 @NgModule({
   declarations: [
@@ -13,7 +14,8 @@ import { PrivacyComponent } from './privacy/privacy.component';
     HomeComponent,
     AboutComponent,
     ContactComponent,
-    PrivacyComponent
+    PrivacyComponent,
+    PostDetailComponent
   ],
   imports: [
     CommonModule,

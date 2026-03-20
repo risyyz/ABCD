@@ -56,6 +56,27 @@
                   </div>
                 </div>
               </app-editable-generic>
+              @if (post.fragments.length === 0) {
+                <div class="has-text-centered py-5">
+                  <p class="has-text-grey mb-3">No fragments yet. Add one to get started.</p>
+                  <div class="dropdown" [class.is-active]="isAddFirstFragmentOpen">
+                    <div class="dropdown-trigger">
+                      <button type="button" class="button is-dark-grey" (click)="isAddFirstFragmentOpen = !isAddFirstFragmentOpen">
+                        <span class="icon"><i class="fas fa-plus"></i></span>
+                        <span>Add Fragment</span>
+                      </button>
+                    </div>
+                    <div class="dropdown-menu" role="menu">
+                      <div class="dropdown-content">
+                        <a class="dropdown-item" (click)="onAddFirstFragment('RichText')">Rich Text</a>
+                        <a class="dropdown-item" (click)="onAddFirstFragment('Code')">Code</a>
+                        <a class="dropdown-item" (click)="onAddFirstFragment('Image')">Image</a>
+                        <a class="dropdown-item" (click)="onAddFirstFragment('Table')">Table</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              }
               @for (fragment of post.fragments; track fragment) {
                 <app-editable-fragment #editableFragmentComp
                   [fragmentId]="fragment.fragmentId"

@@ -8,9 +8,20 @@ import { FragmentUpdateRequest } from '../editor/models/fragment-update-request.
 export interface PostSummary {
   postId: number;
   title: string;
-  synopsis?: string;
-  pathSegment?: string;
+  url?: string;
   dateLastPublished?: string;
+}
+
+export interface PublicFragment {
+  fragmentType: string;
+  content: string;
+  position: number;
+}
+
+export interface PublicPostDetail {
+  title: string;
+  dateLastPublished?: string;
+  fragments: PublicFragment[];
 }
 
 export interface ImageUploadResponse {
@@ -81,7 +92,11 @@ export class PostService {
     );
   }
 
-  getPublishedPosts(): Observable<PostSummary[]> {
-    return this.http.get<PostSummary[]>('/api/posts/published');
+  getPublishedPosts(limit: number = 10, skip: number = 0): Observable<PostSummary[]> {
+    return this.http.get<PostSummary[]>(`/api/public/posts?limit=${limit}&skip=${skip}`);
+  }
+
+  getPublishedPost(pathSegment: string): Observable<PublicPostDetail> {
+    return this.http.get<PublicPostDetail>(`/api/public/posts/${pathSegment}`);
   }
 }

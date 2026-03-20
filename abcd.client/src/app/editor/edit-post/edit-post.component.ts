@@ -17,6 +17,7 @@ export class EditPostComponent implements OnInit {
   errorMessage: string | null = null;
   activeAddFragmentDropdownId: number | null = null;
   isHeaderEditing: boolean = false;
+  isAddFirstFragmentOpen: boolean = false;
   originalHeader: { title: string; synopsis: string; pathSegment?: string } | null = null;
 
   constructor(
@@ -115,6 +116,21 @@ export class EditPostComponent implements OnInit {
   onFragmentAdd(event: { afterFragmentId: number, fragmentType: string }) {
     if (!this.post) return;
     this.postService.addFragment(this.post.postId, event.afterFragmentId, event.fragmentType, this.post.version)
+      .subscribe({
+        next: (updatedPost: Post) => {
+          this.post = updatedPost;
+          this.errorMessage = null;
+        },
+        error: (err) => {
+          this.errorMessage = 'Failed to add fragment. Please try again.';
+        }
+      });
+  }
+
+  onAddFirstFragment(fragmentType: string) {
+    if (!this.post) return;
+    this.isAddFirstFragmentOpen = false;
+    this.postService.addFragment(this.post.postId, 0, fragmentType, this.post.version)
       .subscribe({
         next: (updatedPost: Post) => {
           this.post = updatedPost;
