@@ -1,6 +1,6 @@
-<div class="table-container mb-4">
-  <table class="table is-fullwidth is-striped is-hoverable">
-    <caption *ngIf="table.caption" class="has-text-grey is-size-7 mb-2">{{ table.caption }}</caption>
+<div class="post-table mb-4">
+  <table>
+    <caption *ngIf="table.caption">{{ table.caption }}</caption>
     <thead>
       <tr>
         <th *ngFor="let col of table.columns"

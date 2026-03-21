@@ -5,6 +5,7 @@ import { EditableTable } from '../../models/editable-table.model';
 @Component({
   selector: 'app-public-table-fragment',
   templateUrl: './public-table-fragment.component.html',
+  styleUrls: ['./public-table-fragment.component.scss'],
   standalone: false
 })
 export class PublicTableFragmentComponent implements OnInit {
