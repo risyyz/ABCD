@@ -6,11 +6,10 @@
 
 <article *ngIf="post && !isLoading" class="content">
   <h1 class="title">{{ post.title }}</h1>
+  <hr />
   <p class="is-size-7 has-text-grey mb-5">
     Published {{ post.dateLastPublished | date:'mediumDate' }}
   </p>
-
-  <hr />
 
   <div *ngFor="let fragment of post.fragments" class="mb-5">
     <app-public-richtext-fragment *ngIf="fragment.fragmentType === 'RichText'" [fragment]="fragment"></app-public-richtext-fragment>

@@ -175,6 +175,17 @@ article.content {
     margin-bottom: 1.4em;
   }
 
+  hr {
+    background-color: #999;
+    height: 1px;
+    margin-top: 0.6rem;
+    margin-bottom: 0.6rem;
+  }
+
+  h1 {
+    margin-bottom: 0;
+  }
+
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Lora', Georgia, serif;
     line-height: 1.25;
