@@ -1,4 +1,4 @@
-<div class="mb-4">
-  <span class="tag is-dark mb-2">{{ code.language }}</span>
-  <pre><code>{{ code.code }}</code></pre>
+<div class="code-block mb-4">
+  <span class="code-tab">{{ code.language }}</span>
+  <pre><code class="hljs" [innerHTML]="highlightedCode"></code></pre>
 </div>
