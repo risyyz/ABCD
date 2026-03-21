@@ -13,23 +13,10 @@
   <hr />
 
   <div *ngFor="let fragment of post.fragments">
-
-    <div *ngIf="fragment.fragmentType === 'RichText'"
-         [innerHTML]="fragment.content">
-    </div>
-
-    <div *ngIf="fragment.fragmentType === 'Code'" class="mb-4">
-      <pre><code>{{ fragment.content }}</code></pre>
-    </div>
-
-    <div *ngIf="fragment.fragmentType === 'Image'" class="mb-4 has-text-centered">
-      <img [src]="fragment.content" alt="" />
-    </div>
-
-    <div *ngIf="fragment.fragmentType === 'Table'" class="mb-4 table-container">
-      <div [innerHTML]="fragment.content"></div>
-    </div>
-
+    <app-public-richtext-fragment *ngIf="fragment.fragmentType === 'RichText'" [fragment]="fragment"></app-public-richtext-fragment>
+    <app-public-code-fragment *ngIf="fragment.fragmentType === 'Code'" [fragment]="fragment"></app-public-code-fragment>
+    <app-public-image-fragment *ngIf="fragment.fragmentType === 'Image'" [fragment]="fragment"></app-public-image-fragment>
+    <app-public-table-fragment *ngIf="fragment.fragmentType === 'Table'" [fragment]="fragment"></app-public-table-fragment>
   </div>
 </article>
 

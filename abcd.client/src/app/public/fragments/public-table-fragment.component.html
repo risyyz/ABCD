@@ -1,0 +1,22 @@
+<div class="table-container mb-4">
+  <table class="table is-fullwidth is-striped is-hoverable">
+    <caption *ngIf="table.caption" class="has-text-grey is-size-7 mb-2">{{ table.caption }}</caption>
+    <thead>
+      <tr>
+        <th *ngFor="let col of table.columns"
+            [style.maxWidth.px]="col.maxWidth || null"
+            [style.textAlign]="col.alignment || 'left'">
+          {{ col.header }}
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let row of table.rows">
+        <td *ngFor="let cell of row; let i = index"
+            [style.textAlign]="table.columns[i]?.alignment || 'left'">
+          {{ cell.value }}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

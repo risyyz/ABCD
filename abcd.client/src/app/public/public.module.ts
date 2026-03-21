@@ -7,6 +7,10 @@ import { AboutComponent } from './about/about.component';
 import { ContactComponent } from './contact/contact.component';
 import { PrivacyComponent } from './privacy/privacy.component';
 import { PostDetailComponent } from './post-detail/post-detail.component';
+import { PublicCodeFragmentComponent } from './fragments/public-code-fragment.component';
+import { PublicRichTextFragmentComponent } from './fragments/public-richtext-fragment.component';
+import { PublicImageFragmentComponent } from './fragments/public-image-fragment.component';
+import { PublicTableFragmentComponent } from './fragments/public-table-fragment.component';
 
 @NgModule({
   declarations: [
@@ -15,7 +19,11 @@ import { PostDetailComponent } from './post-detail/post-detail.component';
     AboutComponent,
     ContactComponent,
     PrivacyComponent,
-    PostDetailComponent
+    PostDetailComponent,
+    PublicCodeFragmentComponent,
+    PublicRichTextFragmentComponent,
+    PublicImageFragmentComponent,
+    PublicTableFragmentComponent
   ],
   imports: [
     CommonModule,
