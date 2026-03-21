@@ -18,6 +18,6 @@
       <a [routerLink]="post.url">{{ post.title }}</a>
     </h2>
     <p class="is-size-7 has-text-grey">Published {{ post.dateLastPublished | date:'mediumDate' }}</p>
-    <hr *ngIf="!last" class="mt-5" />
+    <hr *ngIf="!last" class="mt-5 list-divider" />
   </article>
 </ng-container>

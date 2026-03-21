@@ -7,9 +7,9 @@
 }
 
 .navbar {
-  background-color: #ffffff;
+  background-color: #282c34;
   box-shadow: none;
-  border-bottom: 1px solid #e8e8e8;
+  border-bottom: none;
 }
 
 .footer {
@@ -19,6 +19,30 @@
 
 .navbar-brand {
   width: 100%;
+
+  .navbar-item.brand {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 1.1rem;
+    color: #4af626 !important;
+    padding: 0.3rem 0.75rem 0.3rem 0.25rem;
+    margin: 0.4rem 0;
+    letter-spacing: 0.01em;
+    text-decoration: none !important;
+
+    &::after {
+      content: '_';
+      animation: terminal-blink 1s step-end infinite;
+    }
+
+    &:hover {
+      color: #6dff42 !important;
+    }
+  }
+}
+
+@keyframes terminal-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
 }
 
 .navbar-search {
@@ -30,21 +54,27 @@
 }
 
 .navbar-search-input {
-  border: 1px solid #e0e0e0;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 4px;
   padding: 0.35rem 0.65rem;
   font-size: 0.875rem;
   font-family: inherit;
   width: 140px;
   outline: none;
+  background-color: rgba(255, 255, 255, 0.07);
+  color: #ffffff;
   transition: border-color 0.15s ease;
+
+  &::placeholder {
+    color: rgba(255, 255, 255, 0.35);
+  }
 
   @media (min-width: 768px) {
     width: 180px;
   }
 
   &:focus {
-    border-color: #999;
+    border-color: rgba(255, 255, 255, 0.5);
   }
 }
 
@@ -52,13 +82,13 @@
   background: none;
   border: none;
   cursor: pointer;
-  color: #4a6585;
+  color: rgba(255, 255, 255, 0.5);
   padding: 0.35rem 0.4rem;
   font-size: 0.875rem;
   line-height: 1;
   transition: color 0.15s ease;
 
   &:hover {
-    color: #2d4a65;
+    color: #ffffff;
   }
 }
