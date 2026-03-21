@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-public-layout',
@@ -6,4 +7,13 @@ import { Component } from '@angular/core';
   styleUrls: ['./public-layout.component.scss'],
   standalone: false
 })
-export class PublicLayoutComponent {}
+export class PublicLayoutComponent {
+  searchQuery = '';
+
+  constructor(private router: Router) {}
+
+  onSearch(): void {
+    const q = this.searchQuery.trim();
+    this.router.navigate(['/'], { queryParams: q ? { q } : {} });
+  }
+}
