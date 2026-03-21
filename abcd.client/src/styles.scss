@@ -13,7 +13,7 @@
   --checkbox-checked-color: #222; // dark grey
   --button-bg-color: #222; // dark grey
   --button-text-color: #fff; // white
-  --link-color: #222; // dark grey
+  --link-color: #4a6585; // muted steel-blue
 }
 
 .control.has-floating-label {
@@ -129,16 +129,65 @@ a,
 .button.is-link,
 .has-text-link {
   color: var(--link-color) !important;
-  text-decoration:underline;
+  text-decoration: none;
+  transition: color 0.15s ease;
 }
 
 a:hover,
 .button.is-link:hover,
 .has-text-link:hover {
-  color: #111 !important;
+  color: #2d4a65 !important;
+}
+
+// Prose links inside article content get underline + a readable distinct colour
+article.content a {
+  color: #1a6fa8;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: rgba(26, 111, 168, 0.4);
+  transition: color 0.15s ease, text-decoration-color 0.15s ease;
+}
+
+article.content a:visited {
+  color: #7b5ea7;
+  text-decoration-color: rgba(123, 94, 167, 0.4);
+}
+
+article.content a:hover {
+  color: #155a8a;
+  text-decoration-color: rgba(21, 90, 138, 0.7);
 }
 
 .no-border {
   border: none !important;
   box-shadow: none !important;
+}
+
+// Public article reading typography
+article.content {
+  line-height: 1.75;
+
+  @media (min-width: 1024px) {
+    font-size: 1.0625rem;
+  }
+
+  p {
+    margin-bottom: 1.4em;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Lora', Georgia, serif;
+    line-height: 1.25;
+    letter-spacing: -0.015em;
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    a:hover {
+      color: #4a6585;
+      text-decoration: none;
+    }
+  }
 }

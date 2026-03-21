@@ -8,9 +8,10 @@
   <p class="has-text-grey">No posts yet.</p>
 </div>
 
-<div *ngFor="let post of posts" class="box mb-4">
-  <a [routerLink]="post.url" class="title is-5 has-text-dark">{{ post.title }}</a>
-  <p class="is-size-7 has-text-grey mt-2">
-    Published {{ post.dateLastPublished | date:'mediumDate' }}
-  </p>
-</div>
+<article *ngFor="let post of posts; let last = last" class="content mb-5">
+  <h2 class="title is-5">
+    <a [routerLink]="post.url">{{ post.title }}</a>
+  </h2>
+  <p class="is-size-7 has-text-grey">Published {{ post.dateLastPublished | date:'mediumDate' }}</p>
+  <hr *ngIf="!last" class="mt-5" />
+</article>

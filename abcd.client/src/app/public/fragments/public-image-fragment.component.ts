@@ -5,6 +5,7 @@ import { EditableImage } from '../../models/editable-image.model';
 @Component({
   selector: 'app-public-image-fragment',
   templateUrl: './public-image-fragment.component.html',
+  styleUrls: ['./public-image-fragment.component.scss'],
   standalone: false
 })
 export class PublicImageFragmentComponent implements OnInit {

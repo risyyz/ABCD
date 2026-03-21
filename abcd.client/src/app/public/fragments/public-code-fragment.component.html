@@ -1,4 +1,5 @@
-<div class="code-block mb-4">
+<div class="code-block">
   <span class="code-tab">{{ code.language }}</span>
   <pre><code class="hljs" [innerHTML]="highlightedCode"></code></pre>
+  <p *ngIf="code.caption" class="code-caption">{{ code.caption }}</p>
 </div>

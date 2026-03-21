@@ -1,6 +1,5 @@
-<div class="post-table mb-4">
+<div class="post-table">
   <table>
-    <caption *ngIf="table.caption">{{ table.caption }}</caption>
     <thead>
       <tr>
         <th *ngFor="let col of table.columns"
@@ -20,3 +19,4 @@
     </tbody>
   </table>
 </div>
+<p *ngIf="table.caption" class="table-caption">{{ table.caption }}</p>

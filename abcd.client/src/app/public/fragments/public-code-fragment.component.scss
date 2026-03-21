@@ -1,6 +1,21 @@
+:host {
+  display: block;
+}
+
 .code-block {
   display: flex;
   flex-direction: column;
+  max-width: 100%;
+
+  @media (min-width: 768px) {
+    max-width: 90%;
+    margin: 0 auto;
+  }
+
+  @media (min-width: 1024px) {
+    max-width: 800px;
+    margin: 0 auto;
+  }
 
   .code-tab {
     align-self: flex-start;
@@ -19,5 +34,12 @@
 
   code {
     border-radius: 0 6px 6px 6px;
+  }
+
+  .code-caption {
+    font-size: 0.72rem;
+    color: #aaaaaa;
+    margin-top: 0.4rem;
+    text-align: left;
   }
 }

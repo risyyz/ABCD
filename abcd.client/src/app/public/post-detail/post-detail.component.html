@@ -12,7 +12,7 @@
 
   <hr />
 
-  <div *ngFor="let fragment of post.fragments">
+  <div *ngFor="let fragment of post.fragments" class="mb-5">
     <app-public-richtext-fragment *ngIf="fragment.fragmentType === 'RichText'" [fragment]="fragment"></app-public-richtext-fragment>
     <app-public-code-fragment *ngIf="fragment.fragmentType === 'Code'" [fragment]="fragment"></app-public-code-fragment>
     <app-public-image-fragment *ngIf="fragment.fragmentType === 'Image'" [fragment]="fragment"></app-public-image-fragment>
