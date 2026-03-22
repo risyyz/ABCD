@@ -1,0 +1,45 @@
+:host {
+  display: block;
+}
+
+.code-block {
+  display: flex;
+  flex-direction: column;
+  max-width: 100%;
+
+  @media (min-width: 768px) {
+    max-width: 90%;
+    margin: 0 auto;
+  }
+
+  @media (min-width: 1024px) {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .code-tab {
+    align-self: flex-start;
+    background-color: #282c34;
+    color: rgba(171, 178, 191, 0.6);
+    font-size: 0.72rem;
+    padding: 0.3rem 0.9rem;
+    border-radius: 6px 6px 0 0;
+  }
+
+  pre {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  code {
+    border-radius: 0 6px 6px 6px;
+  }
+
+  .code-caption {
+    font-size: 0.72rem;
+    color: #aaaaaa;
+    margin-top: 0.4rem;
+    text-align: left;
+  }
+}

@@ -1,0 +1,39 @@
+<header class="navbar" role="navigation" aria-label="main navigation">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item brand" routerLink="/">A Bit of Code</a>
+      <form (ngSubmit)="onSearch()" class="navbar-search">
+        <input
+          class="navbar-search-input"
+          type="text"
+          [(ngModel)]="searchQuery"
+          name="searchQuery"
+          placeholder="Search…"
+          autocomplete="off" />
+        <button type="submit" class="navbar-search-btn" aria-label="Search">
+          <i class="fas fa-search"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+</header>
+
+<main class="section">
+  <div class="container">
+    <router-outlet></router-outlet>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="container has-text-centered">
+    <p class="mb-2">
+      <a routerLink="/" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }">Home</a>
+      <span class="mx-3 has-text-grey-light">·</span>
+      <a routerLink="/about" routerLinkActive="is-active">About</a>
+      <span class="mx-3 has-text-grey-light">·</span>
+      <a routerLink="/contact" routerLinkActive="is-active">Contact</a>
+      <span class="mx-3 has-text-grey-light">·</span>
+      <a routerLink="/privacy" routerLinkActive="is-active">Privacy Policy</a>
+    </p>
+  </div>
+</footer>

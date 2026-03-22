@@ -17,4 +17,16 @@
       </ngx-monaco-editor>
     </div>
   </div>
+  <div class="field">
+    <label class="label">Caption</label>
+    <div class="control">
+      <input
+        type="text"
+        class="input"
+        [(ngModel)]="editableCode.caption"
+        [disabled]="!isEditing"
+        placeholder="Enter caption..."
+      />
+    </div>
+  </div>
 </div>

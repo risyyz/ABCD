@@ -1,0 +1,4 @@
+<figure class="image has-text-centered">
+  <img [src]="image.imageUrl" [alt]="image.caption || image.fileName" />
+  <figcaption *ngIf="image.caption" class="is-size-7 has-text-grey has-text-left mt-1">{{ image.caption }}</figcaption>
+</figure>

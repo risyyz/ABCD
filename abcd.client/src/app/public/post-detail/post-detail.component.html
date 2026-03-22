@@ -1,0 +1,21 @@
+<div *ngIf="isLoading" class="has-text-centered py-6">
+  <span class="has-text-grey">Loading…</span>
+</div>
+
+<div *ngIf="error" class="notification is-danger">{{ error }}</div>
+
+<article *ngIf="post && !isLoading" class="content">
+  <h1 class="title">{{ post.title }}</h1>
+  <hr />
+  <p class="is-size-7 has-text-grey mb-5">
+    Published {{ post.dateLastPublished | date:'mediumDate' }}
+  </p>
+
+  <div *ngFor="let fragment of post.fragments" class="mb-5">
+    <app-public-richtext-fragment *ngIf="fragment.fragmentType === 'RichText'" [fragment]="fragment"></app-public-richtext-fragment>
+    <app-public-code-fragment *ngIf="fragment.fragmentType === 'Code'" [fragment]="fragment"></app-public-code-fragment>
+    <app-public-image-fragment *ngIf="fragment.fragmentType === 'Image'" [fragment]="fragment"></app-public-image-fragment>
+    <app-public-table-fragment *ngIf="fragment.fragmentType === 'Table'" [fragment]="fragment"></app-public-table-fragment>
+  </div>
+</article>
+

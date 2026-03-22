@@ -28,8 +28,19 @@ namespace ABCD.Infra.Data {
             return records.Select(MapToDomain);
         }
 
+        public async Task<IEnumerable<Post>> GetPublishedByBlogIdAsync(int blogId, int limit, int skip) {
+            var records = await _context.Posts
+                .Where(p => p.BlogId == blogId && p.Status == PostStatus.Published)
+                .OrderByDescending(p => p.DateLastPublished)
+                .Skip(skip)
+                .Take(limit)
+                .ToListAsync();
+            return records.Select(MapToDomain);
+        }
+
         public async Task<Post?> GetByBlogIdAndPathSegmentAsync(int blogId, string path) {
             var record = await _context.Posts
+                .Include(p => p.Fragments)
                 .FirstOrDefaultAsync(p => p.BlogId == blogId && p.PathSegment == path);
 
             if (record == null)

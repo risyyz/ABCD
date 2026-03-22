@@ -152,6 +152,22 @@ config.NewConfig<Post, PostDetailResponse>()
 .Map(dest => dest.CanPublish, src => src.EligibleForPublishing().CanPublish)
 .Map(dest => dest.PublishReasons, src => src.EligibleForPublishing().Reasons.ToList());
 
+config.NewConfig<Post, PublicPostSummaryResponse>()
+    .Map(dest => dest.PostId, src => src.PostId != null ? src.PostId.Value : 0)
+    .Map(dest => dest.Title, src => src.Title)
+    .Map(dest => dest.Url, src => src.PathSegment != null ? $"/{src.PathSegment.Value}" : null)
+    .Map(dest => dest.DateLastPublished, src => src.DateLastPublished);
+
+config.NewConfig<Fragment, PublicFragmentResponse>()
+    .Map(dest => dest.FragmentType, src => src.FragmentType.ToString())
+    .Map(dest => dest.Content, src => src.Content != null ? src.Content : string.Empty)
+    .Map(dest => dest.Position, src => src.Position);
+
+config.NewConfig<Post, PublicPostDetailResponse>()
+    .Map(dest => dest.Title, src => src.Title)
+    .Map(dest => dest.DateLastPublished, src => src.DateLastPublished)
+    .Map(dest => dest.Fragments, src => src.Fragments.Adapt<List<PublicFragmentResponse>>());
+
 // Register the config and mapper
 builder.Services.AddSingleton(config);
 builder.Services.AddSingleton<ITypeMapper, TypeMapper>();

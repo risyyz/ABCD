@@ -1,42 +1,5 @@
-﻿/* BBC-inspired app component styles */
-
 :host {
-    max-width: 1280px;
-    padding: 2rem;
-    text-align: left; /* BBC uses left-aligned text for better readability */
-    margin: 0 auto;
-}
-
-/* Table styling - BBC editorial approach */
-table {
-    margin: 0 auto;
-    border-collapse: collapse;
-    width: 100%;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 0.95rem;
-    line-height: 1.5;
-}
-
-th, td {
-    padding: 1rem;
-    text-align: left;
-    border-bottom: 1px solid var(--bbc-very-light-gray);
-}
-
-th {
-    background-color: var(--bbc-off-white);
-    font-weight: 700;
-    color: var(--bbc-black);
-    text-transform: none; /* BBC doesn't use uppercase headers */
-}
-
-/* Remove alternating row colors for cleaner look */
-tr:nth-child(even) {
-    background: var(--bbc-white);
-}
-
-tr:nth-child(odd) {
-    background: var(--bbc-white);
+  display: block;
 }
 
 /* Add subtle hover effect */

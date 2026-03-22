@@ -18,8 +18,12 @@ namespace ABCD.Application {
 
         public async Task<Post> AddFragmentAsync(AddFragmentCommand command) {
             var post = await TryGetPostByIdAndVersion(command.PostId, command.Version);
-            var fragment = post.GetFragmentById(command.AfterFragmentId);
-            post.AddFragment(command.FragmentType, fragment?.Position + 1);
+            int? position = null;
+            if (command.AfterFragmentId > 0) {
+                var fragment = post.GetFragmentById(command.AfterFragmentId);
+                position = fragment.Position + 1;
+            }
+            post.AddFragment(command.FragmentType, position);
             return await _postRepository.UpdatePostFragmentsAsync(post);
         }
 
@@ -52,8 +56,17 @@ namespace ABCD.Application {
             return await _postRepository.GetAllByBlogIdAsync(_requestContext.Blog.BlogId.Value!);
         }
 
+        public async Task<IEnumerable<Post>> GetPublishedAsync(int limit, int skip) {
+            return await _postRepository.GetPublishedByBlogIdAsync(_requestContext.Blog.BlogId.Value!, limit, skip);
+        }
+
         public async Task<Post?> GetByIdAsync(int postId) {
             return await _postRepository.GetByPostIdAsync(_requestContext.Blog.BlogId.Value!, postId);
+        }
+
+        public async Task<Post?> GetPublishedByPathSegmentAsync(string pathSegment) {
+            var post = await _postRepository.GetByBlogIdAndPathSegmentAsync(_requestContext.Blog.BlogId.Value!, pathSegment);
+            return post?.Status == PostStatus.Published ? post : null;
         }
 
         public async Task<Post> UpdateFragmentAsync(UpdateFragmentCommand command) {

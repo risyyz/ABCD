@@ -46,4 +46,26 @@ namespace ABCD.Server.Models
     {
         public List<PostSummaryResponse> Posts { get; init; } = new();
     }
+
+    public record PublicPostSummaryResponse
+    {
+        public int PostId { get; init; }
+        public string Title { get; init; } = string.Empty;
+        public string? Url { get; init; }
+        public DateTime? DateLastPublished { get; init; }
+    }
+
+    public record PublicFragmentResponse
+    {
+        public string FragmentType { get; init; } = string.Empty;
+        public string Content { get; init; } = string.Empty;
+        public int Position { get; init; }
+    }
+
+    public record PublicPostDetailResponse
+    {
+        public string Title { get; init; } = string.Empty;
+        public DateTime? DateLastPublished { get; init; }
+        public List<PublicFragmentResponse> Fragments { get; init; } = new();
+    }
 }

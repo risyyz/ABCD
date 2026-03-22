@@ -6,6 +6,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { SharedModule } from './shared/shared.module';
 import { AuthInterceptor } from './auth/interceptors/auth.interceptor';
+import { PublicModule } from './public/public.module';
 
 @NgModule({
   declarations: [
@@ -15,6 +16,7 @@ import { AuthInterceptor } from './auth/interceptors/auth.interceptor';
     BrowserModule,
     HttpClientModule,
     SharedModule,
+    PublicModule,
     AppRoutingModule
   ],
   providers: [
