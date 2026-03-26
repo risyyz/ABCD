@@ -6,6 +6,14 @@
     <div class="navbar-menu">
       <div class="navbar-end">
         <div class="navbar-item">
+          <a class="button no-border" [routerLink]="['/editor/ai-chat']" title="AI Post Assistant">
+            <span class="icon">
+              <i class="fas fa-robot"></i>
+            </span>
+            <span>AI Assistant</span>
+          </a>
+        </div>
+        <div class="navbar-item">
           <button class="button is-dark-grey" (click)="logout()">
             <span class="icon">
               <i class="fas fa-sign-out-alt"></i>

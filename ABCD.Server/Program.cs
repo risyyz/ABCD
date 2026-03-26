@@ -21,6 +21,10 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 
+using Microsoft.Extensions.AI;
+
+using OpenAI;
+
 using Swashbuckle.AspNetCore.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -55,6 +59,7 @@ builder.Services.Configure<Settings>(options => {
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection(JwtSettings.SectionName));
 builder.Services.Configure<CachingSettings>(builder.Configuration.GetSection(CachingSettings.SectionName));
 builder.Services.Configure<FileUploadSettings>(builder.Configuration.GetSection(FileUploadSettings.SectionName));
+builder.Services.Configure<AiSettings>(builder.Configuration.GetSection(AiSettings.SectionName));
 
 // Add services to the container.
 var connectionString = configuration.GetConnectionString("DefaultConnection");
@@ -171,6 +176,14 @@ config.NewConfig<Post, PublicPostDetailResponse>()
 // Register the config and mapper
 builder.Services.AddSingleton(config);
 builder.Services.AddSingleton<ITypeMapper, TypeMapper>();
+
+var aiSettings = builder.Configuration.GetSection(AiSettings.SectionName).Get<AiSettings>();
+if (!string.IsNullOrWhiteSpace(aiSettings?.ApiKey)) {
+    builder.Services.AddSingleton<IChatClient>(
+        new OpenAI.Chat.ChatClient(aiSettings.Model, new System.ClientModel.ApiKeyCredential(aiSettings.ApiKey))
+            .AsIChatClient());
+    builder.Services.AddScoped<IAiChatService, AiChatService>();
+}
 
 var app = builder.Build();
 
