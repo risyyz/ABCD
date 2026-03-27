@@ -16,6 +16,7 @@ export interface PostProposal {
 export interface ProposedFragment {
   fragmentType: 'RichText' | 'Code' | 'Table' | 'Image';
   content: string;
+  caption?: string;
 }
 
 @Injectable({ providedIn: 'root' })
