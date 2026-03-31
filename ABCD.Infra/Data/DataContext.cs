@@ -17,6 +17,8 @@ namespace ABCD.Infra.Data {
                 entity.Property(e => e.BlogId).ValueGeneratedOnAdd();
                 entity.Property(e => e.Name).IsRequired().HasMaxLength(255);
                 entity.Property(e => e.Description);
+                entity.Property(e => e.AiChatSystemPrompt);
+                entity.Property(e => e.AiGeneratePostSystemPrompt);
                 entity.HasMany(e => e.Domains)
                       .WithOne(e => e.Blog)
                       .HasForeignKey(e => e.BlogId)
@@ -45,7 +47,7 @@ namespace ABCD.Infra.Data {
                 entity.Property(e => e.Status)
                       .HasConversion<string>()
                       .IsRequired()
-                      .HasMaxLength(15);                
+                      .HasMaxLength(15);
                 entity.Property(e => e.PathSegment).HasMaxLength(250);
                 entity.HasIndex(e => e.PathSegment).IsUnique();
                 entity.HasMany(e => e.Fragments)
@@ -75,7 +77,7 @@ namespace ABCD.Infra.Data {
                       .HasConversion<string>()
                       .IsRequired()
                       .HasMaxLength(15);
-                entity.Property(e => e.CreatedBy).IsRequired().HasMaxLength(450);                
+                entity.Property(e => e.CreatedBy).IsRequired().HasMaxLength(450);
                 entity.Property(e => e.CreatedDate).IsRequired();
                 entity.Property(e => e.UpdatedBy).IsRequired().HasMaxLength(450);
                 entity.Property(e => e.UpdatedDate).IsRequired();
