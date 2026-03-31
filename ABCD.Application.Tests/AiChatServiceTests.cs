@@ -1,4 +1,6 @@
 using ABCD.Application;
+using ABCD.Domain;
+using ABCD.Infra.Data;
 
 using Microsoft.Extensions.AI;
 
@@ -8,9 +10,12 @@ namespace ABCD.Application.Tests {
     public class AiChatServiceTests {
         private readonly Mock<IChatClient> _chatClientMock = new();
         private readonly AiChatService _service;
+        private readonly Blog _blog = new(new BlogId(1)) { Name = "Test Blog" };
+        private readonly RequestContext _requestContext;
 
         public AiChatServiceTests() {
-            _service = new AiChatService(_chatClientMock.Object);
+            _requestContext = new RequestContext(_blog, new ApplicationUser());
+            _service = new AiChatService(_chatClientMock.Object, _requestContext);
         }
 
         [Fact]
@@ -66,6 +71,35 @@ namespace ABCD.Application.Tests {
             Assert.Equal(ChatRole.User,      list[1].Role);
             Assert.Equal(ChatRole.Assistant, list[2].Role);
             Assert.Equal(ChatRole.User,      list[3].Role);
+        }
+
+        [Fact]
+        public async Task ChatAsync_UsesDefaultChatSystemPrompt_WhenBlogHasNullPrompt() {
+            IEnumerable<ChatMessage>? captured = null;
+            _chatClientMock
+                .Setup(c => c.GetResponseAsync(It.IsAny<IEnumerable<ChatMessage>>(), It.IsAny<ChatOptions?>(), It.IsAny<CancellationToken>()))
+                .Callback<IEnumerable<ChatMessage>, ChatOptions?, CancellationToken>((msgs, _, _) => captured = msgs)
+                .ReturnsAsync(new ChatResponse([new ChatMessage(ChatRole.Assistant, "ok")]));
+
+            await _service.ChatAsync([new AiChatMessage { Role = "user", Content = "Hello" }]);
+
+            Assert.Contains("blog writing assistant", captured!.First().Text);
+        }
+
+        [Fact]
+        public async Task ChatAsync_UsesCustomChatSystemPrompt_WhenBlogHasPromptConfigured() {
+            var customPrompt = "You are a custom AI assistant for this specific blog.";
+            var blog = new Blog(new BlogId(2)) { Name = "Custom Blog", AiChatSystemPrompt = customPrompt };
+            var service = new AiChatService(_chatClientMock.Object, new RequestContext(blog, new ApplicationUser()));
+            IEnumerable<ChatMessage>? captured = null;
+            _chatClientMock
+                .Setup(c => c.GetResponseAsync(It.IsAny<IEnumerable<ChatMessage>>(), It.IsAny<ChatOptions?>(), It.IsAny<CancellationToken>()))
+                .Callback<IEnumerable<ChatMessage>, ChatOptions?, CancellationToken>((msgs, _, _) => captured = msgs)
+                .ReturnsAsync(new ChatResponse([new ChatMessage(ChatRole.Assistant, "ok")]));
+
+            await service.ChatAsync([new AiChatMessage { Role = "user", Content = "Hello" }]);
+
+            Assert.Equal(customPrompt, captured!.First().Text);
         }
 
         [Fact]
@@ -136,6 +170,37 @@ namespace ABCD.Application.Tests {
             await _service.GeneratePostAsync([new AiChatMessage { Role = "user", Content = "Write" }]);
 
             Assert.NotNull(capturedOptions?.ResponseFormat);
+        }
+
+        [Fact]
+        public async Task GeneratePostAsync_UsesDefaultGeneratePostSystemPrompt_WhenBlogHasNullPrompt() {
+            var json = """{"title":"T","path":"t","fragments":[{"fragmentType":"RichText","content":"<p>x</p>"}]}""";
+            IEnumerable<ChatMessage>? captured = null;
+            _chatClientMock
+                .Setup(c => c.GetResponseAsync(It.IsAny<IEnumerable<ChatMessage>>(), It.IsAny<ChatOptions?>(), It.IsAny<CancellationToken>()))
+                .Callback<IEnumerable<ChatMessage>, ChatOptions?, CancellationToken>((msgs, _, _) => captured = msgs)
+                .ReturnsAsync(new ChatResponse([new ChatMessage(ChatRole.Assistant, json)]));
+
+            await _service.GeneratePostAsync([new AiChatMessage { Role = "user", Content = "Write" }]);
+
+            Assert.Contains("blog post generator", captured!.First().Text);
+        }
+
+        [Fact]
+        public async Task GeneratePostAsync_UsesCustomGeneratePostSystemPrompt_WhenBlogHasPromptConfigured() {
+            var customPrompt = "Generate posts only about cloud infrastructure topics.";
+            var blog = new Blog(new BlogId(2)) { Name = "Cloud Blog", AiGeneratePostSystemPrompt = customPrompt };
+            var service = new AiChatService(_chatClientMock.Object, new RequestContext(blog, new ApplicationUser()));
+            var json = """{"title":"T","path":"t","fragments":[{"fragmentType":"RichText","content":"<p>x</p>"}]}""";
+            IEnumerable<ChatMessage>? captured = null;
+            _chatClientMock
+                .Setup(c => c.GetResponseAsync(It.IsAny<IEnumerable<ChatMessage>>(), It.IsAny<ChatOptions?>(), It.IsAny<CancellationToken>()))
+                .Callback<IEnumerable<ChatMessage>, ChatOptions?, CancellationToken>((msgs, _, _) => captured = msgs)
+                .ReturnsAsync(new ChatResponse([new ChatMessage(ChatRole.Assistant, json)]));
+
+            await service.GeneratePostAsync([new AiChatMessage { Role = "user", Content = "Write" }]);
+
+            Assert.Equal(customPrompt, captured!.First().Text);
         }
 
         private void SetupChatResponse(string text) {

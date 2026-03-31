@@ -33,7 +33,9 @@ namespace ABCD.Infra.Data {
             // Update fields
             record.Name = blog.Name;
             record.Description = blog.Description;
-            // Domains sync (simple replace for demo)
+            record.AiChatSystemPrompt = blog.AiChatSystemPrompt;
+            record.AiGeneratePostSystemPrompt = blog.AiGeneratePostSystemPrompt;
+            // Domains sync
             record.Domains.Clear();
             foreach (var d in blog.Domains)
                 record.Domains.Add(new DomainRecord { BlogId = record.BlogId, Domain = d.DomainName });
@@ -43,7 +45,7 @@ namespace ABCD.Infra.Data {
         }
 
         private static Blog MapToDomain(BlogRecord record) {
-            var blog = new Blog(new BlogId(record.BlogId)) { Name = record.Name, Description = record.Description };
+            var blog = new Blog(new BlogId(record.BlogId)) { Name = record.Name, Description = record.Description, AiChatSystemPrompt = record.AiChatSystemPrompt, AiGeneratePostSystemPrompt = record.AiGeneratePostSystemPrompt };
             foreach (var d in record.Domains)
                 blog.AddDomain(new BlogDomain(d.Domain));
             return blog;

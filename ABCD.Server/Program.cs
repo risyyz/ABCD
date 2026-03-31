@@ -47,6 +47,16 @@ if (builder.Environment.IsDevelopment()) {
 
         options.OperationFilter<SecurityRequirementsOperationFilter>();
     }); 
+
+    // In production Angular is served from the same origin — no CORS needed
+    builder.Services.AddCors(options => {
+        options.AddPolicy("AllowAngularClient", policy => {
+            policy.WithOrigins("https://localhost:4200", "http://localhost:4200")
+                  .AllowAnyMethod()
+                  .AllowAnyHeader()
+                  .AllowCredentials();
+        });
+    });
 }
 
 // Bind Settings class to configuration
@@ -92,16 +102,6 @@ builder.Services.AddAuthentication(options => {
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddAuthorization();
-
-// Add CORS configuration to allow credentials (for cookie-based auth)
-builder.Services.AddCors(options => {
-    options.AddPolicy("AllowAngularClient", policy => {
-        policy.WithOrigins("https://localhost:4200", "http://localhost:4200")
-              .AllowAnyMethod()
-              .AllowAnyHeader()
-              .AllowCredentials(); // Required for cookies
-    });
-});
 
 builder.Services.AddControllers();
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterUserCommandValidator>();
@@ -197,14 +197,16 @@ if (app.Environment.IsDevelopment()) {
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-app.UseCors("AllowAngularClient"); // Enable CORS for cookie-based auth
+if (app.Environment.IsDevelopment()) app.UseCors("AllowAngularClient");
 app.UseAuthentication();
 app.UseMiddleware<TokenValidationMiddleware>();
 app.UseAuthorization();
 app.UseMiddleware<RequestContextMiddleware>(); //TODO: do not use this middleware for live blog - only for backend scenarios
 app.MapControllers();
+app.MapFallbackToFile("index.html");
 
 // Apply migrations
-//MigrationHelper.ApplyMigrations(app.Services);
+MigrationHelper.ApplyMigrations(app.Services);
+await MigrationHelper.SeedAdminUserAsync(app.Services);
 
 app.Run();

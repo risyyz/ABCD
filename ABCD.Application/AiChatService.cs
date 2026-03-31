@@ -28,17 +28,17 @@ namespace ABCD.Application {
 
     public class AiChatService : IAiChatService {
         private readonly IChatClient _chatClient;
+        private readonly RequestContext _requestContext;
 
-        private const string ChatSystemPrompt = """
-            You are an expert blog writing assistant for a software development blog.
-            Help the user brainstorm blog post ideas, outlines, and content about programming,
-            coding, software architecture, and development practices.
-            Be specific, practical, and targeted at working software developers.
+        private const string DefaultChatSystemPrompt = """
+            You are an expert blog writing assistant.
+            Help the user brainstorm blog post ideas, outlines, and content.
+            Be specific, practical, and targeted at the blog's intended audience.
             Keep responses concise and actionable.
             """;
 
-        private const string GeneratePostSystemPrompt = """
-            You are a blog post generator for a software development blog.
+        private const string DefaultGeneratePostSystemPrompt = """
+            You are a blog post generator.
             Based on the conversation, generate a complete, well-structured blog post.
             Respond ONLY with valid JSON — no markdown fences, no explanation, just raw JSON — in exactly this format:
             {
@@ -63,8 +63,19 @@ namespace ABCD.Application {
             - Every newline inside any string value MUST be written as \n — never use a literal line break inside a JSON string
             """;
 
-        public AiChatService(IChatClient chatClient) {
+        private string ChatSystemPrompt =>
+            string.IsNullOrWhiteSpace(_requestContext.Blog.AiChatSystemPrompt)
+                ? DefaultChatSystemPrompt
+                : _requestContext.Blog.AiChatSystemPrompt;
+
+        private string GeneratePostSystemPrompt =>
+            string.IsNullOrWhiteSpace(_requestContext.Blog.AiGeneratePostSystemPrompt)
+                ? DefaultGeneratePostSystemPrompt
+                : _requestContext.Blog.AiGeneratePostSystemPrompt;
+
+        public AiChatService(IChatClient chatClient, RequestContext requestContext) {
             _chatClient = chatClient;
+            _requestContext = requestContext;
         }
 
         public async Task<string> ChatAsync(IEnumerable<AiChatMessage> messages) {
