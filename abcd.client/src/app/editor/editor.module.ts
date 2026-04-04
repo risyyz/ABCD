@@ -13,10 +13,12 @@ import { NgxEditorModule } from 'ngx-editor';
 import { ImageFragmentComponent } from './image-fragment/image-fragment.component';
 import { TableFragmentComponent } from './table-fragment/table-fragment.component';
 import { CodeFragmentComponent } from './code-fragment/code-fragment.component';
+import { AiChatComponent } from './ai-chat/ai-chat.component';
 import { MonacoEditorModule } from 'ngx-monaco-editor-v2';
 
 @NgModule({
   declarations: [
+    AiChatComponent,
     CodeFragmentComponent,
     DashboardComponent,
     EditPostComponent,

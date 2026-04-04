@@ -1,0 +1,147 @@
+<div class="ai-chat-layout">
+
+  <!-- Left: Chat Panel -->
+  <div class="chat-panel" [class.is-narrowed]="postProposal">
+    <nav class="navbar" role="navigation">
+      <div class="navbar-brand">
+        <h1 class="navbar-item is-size-4">
+          <span class="icon mr-2"><i class="fas fa-robot"></i></span>
+          AI Post Assistant
+        </h1>
+      </div>
+      <div class="navbar-menu">
+        <div class="navbar-end">
+          <div class="navbar-item">
+            <a class="button no-border" [routerLink]="['/editor/dashboard']">
+              <span class="icon"><i class="fas fa-arrow-left"></i></span>
+              <span>Dashboard</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="chat-body">
+
+      <!-- Message list -->
+      <div class="message-list" #messageList>
+        @if (messages.length === 0) {
+          <div class="empty-state has-text-centered has-text-grey">
+            <p class="mb-3"><i class="fas fa-lightbulb fa-3x"></i></p>
+            <p class="is-size-5">Ask for blog post ideas about software development.</p>
+            <p class="is-size-6 mt-2">Try: <em>"Give me 5 ideas for posts about .NET performance"</em></p>
+          </div>
+        }
+
+        @for (message of messages; track $index) {
+          <div class="message-row" [class.is-user]="message.role === 'user'">
+            <div class="message-bubble"
+              [class.user-bubble]="message.role === 'user'"
+              [class.ai-bubble]="message.role === 'assistant'">
+              <p class="message-content">{{ message.content }}</p>
+            </div>
+          </div>
+        }
+
+        @if (isLoading) {
+          <div class="message-row">
+            <div class="message-bubble ai-bubble">
+              <span class="icon"><i class="fas fa-circle-notch fa-spin"></i></span>
+              <span class="ml-1 has-text-grey">Thinking...</span>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Input bar -->
+      <div class="input-bar">
+        @if (hasAiResponse && !postProposal) {
+          <div class="mb-2">
+            <button class="button is-small"
+              (click)="generatePost()"
+              [disabled]="isGenerating"
+              [class.is-loading]="isGenerating">
+              <span class="icon is-small"><i class="fas fa-wand-magic-sparkles"></i></span>
+              <span>Generate Post from Conversation</span>
+            </button>
+          </div>
+        }
+        <div class="field has-addons mb-0">
+          <div class="control is-expanded">
+            <textarea class="textarea has-fixed-size"
+              rows="2"
+              placeholder="Ask for blog post ideas... (Enter to send, Shift+Enter for new line)"
+              [(ngModel)]="inputText"
+              (keydown)="onKeyDown($event)"
+              [disabled]="isLoading">
+            </textarea>
+          </div>
+          <div class="control">
+            <button class="button is-dark-grey send-button"
+              (click)="sendMessage()"
+              [disabled]="!inputText.trim() || isLoading">
+              <span class="icon"><i class="fas fa-paper-plane"></i></span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Right: Post Proposal Preview -->
+  @if (postProposal) {
+    <div class="proposal-panel">
+      <div class="box proposal-box">
+
+        <div class="level mb-4">
+          <div class="level-left">
+            <h2 class="subtitle is-4 mb-0">Post Preview</h2>
+          </div>
+          <div class="level-right">
+            <button class="delete" (click)="discardProposal()" title="Discard proposal"></button>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <p class="label mb-1">Title</p>
+          <p class="is-size-5">{{ postProposal.title }}</p>
+        </div>
+
+        <div class="mb-4">
+          <p class="label mb-1">URL Path</p>
+          <code>/{{ postProposal.path }}</code>
+        </div>
+
+        <div class="mb-5">
+          <p class="label mb-1">Fragments ({{ postProposal.fragments.length }})</p>
+          @for (fragment of postProposal.fragments; track $index) {
+            <div class="fragment-preview mb-2">
+              <span class="tag is-light mr-2">{{ fragment.fragmentType }}</span>
+              <span class="has-text-grey is-size-7">{{ fragment.content | slice:0:80 }}...</span>
+            </div>
+          }
+        </div>
+
+        <div class="buttons is-flex-direction-column">
+          <button class="button is-dark-grey is-fullwidth mb-2"
+            (click)="createPost()"
+            [disabled]="isCreating"
+            [class.is-loading]="isCreating">
+            <span class="icon"><i class="fas fa-file-circle-plus"></i></span>
+            <span>Create Post &amp; Open in Editor</span>
+          </button>
+          <button class="button is-fullwidth"
+            (click)="generatePost()"
+            [disabled]="isGenerating"
+            [class.is-loading]="isGenerating">
+            <span class="icon"><i class="fas fa-rotate"></i></span>
+            <span>Regenerate</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  }
+
+</div>

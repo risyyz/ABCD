@@ -22,6 +22,9 @@ public class Blog {
         set => _description = value?.Trim();
     }
 
+    public string? AiChatSystemPrompt { get; set; }
+    public string? AiGeneratePostSystemPrompt { get; set; }
+
     private readonly List<BlogDomain> _domains = new();
     public IReadOnlyCollection<BlogDomain> Domains => _domains;
     public void AddDomain(BlogDomain blogDomain) {

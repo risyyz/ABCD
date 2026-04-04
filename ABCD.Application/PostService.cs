@@ -41,8 +41,7 @@ namespace ABCD.Application {
                 throw new DuplicatePathSegmentException($"A post with the path segment '{post.PathSegment}' already exists in this blog.");
 
             // Persist
-            await _postRepository.AddAsync(post);
-            return post;
+            return await _postRepository.AddAsync(post);
         }
 
         public async Task<Post> DeleteFragmentAsync(DeleteFragmentCommand command) {

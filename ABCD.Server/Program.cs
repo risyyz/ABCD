@@ -21,6 +21,10 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 
+using Microsoft.Extensions.AI;
+
+using OpenAI;
+
 using Swashbuckle.AspNetCore.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -43,6 +47,16 @@ if (builder.Environment.IsDevelopment()) {
 
         options.OperationFilter<SecurityRequirementsOperationFilter>();
     }); 
+
+    // In production Angular is served from the same origin — no CORS needed
+    builder.Services.AddCors(options => {
+        options.AddPolicy("AllowAngularClient", policy => {
+            policy.WithOrigins("https://localhost:4200", "http://localhost:4200")
+                  .AllowAnyMethod()
+                  .AllowAnyHeader()
+                  .AllowCredentials();
+        });
+    });
 }
 
 // Bind Settings class to configuration
@@ -55,6 +69,7 @@ builder.Services.Configure<Settings>(options => {
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection(JwtSettings.SectionName));
 builder.Services.Configure<CachingSettings>(builder.Configuration.GetSection(CachingSettings.SectionName));
 builder.Services.Configure<FileUploadSettings>(builder.Configuration.GetSection(FileUploadSettings.SectionName));
+builder.Services.Configure<AiSettings>(builder.Configuration.GetSection(AiSettings.SectionName));
 
 // Add services to the container.
 var connectionString = configuration.GetConnectionString("DefaultConnection");
@@ -87,16 +102,6 @@ builder.Services.AddAuthentication(options => {
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddAuthorization();
-
-// Add CORS configuration to allow credentials (for cookie-based auth)
-builder.Services.AddCors(options => {
-    options.AddPolicy("AllowAngularClient", policy => {
-        policy.WithOrigins("https://localhost:4200", "http://localhost:4200")
-              .AllowAnyMethod()
-              .AllowAnyHeader()
-              .AllowCredentials(); // Required for cookies
-    });
-});
 
 builder.Services.AddControllers();
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterUserCommandValidator>();
@@ -172,6 +177,14 @@ config.NewConfig<Post, PublicPostDetailResponse>()
 builder.Services.AddSingleton(config);
 builder.Services.AddSingleton<ITypeMapper, TypeMapper>();
 
+var aiSettings = builder.Configuration.GetSection(AiSettings.SectionName).Get<AiSettings>();
+if (!string.IsNullOrWhiteSpace(aiSettings?.ApiKey)) {
+    builder.Services.AddSingleton<IChatClient>(
+        new OpenAI.Chat.ChatClient(aiSettings.Model, new System.ClientModel.ApiKeyCredential(aiSettings.ApiKey))
+            .AsIChatClient());
+    builder.Services.AddScoped<IAiChatService, AiChatService>();
+}
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment()) {
@@ -184,14 +197,16 @@ if (app.Environment.IsDevelopment()) {
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-app.UseCors("AllowAngularClient"); // Enable CORS for cookie-based auth
+if (app.Environment.IsDevelopment()) app.UseCors("AllowAngularClient");
 app.UseAuthentication();
 app.UseMiddleware<TokenValidationMiddleware>();
 app.UseAuthorization();
 app.UseMiddleware<RequestContextMiddleware>(); //TODO: do not use this middleware for live blog - only for backend scenarios
 app.MapControllers();
+app.MapFallbackToFile("index.html");
 
 // Apply migrations
-//MigrationHelper.ApplyMigrations(app.Services);
+MigrationHelper.ApplyMigrations(app.Services);
+await MigrationHelper.SeedAdminUserAsync(app.Services);
 
 app.Run();

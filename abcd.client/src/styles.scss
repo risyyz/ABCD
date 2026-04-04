@@ -1,11 +1,19 @@
 @use 'bulma/bulma';
 
+html, body, app-root {
+  height: 100%;
+  margin: 0;
+}
+
+app-root {
+  display: flex;
+  flex-direction: column;
+}
+
 :root {
   --bulma-primary-h: 209deg;
   --bulma-primary-s: 25%;
   --bulma-primary-l: 80%;
-  --bulma-link-h: 234deg;
-  --bulma-link-l: 42%;
   --bulma-success-h: 121deg;
   --bulma-success-s: 73%;
   --bulma-success-l: 36%;
@@ -13,7 +21,8 @@
   --checkbox-checked-color: #222; // dark grey
   --button-bg-color: #222; // dark grey
   --button-text-color: #fff; // white
-  --link-color: #4a6585; // muted steel-blue
+  --link-color: #2d7a20; // deep green — same hue as brand, AA-compliant on white
+  --link-color-hover: #256018; // darker green on hover
 }
 
 .control.has-floating-label {
@@ -61,6 +70,7 @@
 
 body {
   font-family: 'Open Sans', Helvetica, sans-serif;
+  color: #111111;
 }
 
 .field:not(:last-child) {
@@ -136,26 +146,8 @@ a,
 a:hover,
 .button.is-link:hover,
 .has-text-link:hover {
-  color: #2d4a65 !important;
-}
-
-// Prose links inside article content get underline + a readable distinct colour
-article.content a {
-  color: #1a6fa8;
+  color: var(--link-color-hover) !important;
   text-decoration: underline;
-  text-underline-offset: 3px;
-  text-decoration-color: rgba(26, 111, 168, 0.4);
-  transition: color 0.15s ease, text-decoration-color 0.15s ease;
-}
-
-article.content a:visited {
-  color: #7b5ea7;
-  text-decoration-color: rgba(123, 94, 167, 0.4);
-}
-
-article.content a:hover {
-  color: #155a8a;
-  text-decoration-color: rgba(21, 90, 138, 0.7);
 }
 
 .no-border {
@@ -166,6 +158,7 @@ article.content a:hover {
 // Public article reading typography
 article.content {
   line-height: 1.75;
+  font-weight: 400;
 
   @media (min-width: 1024px) {
     font-size: 1.0625rem;
@@ -173,6 +166,11 @@ article.content {
 
   p {
     margin-bottom: 1.4em;
+  }
+
+  strong, b {
+    font-weight: 700;
+    color: #000;
   }
 
   hr {
@@ -198,13 +196,13 @@ article.content {
     letter-spacing: -0.015em;
 
     a {
-      color: inherit;
+      color: inherit !important;
       text-decoration: none;
     }
 
     a:hover {
-      color: #4a6585;
-      text-decoration: none;
+      color: inherit !important;
+      text-decoration: underline;
     }
   }
 }
