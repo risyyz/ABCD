@@ -74,7 +74,7 @@ namespace ABCD.Application {
                 var user = await _userManager.FindByEmailAsync(credentials.Email);
 
                 var pin = RandomNumberGenerator.GetInt32(100000, 1000000).ToString();
-                user!.TwoFactorPin = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(pin)));
+                user!.TwoFactorPin = ComputePinHash(pin);
                 user.TwoFactorPinExpiry = DateTimeOffset.UtcNow.AddMinutes(5);
                 await _userManager.UpdateAsync(user);
 
@@ -95,8 +95,13 @@ namespace ABCD.Application {
             if (user == null)
                 throw new SignInFailedException("Invalid verification attempt");
 
-            var pinHash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(command.Pin)));
-            if (user.TwoFactorPin != pinHash || user.TwoFactorPinExpiry <= DateTimeOffset.UtcNow)
+            var pinHash = ComputePinHash(command.Pin);
+            var storedHash = user.TwoFactorPin ?? string.Empty;
+            var hashesMatch = CryptographicOperations.FixedTimeEquals(
+                Encoding.UTF8.GetBytes(pinHash),
+                Encoding.UTF8.GetBytes(storedHash));
+
+            if (!hashesMatch || user.TwoFactorPinExpiry <= DateTimeOffset.UtcNow)
                 throw new SignInFailedException("Invalid or expired verification code");
 
             user.TwoFactorPin = null;
@@ -128,6 +133,12 @@ namespace ABCD.Application {
 
             var expiration = TimeSpan.FromMinutes(_jwtSettings.TokenExpiryInMinutes);
             _invalidatedTokenCache.Set(jwt, true, expiration);
+        }
+
+        private string ComputePinHash(string pin) {
+            var keyBytes = Encoding.UTF8.GetBytes(_jwtSettings.SecretKey);
+            var pinBytes = Encoding.UTF8.GetBytes(pin);
+            return Convert.ToHexString(HMACSHA256.HashData(keyBytes, pinBytes));
         }
     }
 }
