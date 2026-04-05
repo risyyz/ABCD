@@ -4,11 +4,13 @@ import { ReactiveFormsModule } from '@angular/forms';
 
 import { AuthRoutingModule } from './auth-routing.module';
 import { LoginComponent } from './login/login.component';
+import { VerifyPinComponent } from './verify-pin/verify-pin.component';
 
 
 @NgModule({
   declarations: [
-    LoginComponent
+    LoginComponent,
+    VerifyPinComponent
   ],
   imports: [
     CommonModule,

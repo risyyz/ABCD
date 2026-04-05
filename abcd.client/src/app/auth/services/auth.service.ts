@@ -9,10 +9,19 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
-  success: boolean;
-  token?: string;
-  refreshToken?: string;
+  success?: boolean;
+  requiresTwoFactor?: boolean;
+  email?: string;
   message?: string;
+}
+
+export interface VerifyPinRequest {
+  email: string;
+  pin: string;
+}
+
+export interface VerifyPinResponse {
+  success: boolean;
 }
 
 export interface RefreshTokenRequest {
@@ -37,6 +46,12 @@ export class AuthService {
   signIn(loginData: LoginRequest): Observable<LoginResponse> {
     // Real API call with credentials enabled (sends/receives cookies)
     return this.http.post<LoginResponse>('/api/auth/sign-in', loginData, {
+      withCredentials: true
+    });
+  }
+
+  verifyPin(verifyData: VerifyPinRequest): Observable<VerifyPinResponse> {
+    return this.http.post<VerifyPinResponse>('/api/auth/verify-2fa', verifyData, {
       withCredentials: true
     }).pipe(
       tap(response => {
