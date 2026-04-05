@@ -25,6 +25,19 @@ public class Blog {
     public string? AiChatSystemPrompt { get; set; }
     public string? AiGeneratePostSystemPrompt { get; set; }
 
+    public static readonly int MinSeriesDepth = 2;
+    public static readonly int MaxSeriesDepthLimit = 3;
+
+    private int _maxSeriesDepth = 2;
+    public int MaxSeriesDepth {
+        get => _maxSeriesDepth;
+        set {
+            if (value < MinSeriesDepth || value > MaxSeriesDepthLimit)
+                throw new ArgumentOutOfRangeException(nameof(value), $"MaxSeriesDepth must be between {MinSeriesDepth} and {MaxSeriesDepthLimit}.");
+            _maxSeriesDepth = value;
+        }
+    }
+
     private readonly List<BlogDomain> _domains = new();
     public IReadOnlyCollection<BlogDomain> Domains => _domains;
     public void AddDomain(BlogDomain blogDomain) {

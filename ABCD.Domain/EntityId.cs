@@ -43,4 +43,11 @@
                 throw new ArgumentOutOfRangeException("FragmentId must be greater than 0.");
         }
     }
+
+    public sealed class SeriesId : EntityId<int> {
+        public SeriesId(int value) : base(value) {
+            if (value <= 0)
+                throw new ArgumentOutOfRangeException("SeriesId must be greater than 0.");
+        }
+    }
 }

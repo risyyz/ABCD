@@ -14,11 +14,13 @@ namespace ABCD.Server.Controllers
     public class PublicController : ControllerBase
     {
         private readonly IPostService _postService;
+        private readonly ISeriesService _seriesService;
         private readonly ITypeMapper _typeMapper;
 
-        public PublicController(IPostService postService, ITypeMapper typeMapper)
+        public PublicController(IPostService postService, ISeriesService seriesService, ITypeMapper typeMapper)
         {
             _postService = postService;
+            _seriesService = seriesService;
             _typeMapper = typeMapper;
         }
 
@@ -37,6 +39,24 @@ namespace ABCD.Server.Controllers
             if (post == null)
                 return NotFound();
             var response = _typeMapper.Map<Post, PublicPostDetailResponse>(post);
+            return Ok(response);
+        }
+
+        [HttpGet("series")]
+        public async Task<IActionResult> GetPublishedSeries([FromQuery] int limit = 10, [FromQuery] int skip = 0)
+        {
+            var seriesList = await _seriesService.GetPublishedAsync(limit, skip);
+            var response = _typeMapper.Map<IEnumerable<Series>, IEnumerable<PublicSeriesSummaryResponse>>(seriesList);
+            return Ok(response);
+        }
+
+        [HttpGet("series/{pathSegment}")]
+        public async Task<IActionResult> GetPublishedSeriesByPath([FromRoute] string pathSegment)
+        {
+            var series = await _seriesService.GetPublishedByPathSegmentAsync(pathSegment);
+            if (series == null)
+                return NotFound();
+            var response = _typeMapper.Map<Series, PublicSeriesDetailResponse>(series);
             return Ok(response);
         }
     }

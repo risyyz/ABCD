@@ -129,6 +129,8 @@ builder.Services.AddScoped<IBlogRepository, BlogRepository>();
 builder.Services.AddScoped<IBlogService, BlogService>();
 builder.Services.AddScoped<IPostRepository, PostRepository>();
 builder.Services.AddScoped<IPostService, PostService>();
+builder.Services.AddScoped<ISeriesRepository, SeriesRepository>();
+builder.Services.AddScoped<ISeriesService, SeriesService>();
 
 
 var config = TypeAdapterConfig.GlobalSettings;
@@ -172,6 +174,48 @@ config.NewConfig<Post, PublicPostDetailResponse>()
     .Map(dest => dest.Title, src => src.Title)
     .Map(dest => dest.DateLastPublished, src => src.DateLastPublished)
     .Map(dest => dest.Fragments, src => src.Fragments.Adapt<List<PublicFragmentResponse>>());
+
+config.NewConfig<Series, SeriesSummaryResponse>()
+    .Map(dest => dest.SeriesId, src => src.SeriesId != null ? src.SeriesId.Value : 0)
+    .Map(dest => dest.BlogId, src => src.BlogId.Value)
+    .Map(dest => dest.Status, src => src.Status.ToString())
+    .Map(dest => dest.PathSegment, src => src.PathSegment != null ? src.PathSegment.Value : null)
+    .Map(dest => dest.Version, src => src.Version != null ? src.Version.HexString : null)
+    .Map(dest => dest.PostCount, src => src.Posts.Count);
+
+config.NewConfig<Series, SeriesDetailResponse>()
+    .Map(dest => dest.SeriesId, src => src.SeriesId != null ? src.SeriesId.Value : 0)
+    .Map(dest => dest.BlogId, src => src.BlogId.Value)
+    .Map(dest => dest.Status, src => src.Status.ToString())
+    .Map(dest => dest.PathSegment, src => src.PathSegment != null ? src.PathSegment.Value : null)
+    .Map(dest => dest.Version, src => src.Version != null ? src.Version.HexString : null)
+    .Map(dest => dest.Posts, src => src.Posts.Select(p => new SeriesPostResponse {
+        PostId = p.PostId != null ? p.PostId.Value : 0,
+        Title = p.Title,
+        Status = p.Status.ToString(),
+        PathSegment = p.PathSegment != null ? p.PathSegment.Value : null,
+        Position = p.SeriesPosition ?? 0
+    }).OrderBy(p => p.Position).ToList());
+
+config.NewConfig<Series, PublicSeriesSummaryResponse>()
+    .Map(dest => dest.SeriesId, src => src.SeriesId != null ? src.SeriesId.Value : 0)
+    .Map(dest => dest.Title, src => src.Title)
+    .Map(dest => dest.Description, src => src.Description)
+    .Map(dest => dest.Url, src => src.PathSegment != null ? $"/series/{src.PathSegment.Value}" : null)
+    .Map(dest => dest.DateLastPublished, src => src.DateLastPublished)
+    .Map(dest => dest.PostCount, src => src.Posts.Count);
+
+config.NewConfig<Series, PublicSeriesDetailResponse>()
+    .Map(dest => dest.Title, src => src.Title)
+    .Map(dest => dest.Description, src => src.Description)
+    .Map(dest => dest.DateLastPublished, src => src.DateLastPublished)
+    .Map(dest => dest.Posts, src => src.Posts
+        .Where(p => p.Status == PostStatus.Published)
+        .Select(p => new PublicSeriesPostResponse {
+            Title = p.Title,
+            Url = p.PathSegment != null ? $"/{p.PathSegment.Value}" : null,
+            Position = p.SeriesPosition ?? 0
+        }).OrderBy(p => p.Position).ToList());
 
 // Register the config and mapper
 builder.Services.AddSingleton(config);

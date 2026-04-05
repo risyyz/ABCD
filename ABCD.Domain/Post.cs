@@ -8,6 +8,8 @@ public class Post {
     public PostId? PostId { get; private set; }
     public PostStatus Status { get; private set; }
     public DateTime? DateLastPublished { get; private set; }
+    public SeriesId? SeriesId { get; private set; }
+    public int? SeriesPosition { get; private set; }
 
     private string _title;
     public string Title {
@@ -52,6 +54,27 @@ public class Post {
             }
             _parent = value;
         } 
+    }
+
+    public void AssignToSeries(SeriesId seriesId, int position) {
+        if (seriesId == null)
+            throw new ArgumentNullException(nameof(seriesId), "SeriesId cannot be null.");
+        if (position < 1)
+            throw new ArgumentOutOfRangeException(nameof(position), "Series position must be at least 1.");
+
+        SeriesId = seriesId;
+        SeriesPosition = position;
+    }
+
+    public void RemoveFromSeries() {
+        SeriesId = null;
+        SeriesPosition = null;
+    }
+
+    public void SetSeriesPosition(int position) {
+        if (position < 1)
+            throw new ArgumentOutOfRangeException(nameof(position), "Series position must be at least 1.");
+        SeriesPosition = position;
     }
 
     public Post(BlogId blogId, string title)

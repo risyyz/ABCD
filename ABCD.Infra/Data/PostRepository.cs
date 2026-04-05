@@ -75,7 +75,9 @@ namespace ABCD.Infra.Data {
                                 record.Title, (PostStatus)record.Status, record.DateLastPublished, fragments) { 
                 PathSegment = record.PathSegment != null ? new PathSegment(record.PathSegment) : null,
                 Version = new VersionToken(record.Version)
-            };            
+            };
+            if (record.SeriesId.HasValue && record.SeriesPosition.HasValue)
+                post.AssignToSeries(new SeriesId(record.SeriesId.Value), record.SeriesPosition.Value);
             return post;
         }
 
@@ -100,6 +102,8 @@ namespace ABCD.Infra.Data {
                 PathSegment = post.PathSegment?.Value,
                 DateLastPublished = post.DateLastPublished,
                 Version = post.Version?.Value ?? Array.Empty<byte>(),
+                SeriesId = post.SeriesId?.Value,
+                SeriesPosition = post.SeriesPosition,
                 Fragments = post.Fragments.Select(MapToRecord).ToList()
             };
         }

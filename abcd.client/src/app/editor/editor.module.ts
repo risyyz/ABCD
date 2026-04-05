@@ -14,6 +14,9 @@ import { ImageFragmentComponent } from './image-fragment/image-fragment.componen
 import { TableFragmentComponent } from './table-fragment/table-fragment.component';
 import { CodeFragmentComponent } from './code-fragment/code-fragment.component';
 import { AiChatComponent } from './ai-chat/ai-chat.component';
+import { SeriesListComponent } from './series-list/series-list.component';
+import { EditSeriesComponent } from './edit-series/edit-series.component';
+import { CreateSeriesComponent } from './create-series/create-series.component';
 import { MonacoEditorModule } from 'ngx-monaco-editor-v2';
 
 @NgModule({
@@ -26,6 +29,8 @@ import { MonacoEditorModule } from 'ngx-monaco-editor-v2';
     EditableGenericComponent,
     ImageFragmentComponent,
     RichTextFragmentComponent,
+    SeriesListComponent,
+    EditSeriesComponent,
     TableFragmentComponent,
   ],
   imports: [
@@ -33,6 +38,7 @@ import { MonacoEditorModule } from 'ngx-monaco-editor-v2';
     FormsModule,
     EditorRoutingModule,
     CreatePostComponent,
+    CreateSeriesComponent,
     NgxEditorModule,
     MonacoEditorModule.forRoot()
   ]

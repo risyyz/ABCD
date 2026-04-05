@@ -45,7 +45,7 @@ namespace ABCD.Infra.Data {
         }
 
         private static Blog MapToDomain(BlogRecord record) {
-            var blog = new Blog(new BlogId(record.BlogId)) { Name = record.Name, Description = record.Description, AiChatSystemPrompt = record.AiChatSystemPrompt, AiGeneratePostSystemPrompt = record.AiGeneratePostSystemPrompt };
+            var blog = new Blog(new BlogId(record.BlogId)) { Name = record.Name, Description = record.Description, AiChatSystemPrompt = record.AiChatSystemPrompt, AiGeneratePostSystemPrompt = record.AiGeneratePostSystemPrompt, MaxSeriesDepth = record.MaxSeriesDepth };
             foreach (var d in record.Domains)
                 blog.AddDomain(new BlogDomain(d.Domain));
             return blog;

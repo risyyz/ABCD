@@ -19,12 +19,18 @@ namespace ABCD.Infra.Data {
                 entity.Property(e => e.Description);
                 entity.Property(e => e.AiChatSystemPrompt);
                 entity.Property(e => e.AiGeneratePostSystemPrompt);
+                entity.Property(e => e.MaxSeriesDepth).IsRequired().HasDefaultValue(2);
                 entity.HasMany(e => e.Domains)
                       .WithOne(e => e.Blog)
                       .HasForeignKey(e => e.BlogId)
                       .IsRequired()
                       .OnDelete(DeleteBehavior.Restrict);
                 entity.HasMany(e => e.Posts)
+                      .WithOne(e => e.Blog)
+                      .HasForeignKey(e => e.BlogId)
+                      .IsRequired()
+                      .OnDelete(DeleteBehavior.Restrict);
+                entity.HasMany(e => e.Series)
                       .WithOne(e => e.Blog)
                       .HasForeignKey(e => e.BlogId)
                       .IsRequired()
@@ -62,6 +68,34 @@ namespace ABCD.Infra.Data {
                 entity.Property(e => e.Version)
                       .IsRowVersion()
                       .IsRequired();
+                entity.Property(e => e.SeriesPosition);
+                entity.HasOne(e => e.Series)
+                      .WithMany(e => e.Posts)
+                      .HasForeignKey(e => e.SeriesId)
+                      .IsRequired(false)
+                      .OnDelete(DeleteBehavior.SetNull);
+            });
+
+            modelBuilder.Entity<SeriesRecord>(entity => {
+                entity.ToTable("Series");
+                entity.HasKey(e => e.SeriesId);
+                entity.Property(e => e.SeriesId).ValueGeneratedOnAdd();
+                entity.Property(e => e.Title).IsRequired().HasMaxLength(250);
+                entity.Property(e => e.Description).HasMaxLength(2000);
+                entity.Property(e => e.BlogId).IsRequired();
+                entity.Property(e => e.Status)
+                      .HasConversion<string>()
+                      .IsRequired()
+                      .HasMaxLength(15);
+                entity.Property(e => e.PathSegment).HasMaxLength(250);
+                entity.HasIndex(e => e.PathSegment).IsUnique();
+                entity.Property(e => e.CreatedBy).IsRequired().HasMaxLength(450);
+                entity.Property(e => e.CreatedDate).IsRequired();
+                entity.Property(e => e.UpdatedBy).IsRequired().HasMaxLength(450);
+                entity.Property(e => e.UpdatedDate).IsRequired();
+                entity.Property(e => e.Version)
+                      .IsRowVersion()
+                      .IsRequired();
             });
 
             modelBuilder.Entity<FragmentRecord>(entity => {
@@ -88,5 +122,6 @@ namespace ABCD.Infra.Data {
         public DbSet<DomainRecord> Domains { get; set; }
         public DbSet<PostRecord> Posts { get; set; }
         public DbSet<FragmentRecord> Fragments { get; set; }
+        public DbSet<SeriesRecord> Series { get; set; }
     }
 }

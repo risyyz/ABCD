@@ -22,5 +22,8 @@ namespace ABCD.Infra.Data {
         public string? PathSegment { get; set; } // URL path to access the post
         public DateTime? DateLastPublished { get; set; }
         public byte[] Version { get; set; } = Array.Empty<byte>(); // RowVersion for concurrency
+        public int? SeriesId { get; set; } // nullable for standalone posts
+        public SeriesRecord? Series { get; set; } // navigation property
+        public int? SeriesPosition { get; set; } // position within the series
     }
 }

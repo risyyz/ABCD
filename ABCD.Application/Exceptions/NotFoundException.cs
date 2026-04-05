@@ -10,4 +10,8 @@
     public class FragmentNotFoundException : Exception {
         public FragmentNotFoundException(string message) : base(message) { }
     }
+
+    public class SeriesNotFoundException : Exception {
+        public SeriesNotFoundException(string message) : base(message) { }
+    }
 }
