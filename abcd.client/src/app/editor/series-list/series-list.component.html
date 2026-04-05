@@ -1,0 +1,86 @@
+<div class="container">
+  <nav class="navbar" role="navigation" aria-label="series navigation">
+    <div class="navbar-brand">
+      <h1 class="navbar-item is-size-4">Series</h1>
+    </div>
+    <div class="navbar-menu">
+      <div class="navbar-end">
+        <div class="navbar-item">
+          <a class="button no-border" [routerLink]="['/editor/dashboard']" title="Back to Dashboard">
+            <span class="icon">
+              <i class="fas fa-arrow-left"></i>
+            </span>
+            <span>Dashboard</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main class="section">
+    <div class="columns is-centered">
+      <div class="column is-10">
+        <div class="box">
+          <div class="content">
+            <div class="level mb-2">
+              <div class="level-left">
+                <div class="level-item">
+                  <button class="button no-border" title="Create new series" (click)="openCreateSeries()">
+                    <span class="icon">
+                      <i class="fa-solid fa-folder-plus"></i>
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            @if (showCreateSeries) {
+              <app-create-series (close)="closeCreateSeries()"></app-create-series>
+            }
+
+            <table class="table is-fullwidth">
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Path</th>
+                  <th class="has-text-centered">Status</th>
+                  <th class="has-text-centered">Posts</th>
+                  <th>Date Published</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (series of seriesList; track series.seriesId) {
+                  <tr>
+                    <td>
+                      <a [routerLink]="['/editor/series', series.seriesId]">{{ series.title }}</a>
+                    </td>
+                    <td>{{ series.pathSegment }}</td>
+                    <td class="has-text-centered">
+                      @if (series.status === 'Draft') {
+                        <span><i class="fa-solid fa-pencil-alt"></i></span>
+                      }
+                      @if (series.status === 'Published') {
+                        <span><i class="fa-solid fa-tower-broadcast"></i></span>
+                      }
+                    </td>
+                    <td class="has-text-centered">{{ series.postCount }}</td>
+                    <td>
+                      @if (series.status === 'Published' && series.dateLastPublished) {
+                        <span>{{ series.dateLastPublished | date:'mediumDate' }}</span>
+                      }
+                    </td>
+                  </tr>
+                }
+                @if (seriesList.length === 0) {
+                  <tr>
+                    <td colspan="5" class="has-text-centered">No series found.</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

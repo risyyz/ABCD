@@ -1,0 +1,190 @@
+<div class="container" *ngIf="series">
+  <nav class="navbar" role="navigation" aria-label="series detail navigation">
+    <div class="navbar-brand">
+      <h1 class="navbar-item is-size-4">{{ series.title }}</h1>
+    </div>
+    <div class="navbar-menu">
+      <div class="navbar-end">
+        <div class="navbar-item">
+          <a class="button no-border" [routerLink]="['/editor/series']" title="Back to Series">
+            <span class="icon"><i class="fas fa-arrow-left"></i></span>
+            <span>Series</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main class="section">
+    <div class="columns is-centered">
+      <div class="column is-10">
+
+        <div class="has-text-danger mb-3" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+        <!-- Series metadata -->
+        <div class="box mb-4">
+          <div class="content">
+            @if (!isEditing) {
+              <div class="level">
+                <div class="level-left">
+                  <div class="level-item">
+                    <div>
+                      <p><strong>Title:</strong> {{ series.title }}</p>
+                      <p><strong>Path:</strong> {{ series.pathSegment }}</p>
+                      <p><strong>Description:</strong> {{ series.description || '—' }}</p>
+                      <p>
+                        <strong>Status:</strong>
+                        @if (series.status === 'Draft') {
+                          <span class="tag">Draft</span>
+                        } @else {
+                          <span class="tag is-success">Published</span>
+                        }
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div class="level-right">
+                  <div class="level-item">
+                    <button class="button no-border mr-2" title="Edit" (click)="startEdit()">
+                      <span class="icon"><i class="fa-solid fa-pen"></i></span>
+                    </button>
+                    <button class="button no-border" [title]="series.status === 'Draft' ? 'Publish' : 'Unpublish'" (click)="toggleStatus()">
+                      <span class="icon">
+                        @if (series.status === 'Draft') {
+                          <i class="fa-solid fa-tower-broadcast"></i>
+                        } @else {
+                          <i class="fa-solid fa-pencil-alt"></i>
+                        }
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            } @else {
+              <div class="field">
+                <label class="label">Title</label>
+                <div class="control">
+                  <input class="input" type="text" [(ngModel)]="editTitle" />
+                </div>
+              </div>
+              <div class="field">
+                <label class="label">Path</label>
+                <div class="control">
+                  <input class="input" type="text" [(ngModel)]="editPathSegment" />
+                </div>
+              </div>
+              <div class="field">
+                <label class="label">Description</label>
+                <div class="control">
+                  <input class="input" type="text" [(ngModel)]="editDescription" />
+                </div>
+              </div>
+              <div class="buttons">
+                <button class="button is-dark-grey" (click)="saveEdit()">Save</button>
+                <button class="button" (click)="cancelEdit()">Cancel</button>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Posts in series -->
+        <div class="box">
+          <div class="content">
+            <div class="level mb-2">
+              <div class="level-left">
+                <div class="level-item">
+                  <h2 class="is-size-5 mb-0">Posts</h2>
+                </div>
+              </div>
+              <div class="level-right">
+                <div class="level-item">
+                  <button class="button no-border" title="Add post to series" (click)="openAddPost()">
+                    <span class="icon"><i class="fa-solid fa-plus"></i></span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <table class="table is-fullwidth">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Title</th>
+                  <th>Status</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (post of series.posts; track post.postId) {
+                  <tr>
+                    <td>{{ post.position }}</td>
+                    <td>
+                      <a [routerLink]="['/editor/edit', post.postId]">{{ post.title }}</a>
+                    </td>
+                    <td>
+                      @if (post.status === 'Draft') {
+                        <span><i class="fa-solid fa-pencil-alt"></i></span>
+                      }
+                      @if (post.status === 'Published') {
+                        <span><i class="fa-solid fa-tower-broadcast"></i></span>
+                      }
+                    </td>
+                    <td>
+                      <button class="button is-small no-border" title="Remove from series" (click)="removePost(post)">
+                        <span class="icon"><i class="fa-solid fa-xmark"></i></span>
+                      </button>
+                    </td>
+                  </tr>
+                }
+                @if (series.posts.length === 0) {
+                  <tr>
+                    <td colspan="4" class="has-text-centered">No posts in this series.</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Add Post Modal -->
+@if (showAddPost) {
+  <div class="modal is-active">
+    <div class="modal-background" (click)="closeAddPost()"></div>
+    <div class="modal-card">
+      <header class="modal-card-head">
+        <p class="modal-card-title">Add Post to Series</p>
+        <button class="delete" aria-label="close" (click)="closeAddPost()"></button>
+      </header>
+      <section class="modal-card-body">
+        <div class="field">
+          <label class="label">Post</label>
+          <div class="control">
+            <div class="select is-fullwidth">
+              <select [(ngModel)]="addPostId">
+                <option [ngValue]="null" disabled>Select a post</option>
+                @for (post of availablePosts; track post.postId) {
+                  <option [ngValue]="post.postId">{{ post.title }}</option>
+                }
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Position</label>
+          <div class="control">
+            <input class="input" type="number" min="1" [(ngModel)]="addPostPosition" />
+          </div>
+        </div>
+      </section>
+      <footer class="modal-card-foot">
+        <button class="button is-dark-grey mr-2" [disabled]="!addPostId" (click)="submitAddPost()">Add</button>
+        <button class="button" (click)="closeAddPost()">Cancel</button>
+      </footer>
+    </div>
+  </div>
+}
