@@ -3,10 +3,14 @@
     <div class="is-flex is-align-items-center is-justify-content-space-between">
       <h2 class="title">Edit Post</h2>
       @if (post.status === 'Draft') {
-        <button type="button" class="button is-dark-grey" style="margin-left:auto;" [disabled]="!post.canPublish" [title]="post.canPublish ? '' : post.publishReasons.join('\n')" (click)="onToggleStatus()">Publish</button>
+        <button type="button" class="button is-success" title="Publish" [disabled]="!post.canPublish" [title]="post.canPublish ? 'Publish' : post.publishReasons.join('\n')" (click)="onToggleStatus()">
+          <span class="icon"><i class="fa-solid fa-tower-broadcast"></i></span>
+        </button>
       }
       @if (post.status === 'Published') {
-        <button type="button" class="button is-dark-grey" style="margin-left:auto;" (click)="onToggleStatus()">Convert to Draft</button>
+        <button type="button" class="button is-warning" title="Unpublish" (click)="onToggleStatus()">
+          <span class="icon"><i class="fa-solid fa-eye-slash"></i></span>
+        </button>
       }
     </div>
     <main class="section">

@@ -30,18 +30,18 @@
                 </div>
                 <div class="level-right">
                   <div class="level-item">
-                    <button class="button no-border mr-2" title="Edit" (click)="startEdit()">
-                      <span class="icon"><i class="fa-solid fa-pen"></i></span>
+                    <button class="button mr-2" title="Edit" (click)="startEdit()">
+                      <span class="icon"><i class="fas fa-edit"></i></span>
                     </button>
-                    <button class="button no-border" [title]="series.status === 'Draft' ? 'Publish' : 'Unpublish'" (click)="toggleStatus()">
-                      <span class="icon">
-                        @if (series.status === 'Draft') {
-                          <i class="fa-solid fa-tower-broadcast"></i>
-                        } @else {
-                          <i class="fa-solid fa-pencil-alt"></i>
-                        }
-                      </span>
-                    </button>
+                    @if (series.status === 'Draft') {
+                      <button class="button is-success" title="Publish" (click)="toggleStatus()">
+                        <span class="icon"><i class="fa-solid fa-tower-broadcast"></i></span>
+                      </button>
+                    } @else {
+                      <button class="button is-warning" title="Unpublish" (click)="toggleStatus()">
+                        <span class="icon"><i class="fa-solid fa-eye-slash"></i></span>
+                      </button>
+                    }
                   </div>
                 </div>
               </div>
@@ -83,7 +83,7 @@
               </div>
               <div class="level-right">
                 <div class="level-item">
-                  <button class="button no-border" title="Add post to series" (click)="openAddPost()">
+                  <button class="button" title="Add post to series" (click)="openAddPost()">
                     <span class="icon"><i class="fa-solid fa-plus"></i></span>
                   </button>
                 </div>
@@ -108,15 +108,15 @@
                     </td>
                     <td>
                       @if (post.status === 'Draft') {
-                        <span><i class="fa-solid fa-pencil-alt"></i></span>
+                        <span><i class="fa-solid fa-eye-slash"></i></span>
                       }
                       @if (post.status === 'Published') {
                         <span><i class="fa-solid fa-tower-broadcast"></i></span>
                       }
                     </td>
                     <td>
-                      <button class="button is-small no-border" title="Remove from series" (click)="removePost(post)">
-                        <span class="icon"><i class="fa-solid fa-xmark"></i></span>
+                      <button class="button is-small is-danger" title="Remove from series" (click)="removePost(post)">
+                        <span class="icon"><i class="fas fa-trash"></i></span>
                       </button>
                     </td>
                   </tr>
