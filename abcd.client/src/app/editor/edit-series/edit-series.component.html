@@ -1,20 +1,5 @@
 <div class="container" *ngIf="series">
-  <nav class="navbar" role="navigation" aria-label="series detail navigation">
-    <div class="navbar-brand">
-      <h1 class="navbar-item is-size-4">{{ series.title }}</h1>
-    </div>
-    <div class="navbar-menu">
-      <div class="navbar-end">
-        <div class="navbar-item">
-          <a class="button no-border" [routerLink]="['/editor/series']" title="Back to Series">
-            <span class="icon"><i class="fas fa-arrow-left"></i></span>
-            <span>Series</span>
-          </a>
-        </div>
-      </div>
-    </div>
-  </nav>
-
+  <h2 class="title">{{ series.title }}</h2>
   <main class="section">
     <div class="columns is-centered">
       <div class="column is-10">

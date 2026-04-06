@@ -141,7 +141,8 @@ config.NewConfig<Post, PostSummaryResponse>()
     .Map(dest => dest.PathSegment, src => src.PathSegment != null ? src.PathSegment : null )
     .Map(dest => dest.PostId, src => src.PostId != null ? src.PostId.Value : 0)
     .Map(dest => dest.BlogId, src => src.BlogId.Value)
-    .Map(dest => dest.Version, src => src.Version != null ? src.Version.HexString : null);
+    .Map(dest => dest.Version, src => src.Version != null ? src.Version.HexString : null)
+    .Map(dest => dest.SeriesId, src => src.SeriesId != null ? src.SeriesId.Value : (int?)null);
 
 config.NewConfig<Fragment, FragmentResponse>()
     .Map(dest => dest.FragmentId, src => src.FragmentId != null ? src.FragmentId.Value : 0)

@@ -206,3 +206,9 @@ article.content {
     }
   }
 }
+
+// Editor module page headings — match public article serif style
+app-editor-layout .title {
+  font-family: 'Lora', Georgia, serif;
+  letter-spacing: -0.015em;
+}

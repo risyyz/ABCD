@@ -14,6 +14,7 @@ namespace ABCD.Server.Models
         public string? PathSegment { get; init; }
         public DateTime? DateLastPublished { get; init; }
         public string Version { get; init; } = string.Empty;
+        public int? SeriesId { get; init; }
     }
 
     public record FragmentResponse

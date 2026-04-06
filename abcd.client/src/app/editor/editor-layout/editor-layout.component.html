@@ -1,0 +1,27 @@
+<nav class="navbar" role="navigation" aria-label="editor navigation">
+  <div class="container">
+    <div class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" routerLink="/editor/dashboard">
+          <span class="icon"><i class="fas fa-tachometer-alt"></i></span>
+          <span>Dashboard</span>
+        </a>
+        <a class="navbar-item" routerLink="/editor/series">
+          <span class="icon"><i class="fas fa-layer-group"></i></span>
+          <span>Series</span>
+        </a>
+        <a class="navbar-item" routerLink="/editor/ai-chat">
+          <span class="icon"><i class="fas fa-robot"></i></span>
+          <span>AI Assistant</span>
+        </a>
+      </div>
+      <div class="navbar-end">
+        <a class="navbar-item" (click)="logout()" style="cursor: pointer;">
+          <span>Logout</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<router-outlet></router-outlet>

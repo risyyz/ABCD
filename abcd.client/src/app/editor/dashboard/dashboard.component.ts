@@ -1,15 +1,16 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { AuthService } from '../../auth/services/auth.service';
-import { HttpClient } from '@angular/common/http';
 import { PostService } from '../../services/post.service';
+import { SeriesService, SeriesSummary } from '../../services/series.service';
+import { forkJoin } from 'rxjs';
 
 interface Post {
-  postId: number; // or postId: number;
+  postId: number;
   title: string;
   status: string;
   datePublished?: Date;
   pathSegment?: { value: string };
+  seriesId?: number;
+  seriesTitle?: string;
 }
 
 @Component({
@@ -24,10 +25,8 @@ export class DashboardComponent implements OnInit {
   posts: Post[] = [];
 
   constructor(
-    private authService: AuthService,
-    private router: Router,
-    private http: HttpClient,
-    private postService: PostService
+    private postService: PostService,
+    private seriesService: SeriesService
   ) {}
 
   ngOnInit(): void {
@@ -35,13 +34,21 @@ export class DashboardComponent implements OnInit {
   }
 
   fetchPosts(): void {
-    this.postService.getPosts().subscribe(posts => {
+    forkJoin([
+      this.postService.getPosts(),
+      this.seriesService.getAll()
+    ]).subscribe(([posts, seriesList]) => {
+      const seriesMap = new Map<number, string>(
+        seriesList.map(s => [s.seriesId, s.title])
+      );
       this.posts = posts.map(post => ({
-        postId: post.postId, // or postId: post.postId,
+        postId: post.postId,
         title: post.title,
         status: post.status,
         datePublished: post.dateLastPublished ? new Date(post.dateLastPublished) : undefined,
-        pathSegment: post.pathSegment ? { value: post.pathSegment } : undefined
+        pathSegment: post.pathSegment ? { value: post.pathSegment } : undefined,
+        seriesId: post.seriesId ?? undefined,
+        seriesTitle: post.seriesId ? seriesMap.get(post.seriesId) : undefined
       }));
     });
   }
@@ -50,11 +57,6 @@ export class DashboardComponent implements OnInit {
     const term = this.searchTerm.trim().toLowerCase();
     if (!term) return this.posts;
     return this.posts.filter(post => post.title.toLowerCase().includes(term));
-  }
-
-  logout(): void {
-    this.authService.signOut();
-    this.router.navigate(['/auth/login']);
   }
 
   openCreatePost(): void {

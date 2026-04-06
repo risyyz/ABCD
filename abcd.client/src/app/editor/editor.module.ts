@@ -14,6 +14,7 @@ import { ImageFragmentComponent } from './image-fragment/image-fragment.componen
 import { TableFragmentComponent } from './table-fragment/table-fragment.component';
 import { CodeFragmentComponent } from './code-fragment/code-fragment.component';
 import { AiChatComponent } from './ai-chat/ai-chat.component';
+import { EditorLayoutComponent } from './editor-layout/editor-layout.component';
 import { SeriesListComponent } from './series-list/series-list.component';
 import { EditSeriesComponent } from './edit-series/edit-series.component';
 import { CreateSeriesComponent } from './create-series/create-series.component';
@@ -24,6 +25,7 @@ import { MonacoEditorModule } from 'ngx-monaco-editor-v2';
     AiChatComponent,
     CodeFragmentComponent,
     DashboardComponent,
+    EditorLayoutComponent,
     EditPostComponent,
     EditableFragmentComponent,
     EditableGenericComponent,
