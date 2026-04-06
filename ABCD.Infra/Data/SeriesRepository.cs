@@ -112,13 +112,26 @@ namespace ABCD.Infra.Data {
         }
 
         private Series MapToDomain(SeriesRecord record) {
+            var posts = record.Posts?.Select(MapPostToDomain) ?? Enumerable.Empty<Post>();
+
             var series = new Series(new BlogId(record.BlogId), new SeriesId(record.SeriesId),
-                                    record.Title, (SeriesStatus)record.Status, record.DateLastPublished) {
+                                    record.Title, (SeriesStatus)record.Status, record.DateLastPublished, posts) {
                 PathSegment = record.PathSegment != null ? new PathSegment(record.PathSegment) : null,
                 Description = record.Description,
                 Version = new VersionToken(record.Version)
             };
             return series;
+        }
+
+        private static Post MapPostToDomain(PostRecord record) {
+            var post = new Post(new BlogId(record.BlogId), new PostId(record.PostId),
+                                record.Title, record.Status, record.DateLastPublished) {
+                PathSegment = record.PathSegment != null ? new PathSegment(record.PathSegment) : null,
+                Version = new VersionToken(record.Version)
+            };
+            if (record.SeriesId != null && record.SeriesPosition != null)
+                post.AssignToSeries(new SeriesId(record.SeriesId.Value), record.SeriesPosition.Value);
+            return post;
         }
 
         private SeriesRecord MapToRecord(Series series) {

@@ -40,7 +40,7 @@ public class Series {
         Status = SeriesStatus.Draft;
     }
 
-    public Series(BlogId blogId, SeriesId seriesId, string title, SeriesStatus status, DateTime? dateLastPublished = null) {
+    public Series(BlogId blogId, SeriesId seriesId, string title, SeriesStatus status, DateTime? dateLastPublished = null, IEnumerable<Post>? posts = null) {
         BlogId = blogId ?? throw new ArgumentNullException(nameof(blogId), "BlogId cannot be null.");
         SeriesId = seriesId ?? throw new ArgumentNullException(nameof(seriesId), "SeriesId cannot be null.");
 
@@ -53,6 +53,11 @@ public class Series {
         Title = title;
         Status = status;
         DateLastPublished = dateLastPublished;
+
+        if (posts != null) {
+            _posts.AddRange(posts);
+            _posts.Sort((a, b) => (a.SeriesPosition ?? 0).CompareTo(b.SeriesPosition ?? 0));
+        }
     }
 
     public void AddPost(Post post, int position) {
