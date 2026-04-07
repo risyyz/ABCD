@@ -58,7 +58,7 @@ namespace ABCD.Server.Controllers
             if (string.IsNullOrWhiteSpace(request?.Version))
                 return BadRequest("Invalid request or missing version.");
 
-            var command = new UpdatePostCommand(postId, request.Title, request.Synopsis, request.PathSegment, request.Version);
+            var command = new UpdatePostCommand(postId, request.Title, request.Synopsis, request.PathSegment, request.ParentPostId, request.Version);
             var result = await _postService.UpdatePostAsync(command);
             var response = _typeMapper.Map<Post, PostDetailResponse>(result);
             return Ok(response);

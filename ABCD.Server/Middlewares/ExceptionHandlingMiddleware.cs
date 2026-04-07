@@ -13,6 +13,8 @@ namespace ABCD.Server.Middlewares {
         {
             { typeof(ImageUploadException), StatusCodes.Status400BadRequest},
             { typeof(IllegalOperationException), StatusCodes.Status400BadRequest },
+            { typeof(ArgumentException), StatusCodes.Status400BadRequest },
+            { typeof(ArgumentNullException), StatusCodes.Status400BadRequest },
             { typeof(InvalidFragmentException), StatusCodes.Status400BadRequest },
             { typeof(DuplicatePathSegmentException), StatusCodes.Status400BadRequest },
             { typeof(DuplicatePostTitleException), StatusCodes.Status400BadRequest },

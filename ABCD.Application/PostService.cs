@@ -93,14 +93,23 @@ namespace ABCD.Application {
 
         public async Task<Post> UpdatePostAsync(UpdatePostCommand command) {
             var post = await TryGetPostByIdAndVersion(command.PostId, command.Version);
-            var postWithSamePathSegment = await _postRepository.GetByBlogIdAndPathSegmentAsync(_requestContext.Blog.BlogId.Value!, command.PathSegment?.Trim());
+            var trimmedPathSegment = command.PathSegment.Trim();
+            var postWithSamePathSegment = await _postRepository.GetByBlogIdAndPathSegmentAsync(_requestContext.Blog.BlogId.Value!, trimmedPathSegment);
 
             if(postWithSamePathSegment != null && postWithSamePathSegment.PostId != post.PostId)
                 throw new DuplicatePathSegmentException($"A post with the path segment '{command.PathSegment}' already exists in this blog.");
 
+            Post? parent = null;
+            if (command.ParentPostId.HasValue) {
+                parent = await _postRepository.GetByPostIdAsync(_requestContext.Blog.BlogId.Value!, command.ParentPostId.Value);
+                if (parent == null)
+                    throw new PostNotFoundException($"Parent post {command.ParentPostId.Value} does not exist.");
+            }
+
             post.Title = command.Title;
             //post.Synopsis = command.Synopsis;
-            post.PathSegment = new PathSegment(command.PathSegment);
+            post.PathSegment = new PathSegment(trimmedPathSegment);
+            post.Parent = parent;
             return await _postRepository.UpdatePostFragmentsAsync(post);
         }
 

@@ -41,6 +41,62 @@ namespace ABCD.Application.Tests {
             var service = new PostService(_context, _postRepoMock.Object);
             await Assert.ThrowsAsync<VersionConflictException>(() => service.UpdateFragmentAsync(command));
         }
+
+        [Fact]
+        public async Task UpdatePostAsync_SetsParent_WhenParentPostIdProvided()
+        {
+            var command = new UpdatePostCommand(999, "Updated Title", string.Empty, "updated-path", 77, "0x11");
+            var parent = new Post(new BlogId(1), new PostId(77), "Parent", PostStatus.Published, DateTime.UtcNow)
+            {
+                PathSegment = new PathSegment("parent-path")
+            };
+            var post = new Post(new BlogId(1), new PostId(999), "Title", PostStatus.Draft)
+            {
+                PathSegment = new PathSegment("old-path"),
+                Version = new VersionToken("11")
+            };
+
+            _postRepoMock.Setup(r => r.GetByPostIdAsync(1, 999)).ReturnsAsync(post);
+            _postRepoMock.Setup(r => r.GetByPostIdAsync(1, 77)).ReturnsAsync(parent);
+            _postRepoMock.Setup(r => r.GetByBlogIdAndPathSegmentAsync(1, "updated-path")).ReturnsAsync((Post)null);
+            _postRepoMock.Setup(r => r.UpdatePostFragmentsAsync(It.IsAny<Post>())).ReturnsAsync((Post updated) => updated);
+
+            var service = new PostService(_context, _postRepoMock.Object);
+            var result = await service.UpdatePostAsync(command);
+
+            Assert.Equal(parent, result.Parent);
+            _postRepoMock.Verify(r => r.UpdatePostFragmentsAsync(It.Is<Post>(p =>
+                p.Title == "Updated Title" &&
+                p.PathSegment != null &&
+                p.PathSegment.Value == "updated-path" &&
+                p.Parent == parent)), Times.Once);
+        }
+
+        [Fact]
+        public async Task UpdatePostAsync_ClearsParent_WhenParentPostIdIsNull()
+        {
+            var existingParent = new Post(new BlogId(1), new PostId(77), "Parent", PostStatus.Published, DateTime.UtcNow)
+            {
+                PathSegment = new PathSegment("parent-path")
+            };
+            var post = new Post(new BlogId(1), new PostId(999), "Title", PostStatus.Draft)
+            {
+                PathSegment = new PathSegment("old-path"),
+                Version = new VersionToken("11"),
+                Parent = existingParent
+            };
+            var command = new UpdatePostCommand(999, "Updated Title", string.Empty, "updated-path", null, "0x11");
+
+            _postRepoMock.Setup(r => r.GetByPostIdAsync(1, 999)).ReturnsAsync(post);
+            _postRepoMock.Setup(r => r.GetByBlogIdAndPathSegmentAsync(1, "updated-path")).ReturnsAsync((Post)null);
+            _postRepoMock.Setup(r => r.UpdatePostFragmentsAsync(It.IsAny<Post>())).ReturnsAsync((Post updated) => updated);
+
+            var service = new PostService(_context, _postRepoMock.Object);
+            var result = await service.UpdatePostAsync(command);
+
+            Assert.Null(result.Parent);
+            _postRepoMock.Verify(r => r.UpdatePostFragmentsAsync(It.Is<Post>(p => p.Parent == null)), Times.Once);
+        }
         
         private readonly Mock<IPostRepository> _postRepoMock = new();
         private readonly Blog _blog = new(new BlogId(1)) { Name = "Test Blog" };

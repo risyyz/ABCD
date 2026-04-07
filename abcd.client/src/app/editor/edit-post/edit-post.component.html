@@ -55,6 +55,22 @@
                     <label class="label is-floating-label" for="pathSegment">Path Segment</label>
                   </div>
                 </div>
+                <div class="field">
+                  <label class="label" for="parentPostId">Parent Post</label>
+                  <div class="control">
+                    <div class="select is-fullwidth">
+                      <select id="parentPostId" [(ngModel)]="selectedParentPostId" name="parentPostId" [disabled]="!isHeaderEditing">
+                        <option [ngValue]="null">No parent post</option>
+                        @for (option of parentOptions; track option.postId) {
+                          <option [ngValue]="option.postId">
+                            {{ option.title }}{{ option.pathSegment ? ' (' + option.pathSegment + ')' : '' }} - {{ option.status }}
+                          </option>
+                        }
+                      </select>
+                    </div>
+                  </div>
+                  <p class="help">Optional. Choose a parent to place this post in a series or trail.</p>
+                </div>
               </app-editable-generic>
               @if (post.fragments.length === 0) {
                 <div class="has-text-centered py-5">

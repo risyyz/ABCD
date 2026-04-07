@@ -26,6 +26,13 @@ namespace ABCD.Server.Models
         public string Version { get; init; } = string.Empty;
     }
 
+    public record PostParentResponse
+    {
+        public int PostId { get; init; }
+        public string Title { get; init; } = string.Empty;
+        public string? PathSegment { get; init; }
+    }
+
     public record PostDetailResponse {
         public int PostId { get; init; }
         public int BlogId { get; init; }
@@ -33,6 +40,7 @@ namespace ABCD.Server.Models
         public string Content { get; init; } = string.Empty;
         public string Status { get; init; } = string.Empty;
         public string? PathSegment { get; init; }
+        public PostParentResponse? Parent { get; init; }
         public DateTime? DateLastPublished { get; init; }
         public DateTime DateCreated { get; init; }
         public DateTime DateModified { get; init; }

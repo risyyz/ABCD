@@ -63,11 +63,16 @@ namespace ABCD.Infra.Data {
 
         // Map EF record to domain model
         private Post MapToDomain(PostRecord record) {
-            // TODO: Map all required fields and relationships
+            return MapToDomain(record, new HashSet<int>());
+        }
+
+        private Post MapToDomain(PostRecord record, ISet<int> visitedPostIds) {
+            if (!visitedPostIds.Add(record.PostId))
+                throw new ArgumentException($"Circular parent relationship detected for post {record.PostId}.", nameof(record));
+
             var fragments = new List<Fragment>();
             if (record.Fragments != null) {
                 foreach (var fragmentRecord in record.Fragments) {
-                    // Assuming Fragment is a domain model and you have a method to map from record to domain
                     fragments.Add(MapToDomain(fragmentRecord));
                 }
             }
@@ -75,7 +80,21 @@ namespace ABCD.Infra.Data {
                                 record.Title, (PostStatus)record.Status, record.DateLastPublished, fragments) { 
                 PathSegment = record.PathSegment != null ? new PathSegment(record.PathSegment) : null,
                 Version = new VersionToken(record.Version)
-            };            
+            };
+
+            if (record.ParentPostId.HasValue) {
+                var parentRecord = record.ParentPost;
+                if (parentRecord == null) {
+                    parentRecord = _context.Posts
+                        .AsNoTracking()
+                        .FirstOrDefault(p => p.PostId == record.ParentPostId.Value);
+                }
+
+                if (parentRecord != null)
+                    post.Parent = MapToDomain(parentRecord, visitedPostIds);
+            }
+
+            visitedPostIds.Remove(record.PostId);
             return post;
         }
 
@@ -97,6 +116,7 @@ namespace ABCD.Infra.Data {
                 BlogId = post.BlogId.Value,
                 Title = post.Title,
                 Status = post.Status,
+                ParentPostId = post.Parent?.PostId?.Value,
                 PathSegment = post.PathSegment?.Value,
                 DateLastPublished = post.DateLastPublished,
                 Version = post.Version?.Value ?? Array.Empty<byte>(),
@@ -172,6 +192,7 @@ namespace ABCD.Infra.Data {
 
             trackedPost.Title = post.Title;
             trackedPost.PathSegment = post.PathSegment?.Value;
+            trackedPost.ParentPostId = post.Parent?.PostId?.Value;
             trackedPost.UpdatedDate = DateTime.UtcNow;
 
             _context.Entry(trackedPost).State = EntityState.Modified;
