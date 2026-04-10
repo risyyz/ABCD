@@ -56,18 +56,22 @@
                   </div>
                 </div>
                 <div class="field">
-                  <label class="label" for="parentPostId">Parent Post</label>
-                  <div class="control">
-                    <div class="select is-fullwidth">
-                      <select id="parentPostId" [(ngModel)]="selectedParentPostId" name="parentPostId" [disabled]="!isHeaderEditing">
-                        <option [ngValue]="null">No parent post</option>
-                        @for (option of parentOptions; track option.postId) {
-                          <option [ngValue]="option.postId">
-                            {{ option.title }}{{ option.pathSegment ? ' (' + option.pathSegment + ')' : '' }} - {{ option.status }}
-                          </option>
-                        }
-                      </select>
-                    </div>
+                  <div class="control has-floating-label">
+                    <app-post-autocomplete
+                      [selectedPostId]="selectedParentPostId"
+                      [excludePostId]="post.postId"
+                      [initialDisplayText]="parentDisplayText"
+                      [disabled]="!isHeaderEditing"
+                      (selectedPostIdChange)="selectedParentPostId = $event.postId; parentDisplayText = $event.displayText">
+                    </app-post-autocomplete>
+                    <label class="label is-floating-label">
+                      Parent Post
+                      @if (selectedParentPostId != null) {
+                        <a [routerLink]="['/editor/edit', selectedParentPostId]" target="_blank" title="Open parent post in new tab" class="has-text-link">
+                          <i class="fas fa-external-link-alt" style="font-size: 0.7rem;"></i>
+                        </a>
+                      }
+                    </label>
                   </div>
                   <p class="help">Optional. Choose a parent to place this post in a series or trail.</p>
                 </div>

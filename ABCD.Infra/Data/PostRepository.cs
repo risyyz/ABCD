@@ -61,6 +61,23 @@ namespace ABCD.Infra.Data {
             return MapToDomain(record);
         }
 
+        public async Task<IEnumerable<Post>> SearchByTitleOrPathAsync(int blogId, string searchTerm, int? excludePostId = null, int maxResults = 10) {
+            var pattern = $"%{searchTerm}%";
+            var query = _context.Posts
+                .Where(p => p.BlogId == blogId &&
+                    (EF.Functions.Like(p.Title, pattern) || EF.Functions.Like(p.PathSegment!, pattern)));
+
+            if (excludePostId.HasValue)
+                query = query.Where(p => p.PostId != excludePostId.Value);
+
+            var records = await query
+                .OrderBy(p => p.Title)
+                .Take(maxResults)
+                .ToListAsync();
+
+            return records.Select(MapToDomain);
+        }
+
         // Map EF record to domain model
         private Post MapToDomain(PostRecord record) {
             return MapToDomain(record, new HashSet<int>());

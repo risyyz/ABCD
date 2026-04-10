@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Post } from '../models/post.model'; 
-import { EditorPostSummary, PostService } from '../../services/post.service';
+import { PostService } from '../../services/post.service';
 import { Fragment } from '../models/fragment.model';
 import { MoveFragmentRequest } from '../models/move-fragment-request.model';
 import { FragmentUpdateRequest } from '../models/fragment-update-request.model';
@@ -18,9 +18,9 @@ export class EditPostComponent implements OnInit {
   activeAddFragmentDropdownId: number | null = null;
   isHeaderEditing: boolean = false;
   isAddFirstFragmentOpen: boolean = false;
-  parentOptions: EditorPostSummary[] = [];
   selectedParentPostId: number | null = null;
-  originalHeader: { title: string; synopsis: string; pathSegment?: string; parentPostId: number | null } | null = null;
+  parentDisplayText: string = '';
+  originalHeader: { title: string; synopsis: string; pathSegment?: string; parentPostId: number | null; parentDisplayText: string } | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -30,15 +30,17 @@ export class EditPostComponent implements OnInit {
   ngOnInit(): void {
     const postId = Number(this.route.snapshot.paramMap.get('postId'));
 
-    this.postService.getPosts().subscribe(posts => {
-      this.parentOptions = posts
-        .filter(post => post.postId !== postId)
-        .sort((left, right) => left.title.localeCompare(right.title));
-    });
-
     this.postService.getPost(postId).subscribe(post => {
       this.post = post;
       this.selectedParentPostId = post.parent?.postId ?? null;
+      if (post.parent) {
+        let text = post.parent.title;
+        if (post.parent.pathSegment) {
+          text += ` (${post.parent.pathSegment})`;
+        }
+        text += ` - ${post.parent.status}`;
+        this.parentDisplayText = text;
+      }
     });
   }
 
@@ -173,9 +175,16 @@ export class EditPostComponent implements OnInit {
         title: this.post.title,
         synopsis: this.post.synopsis ?? '',
         pathSegment: this.post.pathSegment,
-        parentPostId: this.selectedParentPostId
+        parentPostId: this.selectedParentPostId,
+        parentDisplayText: this.parentDisplayText
       };
     }
+  }
+
+  onParentPostChange(event: { postId: number | null, displayText: string }) {
+    console.log(event.postId + " - " + event.displayText);
+    this.selectedParentPostId = event.postId;
+    this.parentDisplayText = event.displayText;
   }
 
   onHeaderCancel() {
@@ -185,6 +194,7 @@ export class EditPostComponent implements OnInit {
       this.post.synopsis = this.originalHeader.synopsis;
       this.post.pathSegment = this.originalHeader.pathSegment;
       this.selectedParentPostId = this.originalHeader.parentPostId;
+      this.parentDisplayText = this.originalHeader.parentDisplayText;
     }
   }
 

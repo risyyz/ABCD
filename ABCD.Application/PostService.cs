@@ -121,5 +121,9 @@ namespace ABCD.Application {
                 post.Publish();
             return await _postRepository.UpdatePostStatusAsync(post);
         }
+
+        public async Task<IEnumerable<Post>> SearchAsync(string searchTerm, int? excludePostId = null) {
+            return await _postRepository.SearchByTitleOrPathAsync(_requestContext.Blog.BlogId.Value!, searchTerm, excludePostId);
+        }
     }
 }

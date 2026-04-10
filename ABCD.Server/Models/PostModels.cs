@@ -31,6 +31,7 @@ namespace ABCD.Server.Models
         public int PostId { get; init; }
         public string Title { get; init; } = string.Empty;
         public string? PathSegment { get; init; }
+        public string Status { get; init; } = string.Empty;
     }
 
     public record PostDetailResponse {

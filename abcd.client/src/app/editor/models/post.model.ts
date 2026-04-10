@@ -4,6 +4,7 @@ export interface ParentPost {
   postId: number;
   title: string;
   pathSegment?: string;
+  status: string;
 }
 
 export class Post {

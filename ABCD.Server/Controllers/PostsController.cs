@@ -41,6 +41,17 @@ namespace ABCD.Server.Controllers
             return Ok(response);
         }
 
+        [HttpGet("search")]
+        public async Task<IActionResult> Search([FromQuery] string term, [FromQuery] int? excludePostId)
+        {
+            if (string.IsNullOrWhiteSpace(term) || term.Trim().Length < 3)
+                return Ok(Array.Empty<PostSummaryResponse>());
+
+            var posts = await _postService.SearchAsync(term.Trim(), excludePostId);
+            var response = _typeMapper.Map<IEnumerable<Post>, IEnumerable<PostSummaryResponse>>(posts);
+            return Ok(response);
+        }
+
         [HttpGet("{postId:int}")]
         public async Task<IActionResult> GetPostById([FromRoute] int postId) {
             var post = await _postService.GetByIdAsync(postId);

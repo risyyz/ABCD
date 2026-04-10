@@ -113,4 +113,12 @@ export class PostService {
   getPublishedPost(pathSegment: string): Observable<PublicPostDetail> {
     return this.http.get<PublicPostDetail>(`/api/public/posts/${pathSegment}`);
   }
+
+  searchPosts(term: string, excludePostId?: number): Observable<EditorPostSummary[]> {
+    let url = `/api/posts/search?term=${encodeURIComponent(term)}`;
+    if (excludePostId != null) {
+      url += `&excludePostId=${excludePostId}`;
+    }
+    return this.http.get<EditorPostSummary[]>(url);
+  }
 }

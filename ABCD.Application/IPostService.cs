@@ -13,5 +13,6 @@ namespace ABCD.Application {
         Task<Post> UpdateFragmentAsync(UpdateFragmentCommand command);
         Task<Post> DeleteFragmentAsync(DeleteFragmentCommand command);
         Task<Post> TogglePostStatusAsync(TogglePostStatusCommand command);
+        Task<IEnumerable<Post>> SearchAsync(string searchTerm, int? excludePostId = null);
     }
 }
