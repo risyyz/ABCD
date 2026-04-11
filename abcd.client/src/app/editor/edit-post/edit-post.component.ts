@@ -18,7 +18,9 @@ export class EditPostComponent implements OnInit {
   activeAddFragmentDropdownId: number | null = null;
   isHeaderEditing: boolean = false;
   isAddFirstFragmentOpen: boolean = false;
-  originalHeader: { title: string; synopsis: string; pathSegment?: string } | null = null;
+  selectedParentPostId: number | null = null;
+  parentDisplayText: string = '';
+  originalHeader: { title: string; synopsis: string; pathSegment?: string; parentPostId: number | null; parentDisplayText: string } | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -27,8 +29,18 @@ export class EditPostComponent implements OnInit {
 
   ngOnInit(): void {
     const postId = Number(this.route.snapshot.paramMap.get('postId'));
+
     this.postService.getPost(postId).subscribe(post => {
       this.post = post;
+      this.selectedParentPostId = post.parent?.postId ?? null;
+      if (post.parent) {
+        let text = post.parent.title;
+        if (post.parent.pathSegment) {
+          text += ` (${post.parent.pathSegment})`;
+        }
+        text += ` - ${post.parent.status}`;
+        this.parentDisplayText = text;
+      }
     });
   }
 
@@ -162,9 +174,17 @@ export class EditPostComponent implements OnInit {
       this.originalHeader = {
         title: this.post.title,
         synopsis: this.post.synopsis ?? '',
-        pathSegment: this.post.pathSegment
+        pathSegment: this.post.pathSegment,
+        parentPostId: this.selectedParentPostId,
+        parentDisplayText: this.parentDisplayText
       };
     }
+  }
+
+  onParentPostChange(event: { postId: number | null, displayText: string }) {
+    console.log(event.postId + " - " + event.displayText);
+    this.selectedParentPostId = event.postId;
+    this.parentDisplayText = event.displayText;
   }
 
   onHeaderCancel() {
@@ -173,20 +193,29 @@ export class EditPostComponent implements OnInit {
       this.post.title = this.originalHeader.title;
       this.post.synopsis = this.originalHeader.synopsis;
       this.post.pathSegment = this.originalHeader.pathSegment;
+      this.selectedParentPostId = this.originalHeader.parentPostId;
+      this.parentDisplayText = this.originalHeader.parentDisplayText;
     }
   }
 
   onHeaderSave() {
     if (!this.post) return;
-    this.postService.savePost(this.post)
+    this.postService.savePost(this.post, this.selectedParentPostId)
       .subscribe({
         next: (updatedPost: Post) => {
           this.post = updatedPost;
+          this.selectedParentPostId = updatedPost.parent?.postId ?? null;
           this.errorMessage = null;
           this.isHeaderEditing = false;
         },
         error: (err) => {
-          this.errorMessage = 'Failed to update post.';
+          if (err?.error && typeof err.error === 'string') {
+            this.errorMessage = err.error;
+          } else if (err?.error?.message) {
+            this.errorMessage = err.error.message;
+          } else {
+            this.errorMessage = 'Failed to update post.';
+          }
           this.isHeaderEditing = true;
         }
       });

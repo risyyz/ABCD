@@ -4,6 +4,7 @@ namespace ABCD.Server.Models
         string Title,
         string? Synopsis,
         string PathSegment,
+        int? ParentPostId,
         string Version
     );
 }
