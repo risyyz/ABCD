@@ -24,6 +24,22 @@
             </a>
           </div>
         </div>
+        <div class="navbar-item has-dropdown" [class.is-active]="showProfileMenu">
+          <a class="navbar-link" (click)="toggleProfileMenu()">
+            <span class="icon">
+              <i class="fas fa-user-circle"></i>
+            </span>
+            <span>Profile</span>
+          </a>
+          <div class="navbar-dropdown is-right">
+            <a class="navbar-item" (click)="openChangePassword()">
+              <span class="icon">
+                <i class="fas fa-key"></i>
+              </span>
+              <span>Change Password</span>
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   </nav>
