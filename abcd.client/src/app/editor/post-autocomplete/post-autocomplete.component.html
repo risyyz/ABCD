@@ -1,0 +1,53 @@
+<div class="dropdown is-fullwidth" [class.is-active]="isOpen && (filteredOptions.length > 0 || isLoading || searchText.length >= 3)">
+  <div class="dropdown-trigger" style="width: 100%;">
+    <div class="field has-addons" style="margin-bottom: 0;">
+      @if (selectedPostId != null) {
+        <div class="control is-expanded">
+          <div class="message is-small selected-post-tag">
+            <div class="message-header">
+              <span class="selected-post-text">{{ searchText }}</span>
+              @if (!disabled) {
+                <button type="button" class="delete is-small" (click)="clearSelection()" aria-label="clear selection"></button>
+              }
+            </div>
+          </div>
+        </div>
+      } @else {
+        <div class="control is-expanded">
+          <input
+            class="input is-medium with-floating-label"
+            type="text"
+            placeholder=" "
+            [(ngModel)]="searchText"
+            (input)="onInput()"
+            (focus)="onFocus()"
+            (blur)="onBlur()"
+            (keydown)="onKeyDown($event)"
+            [disabled]="disabled" />
+        </div>
+      }
+    </div>
+  </div>
+  <div class="dropdown-menu" role="listbox" style="width: 100%;">
+    <div class="dropdown-content" style="background-color: #fff; color: #363636; border: 1px solid #dbdbdb; box-shadow: 0 0.5em 1em -0.125em rgba(10,10,10,.1), 0 0 0 1px rgba(10,10,10,.02);">
+      @if (isLoading) {
+        <div class="dropdown-item has-text-grey">
+          <span class="icon is-small"><i class="fas fa-spinner fa-spin"></i></span>
+          <span>Searching...</span>
+        </div>
+      } @else {
+        @for (option of filteredOptions; track option.postId; let i = $index) {
+        <a class="dropdown-item"
+           [class.is-active]="i === highlightedIndex"
+           (click)="selectOption(option)"
+           (mouseenter)="highlightedIndex = i">
+          {{ formatOption(option) }}
+        </a>
+        }
+        @if (filteredOptions.length === 0 && searchText.length >= 3) {
+          <div class="dropdown-item has-text-grey">No matching posts found.</div>
+        }
+      }
+    </div>
+  </div>
+</div>

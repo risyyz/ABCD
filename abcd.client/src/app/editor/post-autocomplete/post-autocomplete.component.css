@@ -1,0 +1,50 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+:host ::ng-deep a.dropdown-item.is-active {
+  background-color: #f5f5f5;
+  color: #363636;
+}
+
+:host ::ng-deep .dropdown {
+  display: block;
+  width: 100%;
+}
+
+:host ::ng-deep .dropdown-trigger,
+:host ::ng-deep .dropdown-menu {
+  width: 100%;
+}
+
+:host .input.is-medium.with-floating-label {
+  height: 3.75rem;
+  padding-top: 1.5rem;
+}
+
+:host .selected-post-tag {
+  margin-bottom: 0;
+}
+
+:host .selected-post-tag .message-header {
+  min-height: 3.75rem;
+  padding: 1.5rem 1rem 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 0;
+  border: none;
+  border-bottom: 2px solid #dbdbdb;
+  background-color: transparent;
+  color: #363636;
+}
+
+:host .selected-post-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #363636;
+}

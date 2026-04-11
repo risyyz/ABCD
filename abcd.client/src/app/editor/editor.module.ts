@@ -15,6 +15,7 @@ import { TableFragmentComponent } from './table-fragment/table-fragment.componen
 import { CodeFragmentComponent } from './code-fragment/code-fragment.component';
 import { AiChatComponent } from './ai-chat/ai-chat.component';
 import { MonacoEditorModule } from 'ngx-monaco-editor-v2';
+import { PostAutocompleteComponent } from './post-autocomplete/post-autocomplete.component';
 
 @NgModule({
   declarations: [
@@ -33,6 +34,7 @@ import { MonacoEditorModule } from 'ngx-monaco-editor-v2';
     FormsModule,
     EditorRoutingModule,
     CreatePostComponent,
+    PostAutocompleteComponent,
     NgxEditorModule,
     MonacoEditorModule.forRoot()
   ]

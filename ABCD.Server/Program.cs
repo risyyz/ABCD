@@ -147,6 +147,12 @@ config.NewConfig<Fragment, FragmentResponse>()
     .Map(dest => dest.Content, src => src.Content != null ? src.Content : null)
     .Map(dest => dest.Position, src => src.Position);
 
+config.NewConfig<Post, PostParentResponse>()
+    .Map(dest => dest.PostId, src => src.PostId != null ? src.PostId.Value : 0)
+    .Map(dest => dest.Title, src => src.Title)
+    .Map(dest => dest.PathSegment, src => src.PathSegment != null ? src.PathSegment.Value : null)
+    .Map(dest => dest.Status, src => src.Status.ToString());
+
 config.NewConfig<Post, PostDetailResponse>()
 .Map(dest => dest.PostId, src => src.PostId != null ? src.PostId.Value : 0)
 .Map(dest => dest.BlogId, src => src.BlogId.Value)

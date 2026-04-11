@@ -10,5 +10,6 @@
         Task<Post> UpdatePostFragmentAsync(Post post, Fragment fragment);
         Task<Post> UpdatePostFragmentsAsync(Post post);
         Task<Post> UpdatePostStatusAsync(Post post);
+        Task<IEnumerable<Post>> SearchByTitleOrPathAsync(int blogId, string searchTerm, int? excludePostId = null, int maxResults = 10);
     }
 }
