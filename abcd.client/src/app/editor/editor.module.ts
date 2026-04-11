@@ -16,6 +16,7 @@ import { CodeFragmentComponent } from './code-fragment/code-fragment.component';
 import { AiChatComponent } from './ai-chat/ai-chat.component';
 import { MonacoEditorModule } from 'ngx-monaco-editor-v2';
 import { PostAutocompleteComponent } from './post-autocomplete/post-autocomplete.component';
+import { ChangePasswordDialogComponent } from '../auth/change-password-dialog/change-password-dialog.component';
 
 @NgModule({
   declarations: [
@@ -28,6 +29,7 @@ import { PostAutocompleteComponent } from './post-autocomplete/post-autocomplete
     ImageFragmentComponent,
     RichTextFragmentComponent,
     TableFragmentComponent,
+    ChangePasswordDialogComponent,
   ],
   imports: [
     CommonModule,

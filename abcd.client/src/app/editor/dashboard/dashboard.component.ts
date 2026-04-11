@@ -21,6 +21,8 @@ interface Post {
 export class DashboardComponent implements OnInit {
   searchTerm: string = '';
   showCreatePost = false;
+  showChangePassword = false;
+  showProfileMenu = false;
   posts: Post[] = [];
 
   constructor(
@@ -64,5 +66,18 @@ export class DashboardComponent implements OnInit {
   closeCreatePost(): void {
     this.showCreatePost = false;
     this.fetchPosts(); // Refresh posts after closing create modal
+  }
+
+  toggleProfileMenu(): void {
+    this.showProfileMenu = !this.showProfileMenu;
+  }
+
+  openChangePassword(): void {
+    this.showProfileMenu = false;
+    this.showChangePassword = true;
+  }
+
+  closeChangePassword(): void {
+    this.showChangePassword = false;
   }
 }

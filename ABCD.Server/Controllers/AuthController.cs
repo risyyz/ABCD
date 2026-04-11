@@ -112,6 +112,38 @@ namespace ABCD.Server.Controllers {
             return Ok(new { isAuthenticated = true, email });
         }
 
+        [Authorize]
+        [HttpPost("password")]
+        public async Task<IActionResult> RequestPasswordChangePin() {
+            var email = User.Identity?.Name;
+            if (string.IsNullOrWhiteSpace(email))
+                return Unauthorized();
+
+            try {
+                await _authService.SendPasswordChangePinAsync(email);
+                return Ok(new { success = true });
+            } catch (Exception) {
+                return BadRequest("Failed to send verification code.");
+            }
+        }
+
+        [Authorize]
+        [HttpPut("password")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request) {
+            var email = User.Identity?.Name;
+            if (string.IsNullOrWhiteSpace(email))
+                return Unauthorized();
+
+            try {
+                await _authService.ChangePasswordWithPinAsync(email, request.Pin, request.NewPassword);
+                return Ok(new { success = true });
+            } catch (SignInFailedException) {
+                return BadRequest("Invalid or expired verification code.");
+            } catch (InvalidOperationException ex) {
+                return BadRequest(ex.Message);
+            }
+        }
+
         private void UpdateTokenCookies(string jwt, string refreshToken, int jwtExpiryMinutes, int refreshTokenExpiryMinutes) {
             Response.Cookies.Append(AppConstants.ACCESS_TOKEN, jwt, new CookieOptions {
                 HttpOnly = true,

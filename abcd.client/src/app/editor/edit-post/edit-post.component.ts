@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Post } from '../models/post.model'; 
 import { PostService } from '../../services/post.service';
+import { AuthService } from '../../auth/services/auth.service';
 import { Fragment } from '../models/fragment.model';
 import { MoveFragmentRequest } from '../models/move-fragment-request.model';
 import { FragmentUpdateRequest } from '../models/fragment-update-request.model';
@@ -21,10 +22,14 @@ export class EditPostComponent implements OnInit {
   selectedParentPostId: number | null = null;
   parentDisplayText: string = '';
   originalHeader: { title: string; synopsis: string; pathSegment?: string; parentPostId: number | null; parentDisplayText: string } | null = null;
+  showChangePassword = false;
+  showProfileMenu = false;
 
   constructor(
     private route: ActivatedRoute,
-    private postService: PostService
+    private router: Router,
+    private postService: PostService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -239,5 +244,23 @@ export class EditPostComponent implements OnInit {
           }
         }
       });
+  }
+
+  logout(): void {
+    this.authService.signOut();
+    this.router.navigate(['/auth/login']);
+  }
+
+  toggleProfileMenu(): void {
+    this.showProfileMenu = !this.showProfileMenu;
+  }
+
+  openChangePassword(): void {
+    this.showProfileMenu = false;
+    this.showChangePassword = true;
+  }
+
+  closeChangePassword(): void {
+    this.showChangePassword = false;
   }
 }
