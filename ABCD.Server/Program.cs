@@ -119,10 +119,20 @@ builder.Services.AddScoped<IValidator<RegisterUserCommand>, RegisterUserCommandV
 builder.Services.AddScoped<IValidator<SignInCommand>, SignInCommandValidator>();
 builder.Services.AddScoped<SecurityTokenHandler, JwtSecurityTokenHandler>();
 
+
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IEmailService, SmtpEmailService>();
+// Register the proper email service based on environment
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddScoped<IEmailService, DropFolderEmailService>();
+}
+else
+{
+    builder.Services.AddScoped<IEmailService, SmtpEmailService>();
+}
+
 builder.Services.AddScoped<BearerTokenReader>();
 
 builder.Services.AddScoped<RequestContextAccessor>();

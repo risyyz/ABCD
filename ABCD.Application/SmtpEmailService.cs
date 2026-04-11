@@ -1,15 +1,9 @@
 using System.Net;
 using System.Net.Mail;
-
 using ABCD.Lib;
-
 using Microsoft.Extensions.Options;
 
 namespace ABCD.Application {
-    public interface IEmailService {
-        Task SendEmailAsync(string toEmail, string subject, string body);
-    }
-
     public class SmtpEmailService : IEmailService {
         private readonly EmailSettings _emailSettings;
 
@@ -26,12 +20,23 @@ namespace ABCD.Application {
             };
             message.To.Add(toEmail);
 
-            using var client = new SmtpClient(_emailSettings.Host, _emailSettings.Port) {
+            using var client = CreateSmtpClient();
+            await client.SendMailAsync(message);
+        }
+
+        private SmtpClient CreateSmtpClient() {
+            if (!string.IsNullOrWhiteSpace(_emailSettings.PickupDirectory)) {
+                // Use drop folder in dev
+                return new SmtpClient {
+                    DeliveryMethod = SmtpDeliveryMethod.SpecifiedPickupDirectory,
+                    PickupDirectoryLocation = _emailSettings.PickupDirectory
+                };
+            }
+            // Use real SMTP in prod
+            return new SmtpClient(_emailSettings.Host, _emailSettings.Port) {
                 EnableSsl = _emailSettings.EnableSsl,
                 Credentials = new NetworkCredential(_emailSettings.Username, _emailSettings.Password)
             };
-
-            await client.SendMailAsync(message);
         }
     }
 }
