@@ -18,6 +18,8 @@ namespace ABCD.Application {
         Task<TwoFactorChallenge> SignIn(SignInCommand credentials);
         Task<Token> VerifyTwoFactor(VerifyTwoFactorCommand command);
         Task SignOut(string jwt);
+        Task SendPasswordChangePinAsync(string email);
+        Task ChangePasswordWithPinAsync(string email, string pin, string newPassword);
     }
 
     public class AuthService : IAuthService {
@@ -139,6 +141,51 @@ namespace ABCD.Application {
             var keyBytes = Encoding.UTF8.GetBytes(_jwtSettings.SecretKey);
             var pinBytes = Encoding.UTF8.GetBytes(pin);
             return Convert.ToHexString(HMACSHA256.HashData(keyBytes, pinBytes));
+        }
+
+        public async Task SendPasswordChangePinAsync(string email) {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+                throw new SignInFailedException("User not found");
+
+            var pin = RandomNumberGenerator.GetInt32(100000, 1000000).ToString();
+            user.TwoFactorPin = ComputePinHash(pin);
+            user.TwoFactorPinExpiry = DateTimeOffset.UtcNow.AddMinutes(5);
+            await _userManager.UpdateAsync(user);
+
+            await _emailService.SendEmailAsync(
+                email,
+                "Password Change Verification Code",
+                $"Your verification code is: {pin}\n\nThis code expires in 5 minutes.");
+        }
+
+        public async Task ChangePasswordWithPinAsync(string email, string pin, string newPassword) {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+                throw new SignInFailedException("User not found");
+
+            var pinHash = ComputePinHash(pin);
+            var storedHash = user.TwoFactorPin ?? string.Empty;
+            var hashesMatch = CryptographicOperations.FixedTimeEquals(
+                Encoding.UTF8.GetBytes(pinHash),
+                Encoding.UTF8.GetBytes(storedHash));
+
+            if (!hashesMatch || user.TwoFactorPinExpiry <= DateTimeOffset.UtcNow)
+                throw new SignInFailedException("Invalid or expired verification code");
+
+            user.TwoFactorPin = null;
+            user.TwoFactorPinExpiry = DateTimeOffset.MinValue;
+            await _userManager.UpdateAsync(user);
+
+            var removeResult = await _userManager.RemovePasswordAsync(user);
+            if (!removeResult.Succeeded)
+                throw new InvalidOperationException("Failed to remove current password.");
+
+            var addResult = await _userManager.AddPasswordAsync(user, newPassword);
+            if (!addResult.Succeeded) {
+                var errors = string.Join(" ", addResult.Errors.Select(e => e.Description));
+                throw new InvalidOperationException(errors);
+            }
         }
     }
 }

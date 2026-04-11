@@ -100,6 +100,12 @@ body {
   color: #111111;
 }
 
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Lora', Georgia, serif;
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+}
+
 .field:not(:last-child) {
   margin-bottom: 1rem; // Increase spacing between all Bulma fields globally
 }
@@ -175,6 +181,13 @@ a:hover,
 .has-text-link:hover {
   color: var(--link-color-hover) !important;
   text-decoration: underline;
+}
+
+a.is-disabled {
+  color: #b5b5b5 !important;
+  cursor: not-allowed;
+  pointer-events: none;
+  text-decoration: none;
 }
 
 .no-border {
