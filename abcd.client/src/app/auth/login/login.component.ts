@@ -63,9 +63,8 @@ export class LoginComponent implements OnInit {
       this.authService.signIn({ email, password }).subscribe({
         next: (response) => {
           this.isLoading = false;
-          if (response.success) {
-            this.notificationService.showSuccess('Login successful!');
-            this.router.navigate(['/editor']);
+          if (response.requiresTwoFactor) {
+            this.router.navigate(['/auth/verify-pin'], { state: { email: response.email } });
           } else {
             this.handleLoginError(response.message || 'Login failed');
           }

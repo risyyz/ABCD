@@ -19,9 +19,11 @@ namespace ABCD.Application.Tests {
         private readonly Mock<UserManager<ApplicationUser>> _userManagerMock;
         private readonly Mock<SignInManager<ApplicationUser>> _signInManagerMock;
         private readonly Mock<ITokenService> _tokenServiceMock;
+        private readonly Mock<IEmailService> _emailServiceMock;
         private readonly Mock<IOptions<JwtSettings>> _jwtSettingsMock;
         private readonly Mock<IValidator<SignInCommand>> _userLoginValidatorMock;
         private readonly Mock<IValidator<RefreshTokenCommand>> _tokenRefreshValidatorMock;
+        private readonly Mock<IValidator<VerifyTwoFactorCommand>> _verifyTwoFactorValidatorMock;
         private readonly Mock<IMemoryCache> _cacheMock;
         private readonly AuthService _authService;
 
@@ -30,9 +32,11 @@ namespace ABCD.Application.Tests {
             _signInManagerMock = new Mock<SignInManager<ApplicationUser>>(
             _userManagerMock.Object, Mock.Of<IHttpContextAccessor>(), Mock.Of<IUserClaimsPrincipalFactory<ApplicationUser>>(), null, null, null, null);
             _tokenServiceMock = new Mock<ITokenService>();
+            _emailServiceMock = new Mock<IEmailService>();
             _jwtSettingsMock = new Mock<IOptions<JwtSettings>>();
             _userLoginValidatorMock = new Mock<IValidator<SignInCommand>>();
             _tokenRefreshValidatorMock = new Mock<IValidator<RefreshTokenCommand>>();
+            _verifyTwoFactorValidatorMock = new Mock<IValidator<VerifyTwoFactorCommand>>();
             _cacheMock = new Mock<IMemoryCache>();
 
             var jwtSettings = new JwtSettings {
@@ -45,8 +49,9 @@ namespace ABCD.Application.Tests {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-            _authService = new AuthService(_userManagerMock.Object, _signInManagerMock.Object, _tokenServiceMock.Object, 
-                _userLoginValidatorMock.Object, _tokenRefreshValidatorMock.Object, _cacheMock.Object, _jwtSettingsMock.Object);
+            _authService = new AuthService(_userManagerMock.Object, _signInManagerMock.Object, _tokenServiceMock.Object,
+                _emailServiceMock.Object, _userLoginValidatorMock.Object, _tokenRefreshValidatorMock.Object,
+                _verifyTwoFactorValidatorMock.Object, _cacheMock.Object, _jwtSettingsMock.Object);
         }
 
         [Fact]
@@ -91,11 +96,10 @@ namespace ABCD.Application.Tests {
         }
 
         [Fact]
-        public async Task SignIn_ValidCredentials_ReturnsToken() {
+        public async Task SignIn_ValidCredentials_SendsEmailAndReturnsTwoFactorChallenge() {
             // Arrange
             var credentials = new SignInCommand { Email = "test@example.com", Password = "password" };
             var user = new ApplicationUser { Email = credentials.Email, UserName = credentials.Email, NormalizedUserName = credentials.Email };
-            var token = new Token { JWT = "test-jwt-token", RefreshToken = "test-refresh-token" };
 
             _userLoginValidatorMock
                 .Setup(v => v.Validate(It.IsAny<IValidationContext>()))
@@ -104,17 +108,20 @@ namespace ABCD.Application.Tests {
             _signInManagerMock.Setup(s => s.PasswordSignInAsync(credentials.Email, credentials.Password, false, false))
                 .ReturnsAsync(SignInResult.Success);
             _userManagerMock.Setup(m => m.FindByEmailAsync(credentials.Email)).ReturnsAsync(user);
-            _tokenServiceMock.Setup(t => t.GenerateToken(user)).Returns(token);
+            _userManagerMock.Setup(m => m.UpdateAsync(It.IsAny<ApplicationUser>())).ReturnsAsync(IdentityResult.Success);
+            _emailServiceMock.Setup(e => e.SendEmailAsync(credentials.Email, It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(Task.CompletedTask);
 
             // Act
             var result = await _authService.SignIn(credentials);
 
             // Assert
-            Assert.Equal(token.JWT, result.JWT);
-            Assert.Equal(token.RefreshToken, result.RefreshToken);
+            Assert.True(result.RequiresTwoFactor);
+            Assert.Equal(credentials.Email, result.Email);
             _userManagerMock.Verify(m => m.FindByEmailAsync(credentials.Email), Times.Once);
             _userManagerMock.Verify(m => m.UpdateAsync(It.IsAny<ApplicationUser>()), Times.Once);
-            _tokenServiceMock.Verify(m => m.GenerateToken(It.IsAny<ApplicationUser>()), Times.Once);
+            _emailServiceMock.Verify(e => e.SendEmailAsync(credentials.Email, It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            _tokenServiceMock.Verify(m => m.GenerateToken(It.IsAny<ApplicationUser>()), Times.Never);
         }
 
         [Fact]

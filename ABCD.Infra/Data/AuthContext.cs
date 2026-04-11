@@ -23,5 +23,7 @@ namespace ABCD.Infra.Data {
     public class ApplicationUser : IdentityUser {
         public string RefreshToken { get; set; }
         public DateTimeOffset RefreshTokenExpiryTime { get; set; }
+        public string? TwoFactorPin { get; set; }
+        public DateTimeOffset TwoFactorPinExpiry { get; set; }
     }
 }

@@ -26,13 +26,26 @@ namespace ABCD.Server.Controllers {
         public async Task<IActionResult> SignIn(SignInRequest signInRequest) {
             try {
                 var credentials = _mapper.Map<SignInRequest, SignInCommand>(signInRequest);
-                var result = await _authService.SignIn(credentials);
+                var challenge = await _authService.SignIn(credentials);
+                return Ok(new { requiresTwoFactor = challenge.RequiresTwoFactor, email = challenge.Email });
+            } catch (ValidationException ex) {
+                return BadRequest(string.Join(" ", ex.Errors.Select(e => e.ErrorMessage)));
+            } catch (SignInFailedException) {
+                return Unauthorized("Invalid login attempt.");
+            }
+        }
+
+        [HttpPost("verify-2fa")]
+        public async Task<IActionResult> VerifyTwoFactor(VerifyTwoFactorRequest verifyRequest) {
+            try {
+                var command = _mapper.Map<VerifyTwoFactorRequest, VerifyTwoFactorCommand>(verifyRequest);
+                var result = await _authService.VerifyTwoFactor(command);
                 UpdateTokenCookies(result.JWT, result.RefreshToken, 60, 60);
                 return Ok(new { success = true });
             } catch (ValidationException ex) {
                 return BadRequest(string.Join(" ", ex.Errors.Select(e => e.ErrorMessage)));
             } catch (SignInFailedException) {
-                return Unauthorized("Invalid login attempt.");
+                return Unauthorized("Invalid or expired verification code.");
             }
         }
 

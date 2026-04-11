@@ -73,16 +73,14 @@ namespace ABCD.Server.Tests.Controllers {
         }
 
         [Fact]
-        public async Task SignIn_ValidCredentials_ReturnsOk() {
+        public async Task SignIn_ValidCredentials_ReturnsTwoFactorChallenge() {
             // Arrange
             var signInRequest = new SignInRequest { Email = "test@example.com", Password = "password" };
             var credentials = new SignInCommand { Email = "test@example.com", Password = "password" };
-            var jwt = "test-token";
-            var refreshToken = "test-refresh-token";
-            var token = new Token { JWT = jwt, RefreshToken = refreshToken };
+            var challenge = new TwoFactorChallenge { Email = "test@example.com" };
 
             _mapperMock.Setup(m => m.Map<SignInRequest, SignInCommand>(signInRequest)).Returns(credentials);
-            _authServiceMock.Setup(s => s.SignIn(credentials)).ReturnsAsync(token);
+            _authServiceMock.Setup(s => s.SignIn(credentials)).ReturnsAsync(challenge);
 
             // Act
             var result = await _controller.SignIn(signInRequest);
@@ -91,7 +89,7 @@ namespace ABCD.Server.Tests.Controllers {
             _authServiceMock.Verify(s => s.SignIn(credentials), Times.Once);
             var okResult = result as OkObjectResult;
             Assert.NotNull(okResult);
-            Assert.Equivalent(new { success = true }, okResult.Value);
+            Assert.Equivalent(new { requiresTwoFactor = true, email = "test@example.com" }, okResult.Value);
         }
 
         [Fact]
