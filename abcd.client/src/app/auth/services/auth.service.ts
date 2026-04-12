@@ -6,6 +6,7 @@ import { tap, switchMap, catchError } from 'rxjs/operators';
 export interface LoginRequest {
   email: string;
   password: string;
+  recaptchaToken?: string;
 }
 
 export interface LoginResponse {

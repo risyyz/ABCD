@@ -32,40 +32,30 @@
                   </p>
                 }
               </div>
-              <!-- Captcha Checkbox -->
+
+              <!-- Submit Button -->
               <div class="field">
                 <div class="control">
-                  <label class="checkbox">
-                    <input
-                      type="checkbox"
-                      formControlName="captcha"
-                      (change)="onCaptchaChange($any($event.target).checked)">
-                      I am not a robot
-                    </label>
-                  </div>
-                  @if (captcha?.invalid && captcha?.touched) {
-                    <p class="help is-danger">
-                      Please verify that you are human
-                    </p>
-                  }
+                  <button
+                    class="button is-dark-grey is-fullwidth is-medium"
+                    type="submit"
+                    [disabled]="isSignInDisabled()"
+                    [class.is-loading]="isLoading">
+                    <span>Sign In</span>
+                  </button>
                 </div>
+              </div>
+            </form>
 
-                <!-- Submit Button -->
-                <div class="field">
-                  <div class="control">
-                    <button
-                      class="button is-dark-grey is-fullwidth is-medium"
-                      type="submit"
-                      [disabled]="isSignInDisabled()"
-                      [class.is-loading]="isLoading">
-                      <span>Sign In</span>
-                    </button>
-                  </div>
-                </div>
-              </form>
+            <!-- reCAPTCHA Badge Notice -->
+            <div class="has-text-centered is-size-7" style="margin-top: 1rem; color: #666;">
+              This site is protected by reCAPTCHA and the Google
+              <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Privacy Policy</a> and
+              <a href="https://policies.google.com/terms" target="_blank" rel="noopener">Terms of Service</a> apply.
             </div>
           </div>
         </div>
       </div>
     </div>
   </div>
+</div>

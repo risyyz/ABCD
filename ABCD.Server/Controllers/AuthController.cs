@@ -16,15 +16,27 @@ namespace ABCD.Server.Controllers {
     public class AuthController : ControllerBase {
         private readonly IAuthService _authService;
         private readonly ITypeMapper _mapper;
+        private readonly IRecaptchaService _recaptchaService;
 
-        public AuthController(IAuthService authService, ITypeMapper mapper) {
+        public AuthController(IAuthService authService, ITypeMapper mapper, IRecaptchaService recaptchaService) {
             _authService = authService;
             _mapper = mapper;
+            _recaptchaService = recaptchaService;
         }        
 
         [HttpPost("sign-in")]
         public async Task<IActionResult> SignIn(SignInRequest signInRequest) {
             try {
+                // Verify reCAPTCHA token
+                if (string.IsNullOrWhiteSpace(signInRequest.RecaptchaToken)) {
+                    return BadRequest("reCAPTCHA validation is required.");
+                }
+
+                var isValidCaptcha = await _recaptchaService.VerifyTokenAsync(signInRequest.RecaptchaToken);
+                if (!isValidCaptcha) {
+                    return BadRequest("reCAPTCHA verification failed. Please try again.");
+                }
+
                 var credentials = _mapper.Map<SignInRequest, SignInCommand>(signInRequest);
                 var challenge = await _authService.SignIn(credentials);
                 return Ok(new { requiresTwoFactor = challenge.RequiresTwoFactor, email = challenge.Email });

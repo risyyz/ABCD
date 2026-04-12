@@ -71,6 +71,7 @@ builder.Services.Configure<CachingSettings>(builder.Configuration.GetSection(Cac
 builder.Services.Configure<FileUploadSettings>(builder.Configuration.GetSection(FileUploadSettings.SectionName));
 builder.Services.Configure<AiSettings>(builder.Configuration.GetSection(AiSettings.SectionName));
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection(EmailSettings.SectionName));
+builder.Services.Configure<RecaptchaSettings>(builder.Configuration.GetSection("Recaptcha"));
 
 // Add services to the container.
 var connectionString = configuration.GetConnectionString("DefaultConnection");
@@ -103,6 +104,12 @@ builder.Services.AddAuthentication(options => {
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddAuthorization();
+
+// Add HttpClient for reCAPTCHA verification
+builder.Services.AddHttpClient<IRecaptchaService, RecaptchaService>((serviceProvider, client) => {
+    var options = serviceProvider.GetRequiredService<IOptions<RecaptchaSettings>>();
+    return new RecaptchaService(client, options.Value.ProjectId, options.Value.ApiKey, options.Value.ScoreThreshold);
+});
 
 builder.Services.AddControllers();
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterUserCommandValidator>();

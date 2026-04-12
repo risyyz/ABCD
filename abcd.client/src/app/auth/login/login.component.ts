@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { ReCaptchaV3Service } from 'ngx-recaptcha';
 import { AuthService } from '../services/auth.service';
 import { NotificationService } from '../../shared/services/notification.service';
 
@@ -13,13 +14,13 @@ import { NotificationService } from '../../shared/services/notification.service'
 export class LoginComponent implements OnInit {
   loginForm!: FormGroup;
   isLoading = false;
-  isCaptchaChecked = false;
 
   constructor(
     private formBuilder: FormBuilder,
     private authService: AuthService,
     private router: Router,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private recaptchaV3Service: ReCaptchaV3Service
   ) {}
 
   ngOnInit(): void {
@@ -29,8 +30,7 @@ export class LoginComponent implements OnInit {
   private initializeForm(): void {
     this.loginForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required]],
-      captcha: [false, [Validators.requiredTrue]]
+      password: ['', [Validators.required]]
     });
   }
 
@@ -42,15 +42,6 @@ export class LoginComponent implements OnInit {
     return this.loginForm.get('password');
   }
 
-  get captcha() {
-    return this.loginForm.get('captcha');
-  }
-
-  onCaptchaChange(checked: boolean): void {
-    this.isCaptchaChecked = checked;
-    this.loginForm.patchValue({ captcha: checked });
-  }
-
   isSignInDisabled(): boolean {
     return !this.loginForm.valid || this.isLoading;
   }
@@ -58,21 +49,32 @@ export class LoginComponent implements OnInit {
   onSubmit(): void {
     if (this.loginForm.valid) {
       this.isLoading = true;
-      const { email, password } = this.loginForm.value;
+      
+      // Execute reCAPTCHA v3
+      this.recaptchaV3Service.execute('login').subscribe({
+        next: (token: string) => {
+          const { email, password } = this.loginForm.value;
 
-      this.authService.signIn({ email, password }).subscribe({
-        next: (response) => {
-          this.isLoading = false;
-          if (response.requiresTwoFactor) {
-            this.router.navigate(['/auth/verify-pin'], { state: { email: response.email } });
-          } else {
-            this.handleLoginError(response.message || 'Login failed');
-          }
+          this.authService.signIn({ email, password, recaptchaToken: token }).subscribe({
+            next: (response) => {
+              this.isLoading = false;
+              if (response.requiresTwoFactor) {
+                this.router.navigate(['/auth/verify-pin'], { state: { email: response.email } });
+              } else {
+                this.handleLoginError(response.message || 'Login failed');
+              }
+            },
+            error: (error) => {
+              this.isLoading = false;
+              this.handleLoginError('Login failed. Please check your credentials.');
+              console.error('Login error:', error);
+            }
+          });
         },
         error: (error) => {
           this.isLoading = false;
-          this.handleLoginError('Login failed. Please check your credentials.');
-          console.error('Login error:', error);
+          this.handleLoginError('Failed to verify reCAPTCHA. Please try again.');
+          console.error('reCAPTCHA error:', error);
         }
       });
     }
@@ -85,6 +87,5 @@ export class LoginComponent implements OnInit {
 
   private clearForm(): void {
     this.loginForm.reset();
-    this.isCaptchaChecked = false;
   }
 }
