@@ -41,6 +41,17 @@ namespace ABCD.Server.Controllers
             return Ok(response);
         }
 
+        [HttpGet("search")]
+        public async Task<IActionResult> Search([FromQuery] string term, [FromQuery] int? excludePostId)
+        {
+            if (string.IsNullOrWhiteSpace(term) || term.Trim().Length < 3)
+                return Ok(Array.Empty<PostSummaryResponse>());
+
+            var posts = await _postService.SearchAsync(term.Trim(), excludePostId);
+            var response = _typeMapper.Map<IEnumerable<Post>, IEnumerable<PostSummaryResponse>>(posts);
+            return Ok(response);
+        }
+
         [HttpGet("{postId:int}")]
         public async Task<IActionResult> GetPostById([FromRoute] int postId) {
             var post = await _postService.GetByIdAsync(postId);
@@ -58,7 +69,7 @@ namespace ABCD.Server.Controllers
             if (string.IsNullOrWhiteSpace(request?.Version))
                 return BadRequest("Invalid request or missing version.");
 
-            var command = new UpdatePostCommand(postId, request.Title, request.Synopsis, request.PathSegment, request.Version);
+            var command = new UpdatePostCommand(postId, request.Title, request.Synopsis, request.PathSegment, request.ParentPostId, request.Version);
             var result = await _postService.UpdatePostAsync(command);
             var response = _typeMapper.Map<Post, PostDetailResponse>(result);
             return Ok(response);

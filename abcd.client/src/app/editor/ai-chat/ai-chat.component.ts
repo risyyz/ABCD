@@ -1,6 +1,7 @@
 import { Component, ElementRef, ViewChild, AfterViewChecked } from '@angular/core';
 import { Router } from '@angular/router';
 import { AiService, ChatMessage, PostProposal } from '../../services/ai.service';
+import { AuthService } from '../../auth/services/auth.service';
 import { NotificationService } from '../../shared/services/notification.service';
 
 @Component({
@@ -18,11 +19,14 @@ export class AiChatComponent implements AfterViewChecked {
   isGenerating = false;
   isCreating = false;
   postProposal: PostProposal | null = null;
+  showChangePassword = false;
+  showProfileMenu = false;
   private shouldScrollToBottom = false;
 
   constructor(
     private aiService: AiService,
     private router: Router,
+    private authService: AuthService,
     private notificationService: NotificationService
   ) {}
 
@@ -107,5 +111,23 @@ export class AiChatComponent implements AfterViewChecked {
     try {
       this.messageList.nativeElement.scrollTop = this.messageList.nativeElement.scrollHeight;
     } catch { }
+  }
+
+  logout(): void {
+    this.authService.signOut();
+    this.router.navigate(['/auth/login']);
+  }
+
+  toggleProfileMenu(): void {
+    this.showProfileMenu = !this.showProfileMenu;
+  }
+
+  openChangePassword(): void {
+    this.showProfileMenu = false;
+    this.showChangePassword = true;
+  }
+
+  closeChangePassword(): void {
+    this.showChangePassword = false;
   }
 }

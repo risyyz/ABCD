@@ -7,5 +7,5 @@
 
     public record UpdateFragmentCommand(int PostId, int FragmentId, string Content, string Version);
 
-    public record UpdatePostCommand(int PostId, string Title, string Synopsis, string PathSegment, string Version);
+    public record UpdatePostCommand(int PostId, string Title, string Synopsis, string PathSegment, int? ParentPostId, string Version);
 }

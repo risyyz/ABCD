@@ -26,13 +26,26 @@ namespace ABCD.Server.Controllers {
         public async Task<IActionResult> SignIn(SignInRequest signInRequest) {
             try {
                 var credentials = _mapper.Map<SignInRequest, SignInCommand>(signInRequest);
-                var result = await _authService.SignIn(credentials);
+                var challenge = await _authService.SignIn(credentials);
+                return Ok(new { requiresTwoFactor = challenge.RequiresTwoFactor, email = challenge.Email });
+            } catch (ValidationException ex) {
+                return BadRequest(string.Join(" ", ex.Errors.Select(e => e.ErrorMessage)));
+            } catch (SignInFailedException) {
+                return Unauthorized("Invalid login attempt.");
+            }
+        }
+
+        [HttpPost("verify-2fa")]
+        public async Task<IActionResult> VerifyTwoFactor(VerifyTwoFactorRequest verifyRequest) {
+            try {
+                var command = _mapper.Map<VerifyTwoFactorRequest, VerifyTwoFactorCommand>(verifyRequest);
+                var result = await _authService.VerifyTwoFactor(command);
                 UpdateTokenCookies(result.JWT, result.RefreshToken, 60, 60);
                 return Ok(new { success = true });
             } catch (ValidationException ex) {
                 return BadRequest(string.Join(" ", ex.Errors.Select(e => e.ErrorMessage)));
             } catch (SignInFailedException) {
-                return Unauthorized("Invalid login attempt.");
+                return Unauthorized("Invalid or expired verification code.");
             }
         }
 
@@ -97,6 +110,38 @@ namespace ABCD.Server.Controllers {
             // If we reach here, the user is authenticated (JWT from cookie is valid)
             var email = User.Identity?.Name;
             return Ok(new { isAuthenticated = true, email });
+        }
+
+        [Authorize]
+        [HttpPost("password")]
+        public async Task<IActionResult> RequestPasswordChangePin() {
+            var email = User.Identity?.Name;
+            if (string.IsNullOrWhiteSpace(email))
+                return Unauthorized();
+
+            try {
+                await _authService.SendPasswordChangePinAsync(email);
+                return Ok(new { success = true });
+            } catch (Exception) {
+                return BadRequest("Failed to send verification code.");
+            }
+        }
+
+        [Authorize]
+        [HttpPut("password")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request) {
+            var email = User.Identity?.Name;
+            if (string.IsNullOrWhiteSpace(email))
+                return Unauthorized();
+
+            try {
+                await _authService.ChangePasswordWithPinAsync(email, request.Pin, request.NewPassword);
+                return Ok(new { success = true });
+            } catch (SignInFailedException) {
+                return BadRequest("Invalid or expired verification code.");
+            } catch (InvalidOperationException ex) {
+                return BadRequest(ex.Message);
+            }
         }
 
         private void UpdateTokenCookies(string jwt, string refreshToken, int jwtExpiryMinutes, int refreshTokenExpiryMinutes) {

@@ -5,6 +5,14 @@ import { Post } from '../editor/models/post.model';
 import { MoveFragmentRequest } from '../editor/models/move-fragment-request.model'; 
 import { FragmentUpdateRequest } from '../editor/models/fragment-update-request.model';
 
+export interface EditorPostSummary {
+  postId: number;
+  title: string;
+  status: string;
+  pathSegment?: string;
+  dateLastPublished?: string;
+}
+
 export interface PostSummary {
   postId: number;
   title: string;
@@ -34,8 +42,8 @@ export class PostService {
   [x: string]: any;
   constructor(private http: HttpClient) {}
 
-  getPosts(): Observable<any[]> {
-    return this.http.get<any[]>('/api/posts');
+  getPosts(): Observable<EditorPostSummary[]> {
+    return this.http.get<EditorPostSummary[]>('/api/posts');
   }
 
   getPost(postId: number): Observable<Post> {
@@ -78,10 +86,16 @@ export class PostService {
     return this.http.post<ImageUploadResponse>(`/api/file/posts/${postId}/image`, formData);
   }
 
-  savePost(request: Post): Observable<Post> {
+  savePost(request: Post, parentPostId: number | null = request.parent?.postId ?? null): Observable<Post> {
     return this.http.put<Post>(
       `/api/posts/${request.postId}`,
-      { title: request.title, synopsis: request.synopsis, pathSegment: request.pathSegment, version: request.version }
+      {
+        title: request.title,
+        synopsis: request.synopsis,
+        pathSegment: request.pathSegment,
+        parentPostId,
+        version: request.version
+      }
     );
   }
 
@@ -98,5 +112,13 @@ export class PostService {
 
   getPublishedPost(pathSegment: string): Observable<PublicPostDetail> {
     return this.http.get<PublicPostDetail>(`/api/public/posts/${pathSegment}`);
+  }
+
+  searchPosts(term: string, excludePostId?: number): Observable<EditorPostSummary[]> {
+    let url = `/api/posts/search?term=${encodeURIComponent(term)}`;
+    if (excludePostId != null) {
+      url += `&excludePostId=${excludePostId}`;
+    }
+    return this.http.get<EditorPostSummary[]>(url);
   }
 }

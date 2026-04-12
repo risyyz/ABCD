@@ -1,5 +1,12 @@
 import { Fragment } from './fragment.model';
 
+export interface ParentPost {
+  postId: number;
+  title: string;
+  pathSegment?: string;
+  status: string;
+}
+
 export class Post {
   postId: number;
   title: string;
@@ -7,6 +14,7 @@ export class Post {
   dateLastPublished?: string;
   pathSegment?: string;
   synopsis?: string;
+  parent?: ParentPost | null;
   version: string = '';
   canPublish: boolean = false;
   publishReasons: string[] = [];

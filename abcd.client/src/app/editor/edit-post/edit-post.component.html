@@ -1,14 +1,33 @@
 @if (post) {
   <div class="container">
-    <div class="is-flex is-align-items-center is-justify-content-space-between">
-      <h2 class="title">Edit Post</h2>
-      @if (post.status === 'Draft') {
-        <button type="button" class="button is-dark-grey" style="margin-left:auto;" [disabled]="!post.canPublish" [title]="post.canPublish ? '' : post.publishReasons.join('\n')" (click)="onToggleStatus()">Publish</button>
-      }
-      @if (post.status === 'Published') {
-        <button type="button" class="button is-dark-grey" style="margin-left:auto;" (click)="onToggleStatus()">Convert to Draft</button>
-      }
-    </div>
+    <nav class="navbar" role="navigation" aria-label="main navigation">
+      <div class="navbar-brand">
+        <a class="navbar-item is-size-4" [routerLink]="['/editor/dashboard']" title="Dashboard">
+          Dashboard
+        </a>
+      </div>
+      <div class="navbar-menu">
+        <div class="navbar-end">
+          <a class="navbar-item" [routerLink]="['/editor/ai-chat']" title="AI Post Assistant">
+            AI Assistant
+          </a>
+          <div class="navbar-item has-dropdown" [class.is-active]="showProfileMenu">
+            <a class="navbar-link" (click)="toggleProfileMenu()">
+              Profile
+            </a>
+            <div class="navbar-dropdown is-right">
+              <a class="navbar-item" (click)="openChangePassword()">
+                Change Password
+              </a>
+              <hr class="navbar-divider">
+              <a class="navbar-item" (click)="logout()">
+                Logout
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
     <main class="section">
       <div class="columns is-centered">
         <div class="column is-10">
@@ -19,7 +38,8 @@
               </div>
             }
             <div class="content">
-              <div class="is-flex is-justify-content-flex-end" style="margin-bottom: 1rem;">
+              <h2 class="title">Edit Post</h2>
+              <div class="is-flex is-align-items-center is-justify-content-flex-end" style="margin-bottom: 1rem;">
                 <span class="has-text-right has-text-grey">
                   @if (post.dateLastPublished) {
                     <span>
@@ -30,6 +50,16 @@
                     <span class="is-size-7">v{{ post.version }}</span>
                   }
                 </span>
+                @if (post.status === 'Draft') {
+                  <a class="ml-3" [class.is-disabled]="!post.canPublish" [title]="post.canPublish ? '' : post.publishReasons.join('\n')" (click)="post.canPublish && onToggleStatus()">
+                    Publish
+                  </a>
+                }
+                @if (post.status === 'Published') {
+                  <a class="ml-3" (click)="onToggleStatus()">
+                    Convert to Draft
+                  </a>
+                }
               </div>
               <app-editable-generic
                 [isEditing]="isHeaderEditing"
@@ -54,6 +84,26 @@
                     <input class="input is-medium with-floating-label" placeholder=" " id="pathSegment" type="text" [(ngModel)]="post.pathSegment" name="pathSegment" required maxlength="250" #editableControl [disabled]="!isHeaderEditing" />
                     <label class="label is-floating-label" for="pathSegment">Path Segment</label>
                   </div>
+                </div>
+                <div class="field">
+                  <div class="control has-floating-label">
+                    <app-post-autocomplete
+                      [selectedPostId]="selectedParentPostId"
+                      [excludePostId]="post.postId"
+                      [initialDisplayText]="parentDisplayText"
+                      [disabled]="!isHeaderEditing"
+                      (selectedPostIdChange)="selectedParentPostId = $event.postId; parentDisplayText = $event.displayText">
+                    </app-post-autocomplete>
+                    <label class="label is-floating-label">
+                      Parent Post
+                      @if (selectedParentPostId != null) {
+                        <a [routerLink]="['/editor/edit', selectedParentPostId]" target="_blank" title="Open parent post in new tab" class="has-text-link">
+                          <i class="fas fa-external-link-alt" style="font-size: 0.7rem;"></i>
+                        </a>
+                      }
+                    </label>
+                  </div>
+                  <p class="help">Optional. Choose a parent to place this post in a series or trail.</p>
                 </div>
               </app-editable-generic>
               @if (post.fragments.length === 0) {
@@ -109,5 +159,9 @@
         </div>
       </div>
     </main>
+
+    @if (showChangePassword) {
+      <app-change-password-dialog (close)="closeChangePassword()"></app-change-password-dialog>
+    }
   </div>
 }

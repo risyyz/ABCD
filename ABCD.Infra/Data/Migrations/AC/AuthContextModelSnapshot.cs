@@ -77,6 +77,12 @@ namespace ABCD.Infra.Data.Migrations.AC
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 
+                    b.Property<string>("TwoFactorPin")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset>("TwoFactorPinExpiry")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");

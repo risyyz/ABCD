@@ -70,6 +70,7 @@ builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection(JwtSett
 builder.Services.Configure<CachingSettings>(builder.Configuration.GetSection(CachingSettings.SectionName));
 builder.Services.Configure<FileUploadSettings>(builder.Configuration.GetSection(FileUploadSettings.SectionName));
 builder.Services.Configure<AiSettings>(builder.Configuration.GetSection(AiSettings.SectionName));
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection(EmailSettings.SectionName));
 
 // Add services to the container.
 var connectionString = configuration.GetConnectionString("DefaultConnection");
@@ -118,9 +119,20 @@ builder.Services.AddScoped<IValidator<RegisterUserCommand>, RegisterUserCommandV
 builder.Services.AddScoped<IValidator<SignInCommand>, SignInCommandValidator>();
 builder.Services.AddScoped<SecurityTokenHandler, JwtSecurityTokenHandler>();
 
+
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+// Register the proper email service based on environment
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddScoped<IEmailService, DropFolderEmailService>();
+}
+else
+{
+    builder.Services.AddScoped<IEmailService, SmtpEmailService>();
+}
+
 builder.Services.AddScoped<BearerTokenReader>();
 
 builder.Services.AddScoped<RequestContextAccessor>();
@@ -146,6 +158,12 @@ config.NewConfig<Fragment, FragmentResponse>()
     .Map(dest => dest.FragmentType, src => src.FragmentType.ToString())
     .Map(dest => dest.Content, src => src.Content != null ? src.Content : null)
     .Map(dest => dest.Position, src => src.Position);
+
+config.NewConfig<Post, PostParentResponse>()
+    .Map(dest => dest.PostId, src => src.PostId != null ? src.PostId.Value : 0)
+    .Map(dest => dest.Title, src => src.Title)
+    .Map(dest => dest.PathSegment, src => src.PathSegment != null ? src.PathSegment.Value : null)
+    .Map(dest => dest.Status, src => src.Status.ToString());
 
 config.NewConfig<Post, PostDetailResponse>()
 .Map(dest => dest.PostId, src => src.PostId != null ? src.PostId.Value : 0)
