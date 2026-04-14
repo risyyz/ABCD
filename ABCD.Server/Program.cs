@@ -106,10 +106,12 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddAuthorization();
 
 // Add HttpClient for reCAPTCHA verification
-builder.Services.AddHttpClient<IRecaptchaService, RecaptchaService>((serviceProvider, client) => {
-    var options = serviceProvider.GetRequiredService<IOptions<RecaptchaSettings>>();
-    return new RecaptchaService(client, options.Value.ProjectId, options.Value.ApiKey, options.Value.ScoreThreshold);
-});
+// ✅ Register settings first
+builder.Services.Configure<RecaptchaSettings>(
+    builder.Configuration.GetSection("Recaptcha"));
+
+// ✅ Use AddHttpClient with the correct delegate signature
+builder.Services.AddHttpClient<IRecaptchaService, RecaptchaService>();
 
 builder.Services.AddControllers();
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterUserCommandValidator>();

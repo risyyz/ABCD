@@ -27,12 +27,8 @@ namespace ABCD.Server.Controllers {
         [HttpPost("sign-in")]
         public async Task<IActionResult> SignIn(SignInRequest signInRequest) {
             try {
-                // Verify reCAPTCHA token
-                if (string.IsNullOrWhiteSpace(signInRequest.RecaptchaToken)) {
-                    return BadRequest("reCAPTCHA validation is required.");
-                }
-
-                var isValidCaptcha = await _recaptchaService.VerifyTokenAsync(signInRequest.RecaptchaToken);
+                // Verify reCAPTCHA token (skipped when not configured)
+                var isValidCaptcha = await _recaptchaService.VerifyTokenAsync(signInRequest.RecaptchaToken ?? string.Empty);
                 if (!isValidCaptcha) {
                     return BadRequest("reCAPTCHA verification failed. Please try again.");
                 }

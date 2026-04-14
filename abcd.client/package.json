@@ -27,7 +27,6 @@
     "monaco-editor": "^0.55.1",
     "ngx-editor": "^19.0.0-beta.1",
     "ngx-monaco-editor-v2": "^21.1.4",
-    "ngx-recaptcha": "^14.0.0",
     "run-script-os": "*",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",

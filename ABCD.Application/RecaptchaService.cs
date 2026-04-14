@@ -1,6 +1,9 @@
 using System.Net.Http.Json;
-using System.Text.Json;
 using System.Text.Json.Serialization;
+
+using ABCD.Lib;
+
+using Microsoft.Extensions.Options;
 
 namespace ABCD.Application {
     public interface IRecaptchaService {
@@ -9,69 +12,53 @@ namespace ABCD.Application {
 
     public class RecaptchaService : IRecaptchaService {
         private readonly HttpClient _httpClient;
-        private readonly string _projectId;
-        private readonly string _apiKey;
-        private readonly float _scoreThreshold;
+        private readonly RecaptchaSettings _settings;
 
-        public RecaptchaService(HttpClient httpClient, string projectId, string apiKey, float scoreThreshold = 0.5f) {
+        public RecaptchaService(HttpClient httpClient, IOptions<RecaptchaSettings> settings) {
             _httpClient = httpClient;
-            _projectId = projectId;
-            _apiKey = apiKey;
-            _scoreThreshold = scoreThreshold;
-
-            if (string.IsNullOrEmpty(projectId)) {
-                throw new ArgumentException("reCAPTCHA Enterprise Project ID is required", nameof(projectId));
-            }
-
-            if (string.IsNullOrEmpty(apiKey)) {
-                throw new ArgumentException("reCAPTCHA Enterprise API Key is required", nameof(apiKey));
-            }
+            _settings = settings.Value;
         }
 
         public async Task<bool> VerifyTokenAsync(string token) {
+            if (string.IsNullOrWhiteSpace(_settings.ApiKey) || _settings.ApiKey.StartsWith("your", StringComparison.OrdinalIgnoreCase)) {
+                return true;
+            }
+
             if (string.IsNullOrWhiteSpace(token)) {
                 return false;
             }
 
             try {
-                var assessmentUrl = $"https://recaptchaenterprise.googleapis.com/v1/projects/{_projectId}/assessments?key={_apiKey}";
-                var requestBody = new {
-                    @event = new {
-                        token,
-                        expectedAction = "login"
-                    }
-                };
+                var parameters = new FormUrlEncodedContent([
+                    new KeyValuePair<string, string>("secret", _settings.ApiKey),
+                    new KeyValuePair<string, string>("response", token)
+                ]);
 
-                using var content = new StringContent(
-                    JsonSerializer.Serialize(requestBody),
-                    System.Text.Encoding.UTF8,
-                    "application/json"
-                );
-
-                var response = await _httpClient.PostAsync(assessmentUrl, content);
+                var response = await _httpClient.PostAsync("https://www.google.com/recaptcha/api/siteverify", parameters);
                 if (!response.IsSuccessStatusCode) {
                     return false;
                 }
 
-                var result = await response.Content.ReadFromJsonAsync<EnterpriseAssessmentResponse>();
-                if (result?.RiskAnalysis == null) {
+                var result = await response.Content.ReadFromJsonAsync<SiteVerifyResponse>();
+                if (result == null || !result.Success) {
                     return false;
                 }
 
-                return result.RiskAnalysis.Score >= _scoreThreshold;
+                return result.Score >= _settings.ScoreThreshold;
             } catch {
                 return false;
             }
         }
 
-        private sealed class EnterpriseAssessmentResponse {
-            [JsonPropertyName("riskAnalysis")]
-            public RiskAnalysis? RiskAnalysis { get; set; }
-        }
+        private sealed class SiteVerifyResponse {
+            [JsonPropertyName("success")]
+            public bool Success { get; set; }
 
-        private sealed class RiskAnalysis {
             [JsonPropertyName("score")]
             public float Score { get; set; }
+
+            [JsonPropertyName("action")]
+            public string Action { get; set; } = string.Empty;
         }
     }
 }

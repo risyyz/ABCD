@@ -1,6 +1,5 @@
-namespace ABCD.Server.Models {
+namespace ABCD.Lib {
     public class RecaptchaSettings {
-        public string ProjectId { get; set; } = string.Empty;
         public string ApiKey { get; set; } = string.Empty;
         public float ScoreThreshold { get; set; } = 0.5f;
     }

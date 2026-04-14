@@ -16,19 +16,23 @@ using Moq;
 namespace ABCD.Server.Tests.Controllers {
     public class AuthControllerTests {
         private readonly Mock<IAuthService> _authServiceMock;
+        private readonly Mock<IRecaptchaService> _recaptchaServiceMock;
         private readonly Mock<ITypeMapper> _mapperMock;
         private readonly Mock<BearerTokenReader> _tokenReaderMock;
         private readonly AuthController _controller;
 
         public AuthControllerTests() {
             _authServiceMock = new Mock<IAuthService>();
+            _recaptchaServiceMock = new Mock<IRecaptchaService>();
             _mapperMock = new Mock<ITypeMapper>();
             _tokenReaderMock = new Mock<BearerTokenReader>(Mock.Of<IHttpContextAccessor>());
-            _controller = new AuthController(_authServiceMock.Object, _mapperMock.Object);
+            _controller = new AuthController(_authServiceMock.Object, _mapperMock.Object, _recaptchaServiceMock.Object);
 
             _controller.ControllerContext = new ControllerContext {
                 HttpContext = new DefaultHttpContext()
             };
+
+            _recaptchaServiceMock.Setup(r => r.VerifyTokenAsync(It.IsAny<string>())).ReturnsAsync(true);
         }
 
         [Fact]

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ReCaptchaV3Service } from 'ngx-recaptcha';
+import { RecaptchaService } from '../services/recaptcha.service';
 import { AuthService } from '../services/auth.service';
 import { NotificationService } from '../../shared/services/notification.service';
 
@@ -20,7 +20,7 @@ export class LoginComponent implements OnInit {
     private authService: AuthService,
     private router: Router,
     private notificationService: NotificationService,
-    private recaptchaV3Service: ReCaptchaV3Service
+    private recaptchaService: RecaptchaService
   ) {}
 
   ngOnInit(): void {
@@ -51,7 +51,7 @@ export class LoginComponent implements OnInit {
       this.isLoading = true;
       
       // Execute reCAPTCHA v3
-      this.recaptchaV3Service.execute('login').subscribe({
+      this.recaptchaService.execute('login').subscribe({
         next: (token: string) => {
           const { email, password } = this.loginForm.value;
 
