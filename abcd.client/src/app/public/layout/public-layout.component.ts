@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-public-layout',
@@ -9,6 +10,8 @@ import { Router } from '@angular/router';
 })
 export class PublicLayoutComponent {
   searchQuery = '';
+  buildNumber = environment.buildNumber;
+  lastPublished = environment.lastPublished;
 
   constructor(private router: Router) {}
 
