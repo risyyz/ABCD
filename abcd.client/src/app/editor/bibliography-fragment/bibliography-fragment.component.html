@@ -1,0 +1,66 @@
+<div class="bibliography-fragment-wrapper">
+  <div class="bibliography-entries">
+    <div *ngFor="let entry of editableBibliography.entries; let i = index; trackBy: trackByIndex" class="bibliography-entry">
+      <div class="entry-header">
+        <h4 class="entry-title">Reference {{ entry.referenceNumber }}</h4>
+        <div class="entry-actions" *ngIf="isEditing">
+          <button 
+            type="button" 
+            class="button is-small is-info is-outlined"
+            (click)="editEntry(i)"
+            title="Edit this reference">
+            <span class="icon is-small">
+              <i class="fas fa-edit"></i>
+            </span>
+          </button>
+          <button 
+            *ngIf="editableBibliography.entries.length > 1"
+            type="button" 
+            class="button is-small is-danger is-outlined"
+            (click)="removeEntry(i)"
+            title="Delete this reference">
+            <span class="icon is-small">
+              <i class="fas fa-trash"></i>
+            </span>
+          </button>
+        </div>
+      </div>
+
+      <div class="entry-content">
+        <p *ngIf="entry.authors && entry.authors.length > 0">
+          <strong>Authors:</strong> {{ formatAuthors(entry.authors) }}
+        </p>
+        <p *ngIf="entry.year">
+          <strong>Year:</strong> {{ entry.year }}
+        </p>
+        <p *ngIf="entry.title">
+          <strong>Title:</strong> <em>{{ entry.title }}</em>
+        </p>
+        <p *ngIf="entry.publisherOrJournal">
+          <strong>Publisher/Journal:</strong> {{ entry.publisherOrJournal }}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="isEditing" class="field mt-4">
+    <button
+      type="button"
+      class="button is-primary is-outlined"
+      (click)="addEntry()">
+      <span class="icon">
+        <i class="fas fa-plus"></i>
+      </span>
+      <span>Add Reference</span>
+    </button>
+  </div>
+</div>
+
+<app-bibliography-entry-dialog
+  *ngIf="showDialog"
+  [entry]="editingEntry"
+  [maxReferenceNumber]="maxReferenceNumber"
+  (save)="onDialogSave($event)"
+  (close)="closeDialog()">
+</app-bibliography-entry-dialog>
+

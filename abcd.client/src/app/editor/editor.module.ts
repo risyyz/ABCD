@@ -13,6 +13,8 @@ import { NgxEditorModule } from 'ngx-editor';
 import { ImageFragmentComponent } from './image-fragment/image-fragment.component';
 import { TableFragmentComponent } from './table-fragment/table-fragment.component';
 import { CodeFragmentComponent } from './code-fragment/code-fragment.component';
+import { BibliographyFragmentComponent } from './bibliography-fragment/bibliography-fragment.component';
+import { BibliographyEntryDialogComponent } from './bibliography-entry-dialog/bibliography-entry-dialog.component';
 import { AiChatComponent } from './ai-chat/ai-chat.component';
 import { MonacoEditorModule } from 'ngx-monaco-editor-v2';
 import { PostAutocompleteComponent } from './post-autocomplete/post-autocomplete.component';
@@ -21,6 +23,8 @@ import { ChangePasswordDialogComponent } from '../auth/change-password-dialog/ch
 @NgModule({
   declarations: [
     AiChatComponent,
+    BibliographyFragmentComponent,
+    BibliographyEntryDialogComponent,
     CodeFragmentComponent,
     DashboardComponent,
     EditPostComponent,

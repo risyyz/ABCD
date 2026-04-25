@@ -1,0 +1,71 @@
+.bibliography-divider {
+  margin: 3.5rem 0 1rem 0;
+  border: none;
+  border-top: 2px solid #dbdbdb;
+}
+
+.bibliography-section {
+  margin: 0 0 2rem 0;
+  padding: 1.5rem;
+  background-color: #fafafa;
+
+  .bibliography-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    color: #363636;
+  }
+
+  .bibliography-list {
+    list-style: none;
+    counter-reset: reference-counter;
+    padding-left: 0;
+
+    .bibliography-entry {
+      margin-bottom: 1.25rem;
+      line-height: 1.6;
+      padding-left: 2.5rem;
+      position: relative;
+      color: #4a4a4a;
+      font-size: 0.85rem;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      .reference-number {
+        position: absolute;
+        left: 0;
+        font-weight: 700;
+        font-size: 0.85rem;
+      }
+
+      .authors {
+        font-weight: normal;
+        margin-right: 0.25rem;
+        font-size: 0.85rem;
+      }
+
+      .year {
+        margin-right: 0.25rem;
+        font-size: 0.85rem;
+      }
+
+      .title {
+        margin-right: 0.25rem;
+        font-style: italic;
+        font-weight: normal;
+        font-size: 0.85rem;
+      }
+
+      .publisher {
+        font-size: 0.85rem;
+        color: #7a7a7a;
+      }
+
+      span {
+        display: inline;
+      }
+    }
+  }
+}

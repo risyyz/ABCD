@@ -1,0 +1,13 @@
+<hr class="bibliography-divider">
+<div class="bibliography-section">
+  <h3 class="bibliography-title">References</h3>
+  <ol class="bibliography-list">
+    <li *ngFor="let entry of bibliography.entries" class="bibliography-entry">
+      <span class="reference-number">[{{ entry.referenceNumber }}]</span>
+      <span class="authors" *ngIf="formatAuthors(entry.authors)">{{ formatAuthors(entry.authors) }}.</span>
+      <span class="title" *ngIf="entry.title">"{{ entry.title }}".</span>
+      <span class="publisher" *ngIf="entry.publisherOrJournal">{{ entry.publisherOrJournal }}.</span>
+      <span class="year" *ngIf="entry.year">({{ entry.year }}).</span>
+    </li>
+  </ol>
+</div>

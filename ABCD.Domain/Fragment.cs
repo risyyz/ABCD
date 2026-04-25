@@ -9,6 +9,7 @@ public enum FragmentType
     Table,
     Image,  
     RichText,
+    Bibliography,
 }
 
 public class Fragment 

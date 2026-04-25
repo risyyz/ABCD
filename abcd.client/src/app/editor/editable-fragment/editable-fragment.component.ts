@@ -5,6 +5,7 @@ import { CodeFragmentComponent } from '../code-fragment/code-fragment.component'
 import { RichTextFragmentComponent } from '../rich-text-fragment/rich-text-fragment.component';
 import { ImageFragmentComponent } from '../image-fragment/image-fragment.component';
 import { TableFragmentComponent } from '../table-fragment/table-fragment.component';
+import { BibliographyFragmentComponent } from '../bibliography-fragment/bibliography-fragment.component';
 
 @Component({
   selector: 'app-editable-fragment',
@@ -17,6 +18,7 @@ export class EditableFragmentComponent implements AfterContentInit {
   @ContentChild(RichTextFragmentComponent) richTextFragmentComp?: IFragmentComponent;
   @ContentChild(ImageFragmentComponent) imageFragmentComp?: IFragmentComponent;
   @ContentChild(TableFragmentComponent) tableFragmentComp?: IFragmentComponent;
+  @ContentChild(BibliographyFragmentComponent) bibliographyFragmentComp?: IFragmentComponent;
 
   @Input() fragmentId!: number;
   @Input() position!: number;
@@ -117,7 +119,8 @@ export class EditableFragmentComponent implements AfterContentInit {
       this.codeFragmentComp ||
       this.richTextFragmentComp ||
       this.imageFragmentComp ||
-      this.tableFragmentComp
+      this.tableFragmentComp ||
+      this.bibliographyFragmentComp
     );
   }
 }

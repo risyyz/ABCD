@@ -12,6 +12,7 @@ import { PublicCodeFragmentComponent } from './fragments/public-code-fragment.co
 import { PublicRichTextFragmentComponent } from './fragments/public-richtext-fragment.component';
 import { PublicImageFragmentComponent } from './fragments/public-image-fragment.component';
 import { PublicTableFragmentComponent } from './fragments/public-table-fragment.component';
+import { PublicBibliographyFragmentComponent } from './fragments/public-bibliography-fragment.component';
 
 @NgModule({
   declarations: [
@@ -24,7 +25,8 @@ import { PublicTableFragmentComponent } from './fragments/public-table-fragment.
     PublicCodeFragmentComponent,
     PublicRichTextFragmentComponent,
     PublicImageFragmentComponent,
-    PublicTableFragmentComponent
+    PublicTableFragmentComponent,
+    PublicBibliographyFragmentComponent
   ],
   imports: [
     CommonModule,

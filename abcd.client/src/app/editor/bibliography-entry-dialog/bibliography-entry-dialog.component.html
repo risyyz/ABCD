@@ -1,0 +1,105 @@
+<div class="modal is-active">
+  <div class="modal-background" (click)="onClose()"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">{{ entry ? 'Edit' : 'Add' }} Bibliography Reference</p>
+      <button class="delete" aria-label="close" (click)="onClose()"></button>
+    </header>
+    <section class="modal-card-body">
+      <div class="field">
+        <label class="label">Reference Number <span class="has-text-danger">*</span></label>
+        <div class="control">
+          <input
+            type="number"
+            class="input"
+            [(ngModel)]="editingEntry.referenceNumber"
+            placeholder="1"
+            min="1"
+            required
+          />
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label">Authors <span class="has-text-danger">*</span></label>
+        <div *ngFor="let author of editingEntry.authors; let i = index; trackBy: trackByIndex" class="field has-addons mb-2">
+          <div class="control is-expanded">
+            <input
+              type="text"
+              class="input"
+              [(ngModel)]="editingEntry.authors[i]"
+              placeholder="Author name"
+              required
+            />
+          </div>
+          <div class="control">
+            <button
+              type="button"
+              class="button is-danger is-outlined"
+              (click)="removeAuthor(i)"
+              [disabled]="editingEntry.authors.length === 1"
+              title="Remove author">
+              <span class="icon is-small">
+                <i class="fas fa-minus"></i>
+              </span>
+            </button>
+          </div>
+        </div>
+        <button
+          type="button"
+          class="button is-small is-info is-outlined"
+          (click)="addAuthor()">
+          <span class="icon is-small">
+            <i class="fas fa-plus"></i>
+          </span>
+          <span>Add Author</span>
+        </button>
+      </div>
+
+      <div class="field">
+        <label class="label">Year of Publication <span class="has-text-danger">*</span></label>
+        <div class="control">
+          <input
+            type="number"
+            class="input"
+            [(ngModel)]="editingEntry.year"
+            placeholder="2025"
+            min="1000"
+            max="9999"
+            required
+          />
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label">Title <span class="has-text-danger">*</span></label>
+        <div class="control">
+          <input
+            type="text"
+            class="input"
+            [(ngModel)]="editingEntry.title"
+            placeholder="Title of article or book"
+            required
+          />
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label">Publisher / Journal <span class="has-text-danger">*</span></label>
+        <div class="control">
+          <input
+            type="text"
+            class="input"
+            [(ngModel)]="editingEntry.publisherOrJournal"
+            placeholder="Publisher or journal name"
+            required
+          />
+        </div>
+      </div>
+    </section>
+    <footer class="modal-card-foot">
+      <button class="button is-success" [disabled]="!isValid" (click)="onSave()">Save</button>
+      <button class="button" (click)="onClose()">Cancel</button>
+    </footer>
+  </div>
+</div>
