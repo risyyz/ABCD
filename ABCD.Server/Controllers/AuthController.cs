@@ -18,13 +18,13 @@ namespace ABCD.Server.Controllers {
         private readonly IAuthService _authService;
         private readonly ITypeMapper _mapper;
         private readonly IRecaptchaService _recaptchaService;
-        private readonly AuthCookieSettings _cookieSettings;
+        private readonly JwtSettings _jwtSettings;
 
-        public AuthController(IAuthService authService, ITypeMapper mapper, IRecaptchaService recaptchaService, IOptions<AuthCookieSettings> cookieSettings) {
+        public AuthController(IAuthService authService, ITypeMapper mapper, IRecaptchaService recaptchaService, IOptions<JwtSettings> jwtSettings) {
             _authService = authService;
             _mapper = mapper;
             _recaptchaService = recaptchaService;
-            _cookieSettings = cookieSettings.Value;
+            _jwtSettings = jwtSettings.Value;
         }
 
         [HttpPost("sign-in")]
@@ -51,7 +51,7 @@ namespace ABCD.Server.Controllers {
             try {
                 var command = _mapper.Map<VerifyTwoFactorRequest, VerifyTwoFactorCommand>(verifyRequest);
                 var result = await _authService.VerifyTwoFactor(command);
-                UpdateTokenCookies(result.JWT, result.RefreshToken, _cookieSettings.AccessTokenExpiryInMinutes, _cookieSettings.RefreshTokenExpiryInMinutes);
+                UpdateTokenCookies(result.JWT, result.RefreshToken, _jwtSettings.TokenExpiryInMinutes, _jwtSettings.RefreshTokenExpiryInMinutes);
                 return Ok(new { success = true });
             } catch (ValidationException ex) {
                 return BadRequest(string.Join(" ", ex.Errors.Select(e => e.ErrorMessage)));
@@ -105,7 +105,7 @@ namespace ABCD.Server.Controllers {
                 };
 
                 var result = await _authService.RefreshToken(tokenRefreshCommand);
-                UpdateTokenCookies(result.JWT, result.RefreshToken, _cookieSettings.AccessTokenExpiryInMinutes, _cookieSettings.RefreshTokenExpiryInMinutes);
+                UpdateTokenCookies(result.JWT, result.RefreshToken, _jwtSettings.TokenExpiryInMinutes, _jwtSettings.RefreshTokenExpiryInMinutes);
 
                 return Ok(new { success = true });
             } catch (ValidationException ex) {

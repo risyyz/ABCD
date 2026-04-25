@@ -27,8 +27,8 @@ namespace ABCD.Server.Tests.Controllers {
             _recaptchaServiceMock = new Mock<IRecaptchaService>();
             _mapperMock = new Mock<ITypeMapper>();
             _tokenReaderMock = new Mock<BearerTokenReader>(Mock.Of<IHttpContextAccessor>());
-            var cookieSettings = Options.Create(new AuthCookieSettings { AccessTokenExpiryInMinutes = 60, RefreshTokenExpiryInMinutes = 60 });
-            _controller = new AuthController(_authServiceMock.Object, _mapperMock.Object, _recaptchaServiceMock.Object, cookieSettings);
+            var jwtSettings = Options.Create(new JwtSettings { TokenExpiryInMinutes = 600, RefreshTokenExpiryInMinutes = 600 });
+            _controller = new AuthController(_authServiceMock.Object, _mapperMock.Object, _recaptchaServiceMock.Object, jwtSettings);
 
             _controller.ControllerContext = new ControllerContext {
                 HttpContext = new DefaultHttpContext()
